@@ -3,7 +3,7 @@ ordem: 2
 frase: App de estudo e rotina em pixel art, offline-first, que mostra uma missão por vez.
 status: aberto
 statusTexto: Código aberto (MIT) · uso pessoal diário
-statusDetalhe: Ainda faltam testes no iPhone real, a IA não foi testada com chave real e não há CI.
+statusDetalhe: Em uso diário. Faltam testes no iPhone, IA com chave real e CI.
 papel: Projeto pessoal, do design à infraestrutura
 periodo: "2026"
 stack: [TypeScript, React 19, Vite, Dexie (IndexedDB), Zustand, Fastify 5, "SQLite (node:sqlite)", Zod 4, ts-fsrs, Vitest, Docker]
@@ -14,6 +14,8 @@ capa:
   imagem: ../../../assets/projetos/life-rpg/mapa.png
   moldura: celular
   alt: Mapa do mundo do Life RPG em pixel art, com territórios, acampamentos e NPCs
+emResumo: >-
+  App que eu uso todos os dias para estudar e organizar a rotina. Funciona sem internet no celular e sincroniza com o PC quase em tempo real. O código é aberto, com testes, e as regras do app foram comparadas com 64 fontes científicas sobre hábitos e aprendizagem.
 resumo:
   problema: >-
     Eu sei o que preciso fazer, mas travo na hora de começar. Lista longa me sobrecarrega e plano
@@ -112,12 +114,16 @@ arquitetura:
     - { de: sse, para: painel }
 decisoes:
   - titulo: Offline-first de verdade
+    resumo: >-
+      O app grava tudo no próprio aparelho primeiro, então funciona sem internet e nunca fica esperando a rede.
     escolha: Tudo é gravado primeiro no IndexedDB, e a sincronização acontece depois.
     porque: >-
       Eu uso no celular em qualquer lugar. A interface nunca espera a rede, e o app funciona com o
       servidor desligado.
     deixeiDeLado: Um app só online, mais simples de escrever, mas inútil sem sinal.
   - titulo: Sincronização por cursor e last-write-wins
+    resumo: >-
+      Cada aparelho envia o que mudou e recebe o que os outros mudaram. Se dois mexerem na mesma coisa, vale a alteração mais recente.
     escolha: >-
       O servidor mantém uma revisão global. Cada aparelho envia as próprias mudanças e recebe o que
       mudou desde o seu cursor. Em conflito, vence o `updatedAt` mais recente.
@@ -129,12 +135,15 @@ decisoes:
       CRDTs, que resolveriam edição simultânea sem perda, com uma complexidade que não se paga para
       uma pessoa só.
   - titulo: Regras de domínio puras
+    resumo: >-
+      As regras mais importantes do app ficam num pacote separado da interface e do servidor, o que deixa cada uma fácil de testar.
     escolha: >-
-      Agendador do dia, XP, recorrência, FSRS, padrões, parser em português e merge ficam em
-      `packages/shared`, sem navegador nem servidor.
+      Agendador do dia, XP, recorrência, revisão espaçada (FSRS), análise da rotina (planejado × executado, adiamentos e tendências), parser em português e merge ficam em `packages/shared`, sem navegador nem servidor.
     porque: As regras mais importantes viram funções puras, fáceis de testar e compartilhadas pelos dois lados.
     deixeiDeLado: Lógica espalhada nos componentes, mais rápida no começo e um pesadelo para testar depois.
   - titulo: Mídia endereçada por conteúdo
+    resumo: >-
+      Imagens e áudios são identificados pelo próprio conteúdo, então o mesmo arquivo nunca é guardado duas vezes, nem nos backups.
     escolha: >-
       Imagens e áudios são guardados pelo hash SHA-256, e o backup diário espelha a mídia com hard
       links.
@@ -143,15 +152,18 @@ decisoes:
       mídia repetida.
     deixeiDeLado: Nomes de arquivo por id, que duplicariam a mídia em cada backup.
   - titulo: Seguro mesmo sendo pessoal
+    resumo: >-
+      O servidor fica em casa e não é exposto direto na internet: o acesso de fora passa por uma rede privada com HTTPS.
     escolha: >-
       Token comparado em tempo constante, servidor escutando só em `127.0.0.1` e acesso remoto por
       HTTPS do Tailscale. A chave da IA fica só no servidor.
     porque: É um servidor em casa, com meus dados pessoais. Nada fica exposto direto na internet.
     deixeiDeLado: Abrir uma porta no roteador, que seria mais simples e muito mais arriscado.
   - titulo: Evidência antes de gamificação
+    resumo: >-
+      Antes de decidir o que dá pontos, comparei cada regra do app com pesquisas sobre hábitos e aprendizagem.
     escolha: >-
-      Reuni 64 fontes científicas sobre hábitos, aprendizagem e sono, e comparei cada regra do app com
-      elas.
+      Reuni [64 fontes científicas](https://github.com/Vitor-Brosque/life-rpg/blob/main/docs/analise-pesquisa-cientifica-2026-11-13.md) sobre hábitos, aprendizagem e sono, e comparei cada regra do app com elas.
     porque: >-
       Gamificação mal feita recompensa a coisa errada. Por isso, registrar o sono não dá XP:
       recompensar o registro, e não o comportamento, pode piorar a motivação.

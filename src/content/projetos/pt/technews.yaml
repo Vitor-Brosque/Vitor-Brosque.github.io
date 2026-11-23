@@ -9,6 +9,12 @@ stack: [Python, PostgreSQL, psycopg 3, httpx, trafilatura, API do Hacker News]
 links:
   codigo: https://github.com/Vitor-Brosque/TechNews
 cartao: rota
+emResumo: >-
+  Pipeline em Python que busca no Hacker News as notícias do dia anterior, descarta o que vem
+  incompleto ou repetido, extrai o texto da página original e grava no PostgreSQL sem duplicar.
+  Numa execução de teste em 23/11/2026, coletou 81 notícias e extraiu o texto de 70 delas (86%).
+  As outras 11 falharam no download (sites que bloqueiam robôs ou exigem login) ou na extração,
+  e ficaram registradas no log.
 resumo:
   problema: >-
     Eu queria entender, na prática, como um dado sai de uma API, passa por validação e chega limpo
@@ -22,7 +28,7 @@ resumo:
 problema: |-
   O TechNews é o meu laboratório de engenharia de dados. Comecei por ele para entender, na prática, cada etapa de um pipeline: de onde vem o dado, o que fazer quando ele chega quebrado e como garantir que rodar de novo não estraga nada.
 
-  Estou indo devagar de propósito. O código é pequeno, e cada decisão foi tomada para eu entender o porquê dela.
+  O código é pequeno de propósito. Cada etapa foi construída para eu entender o porquê de cada decisão.
 rota:
   titulo: Da API ao banco
   paradas:
@@ -51,6 +57,8 @@ rota:
         rejeitadas.
 decisoes:
   - titulo: Idempotência no banco
+    resumo: >-
+      Rodar o pipeline duas vezes não duplica notícias: o próprio banco recusa a repetida e avisa que ela já existia.
     escolha: >-
       Chave única em `(fonte, id_externo)` e `INSERT ... ON CONFLICT DO NOTHING RETURNING id`.
     porque: >-
@@ -60,12 +68,16 @@ decisoes:
       Checar se a notícia existe antes de inserir, que custa uma consulta a mais e ainda deixa uma
       janela para duplicar.
   - titulo: Uma notícia ruim não derruba o lote
+    resumo: >-
+      Cada notícia é gravada por conta própria. Se uma tiver problema, só ela é descartada e as outras seguem.
     escolha: >-
       Commit por notícia. Um `DataError` ou `IntegrityError` desfaz só aquela linha, que entra na
       conta das rejeitadas.
     porque: Num pipeline de ingestão, dado estranho é normal. O resto do lote precisa seguir.
     deixeiDeLado: Uma transação única para o lote, que é mais rápida, mas perde tudo por causa de uma linha.
   - titulo: Logs com nome de evento
+    resumo: >-
+      Cada coisa que acontece vira uma linha de log com um nome fixo, fácil de buscar e de contar.
     escolha: >-
       Eventos como `SEM_URL_OU_TITULO`, `FALHA_EXTRACAO` e `RESUMO_INGESTAO`, sempre com o id da
       notícia.
@@ -74,11 +86,21 @@ decisoes:
       execução.
     deixeiDeLado: Mensagens livres, que são mais fáceis de escrever e difíceis de filtrar.
   - titulo: Janela de tempo fechada
+    resumo: >-
+      Cada execução busca um dia inteiro e fechado, então repetir a execução traz sempre o mesmo conjunto.
     escolha: Cada execução busca o dia anterior inteiro, no fuso de São Paulo, por timestamp.
     porque: >-
       A mesma execução, repetida no mesmo dia, pega o mesmo conjunto. Isso deixa o resultado previsível
       e fácil de conferir.
     deixeiDeLado: As "últimas 24 horas" a partir de agora, que mudam a cada execução.
+numeros:
+  - { valor: "81", rotulo: "notícias coletadas em 10 buscas" }
+  - { valor: "70", rotulo: "com o texto extraído (86%)" }
+  - { valor: "21", rotulo: "descartadas na coleta: 12 sem título ou URL e 9 repetidas entre temas" }
+  - { valor: "11", rotulo: "puladas com registro no log: 9 falhas de download e 2 de extração" }
+numerosFonte: >-
+  Execução das etapas de coleta, validação e extração em 23/11/2026, com as notícias de 22/11/2026,
+  sem gravar no banco.
 proximos:
   - Escrever testes para cada etapa, com respostas da API gravadas.
   - Agendar a execução diária.

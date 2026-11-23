@@ -9,6 +9,12 @@ stack: [Python, PostgreSQL, psycopg 3, httpx, trafilatura, Hacker News API]
 links:
   codigo: https://github.com/Vitor-Brosque/TechNews
 cartao: rota
+emResumo: >-
+  A Python pipeline that fetches the previous day's stories from Hacker News, drops anything
+  incomplete or repeated, extracts the text of the original page and stores it in PostgreSQL
+  without duplicates. In a test run on Nov 23, 2026, it collected 81 stories and extracted the
+  text of 70 of them (86%). The other 11 failed to download (sites that block bots or require a
+  login) or to extract, and were logged.
 resumo:
   problema: I wanted to understand, hands-on, how data leaves an API, gets validated and lands clean in a database.
   construi: >-
@@ -20,7 +26,7 @@ resumo:
 problema: |-
   TechNews is my data engineering lab. I started it to understand, hands-on, every step of a pipeline: where the data comes from, what to do when it arrives broken, and how to make sure running it again doesn't break anything.
 
-  I'm going slowly on purpose. The code is small, and every decision was made so I'd understand the reason behind it.
+  The code is small on purpose. Each step was built so I'd understand the reason behind every decision.
 rota:
   titulo: From the API to the database
   paradas:
@@ -47,23 +53,39 @@ rota:
       texto: At the end, a log line says how many stories were inserted, how many were duplicates and how many were rejected.
 decisoes:
   - titulo: Idempotency in the database
+    resumo: >-
+      Running the pipeline twice doesn't duplicate stories: the database itself rejects the repeat and reports that it already existed.
     escolha: A unique key on `(fonte, id_externo)` and `INSERT ... ON CONFLICT DO NOTHING RETURNING id`.
     porque: >-
       Running the pipeline again, on purpose or by mistake, doesn't duplicate stories. And `RETURNING`
       tells me, without an extra query, whether the row was new or repeated.
     deixeiDeLado: Checking whether the story exists before inserting, which costs an extra query and still leaves a window for duplicates.
   - titulo: One bad story doesn't sink the batch
+    resumo: >-
+      Each story is saved on its own. If one has a problem, only that one is dropped and the rest carry on.
     escolha: A commit per story. A `DataError` or `IntegrityError` rolls back only that row, which counts as rejected.
     porque: In an ingestion pipeline, odd data is normal. The rest of the batch has to keep going.
     deixeiDeLado: A single transaction for the whole batch, which is faster but loses everything because of one row.
   - titulo: Logs with named events
+    resumo: >-
+      Everything that happens becomes a log line with a fixed name, easy to search and to count.
     escolha: Events such as `SEM_URL_OU_TITULO`, `FALHA_EXTRACAO` and `RESUMO_INGESTAO`, always with the story id.
     porque: Any failure can be found with a search in the log file, and each run can be summed up.
     deixeiDeLado: Free-form messages, easier to write and hard to filter.
   - titulo: A closed time window
+    resumo: >-
+      Each run fetches one whole, closed day, so repeating the run always returns the same set.
     escolha: Each run fetches the entire previous day, in São Paulo time, by timestamp.
     porque: The same run repeated on the same day gets the same set, which keeps the result predictable and easy to check.
     deixeiDeLado: The "last 24 hours" from now, which changes with every run.
+numeros:
+  - { valor: "81", rotulo: "stories collected across 10 searches" }
+  - { valor: "70", rotulo: "with text extracted (86%)" }
+  - { valor: "21", rotulo: "dropped at collection: 12 with no title or URL and 9 repeated across topics" }
+  - { valor: "11", rotulo: "skipped and logged: 9 download failures and 2 extraction failures" }
+numerosFonte: >-
+  Collection, validation and extraction steps run on Nov 23, 2026, with the stories from Nov 22, 2026,
+  without writing to the database.
 proximos:
   - Write tests for every step, with recorded API responses.
   - Schedule the daily run.

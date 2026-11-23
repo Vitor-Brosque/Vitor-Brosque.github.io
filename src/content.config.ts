@@ -44,6 +44,7 @@ const projetos = defineCollection({
       links: z.object({ codigo: z.url().optional(), vitrine: z.url().optional() }).default({}),
       cartao: z.enum(['capa', 'rota']).default('capa'),
       capa: midia(image).optional(),
+      emResumo: z.string(),
       resumo: z.object({ problema: z.string(), construi: z.string(), orgulho: z.string() }),
       problema: z.string(),
       rota: z.object({
@@ -62,7 +63,7 @@ const projetos = defineCollection({
         )
         .optional(),
       decisoes: z
-        .array(z.object({ titulo: z.string(), escolha: z.string(), porque: z.string(), deixeiDeLado: z.string() }))
+        .array(z.object({ titulo: z.string(), resumo: z.string(), escolha: z.string(), porque: z.string(), deixeiDeLado: z.string() }))
         .min(1),
       numeros: z.array(z.object({ valor: z.string(), rotulo: z.string() })).default([]),
       numerosFonte: z.string().optional(),
