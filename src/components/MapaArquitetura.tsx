@@ -28,7 +28,7 @@ export default function MapaArquitetura({ nos, faixas, rotulo, dica, todas }: Pr
   useEffect(() => {
     const el = caixa.current;
     if (!el) return;
-    const obs = new ResizeObserver(([e]) => setTransposto(e.contentRect.width < 640));
+    const obs = new ResizeObserver(([e]) => setTransposto(e.contentRect.width < 760));
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
