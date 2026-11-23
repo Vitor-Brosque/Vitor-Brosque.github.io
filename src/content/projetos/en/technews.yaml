@@ -1,0 +1,76 @@
+titulo: TechNews
+ordem: 3
+frase: A Python data pipeline that collects, validates and stores tech news in PostgreSQL.
+status: desenvolvimento
+statusTexto: In development · open source
+papel: Study project, on my own
+periodo: "2026"
+stack: [Python, PostgreSQL, psycopg 3, httpx, trafilatura, Hacker News API]
+links:
+  codigo: https://github.com/Vitor-Brosque/TechNews
+cartao: rota
+resumo:
+  problema: I wanted to understand, hands-on, how data leaves an API, gets validated and lands clean in a database.
+  construi: >-
+    A pipeline that fetches the previous day's Hacker News stories on 10 topics, drops incomplete ones,
+    extracts the page text and stores it in PostgreSQL.
+  orgulho: >-
+    Running it again duplicates nothing, one bad story doesn't take the others down, and every step
+    leaves a log with a named event.
+problema: |-
+  TechNews is my data engineering lab. I started it to understand, hands-on, every step of a pipeline: where the data comes from, what to do when it arrives broken, and how to make sure running it again doesn't break anything.
+
+  I'm going slowly on purpose. The code is small, and every decision was made so I'd understand the reason behind it.
+rota:
+  titulo: From the API to the database
+  paradas:
+    - titulo: Collect
+      curto: Hacker News, previous day.
+      texto: >-
+        Queries the Hacker News search API for the previous day's stories, in São Paulo time, on 10
+        topics across 4 areas: languages, AI, data and DevOps.
+    - titulo: Validate
+      curto: Title and URL.
+      texto: Drops anything without a title or URL and logs every drop.
+    - titulo: Extract
+      curto: Page text.
+      texto: >-
+        Downloads the original page and extracts the text with trafilatura. A failed download or
+        extraction is logged and the story is skipped.
+    - titulo: PostgreSQL
+      curto: No duplicates.
+      texto: >-
+        Writes with `INSERT ... ON CONFLICT (fonte, id_externo) DO NOTHING RETURNING id`. If no id comes
+        back, it was a duplicate.
+    - titulo: Summary
+      curto: Inserted, duplicates, rejected.
+      texto: At the end, a log line says how many stories were inserted, how many were duplicates and how many were rejected.
+decisoes:
+  - titulo: Idempotency in the database
+    escolha: A unique key on `(fonte, id_externo)` and `INSERT ... ON CONFLICT DO NOTHING RETURNING id`.
+    porque: >-
+      Running the pipeline again, on purpose or by mistake, doesn't duplicate stories. And `RETURNING`
+      tells me, without an extra query, whether the row was new or repeated.
+    deixeiDeLado: Checking whether the story exists before inserting, which costs an extra query and still leaves a window for duplicates.
+  - titulo: One bad story doesn't sink the batch
+    escolha: A commit per story. A `DataError` or `IntegrityError` rolls back only that row, which counts as rejected.
+    porque: In an ingestion pipeline, odd data is normal. The rest of the batch has to keep going.
+    deixeiDeLado: A single transaction for the whole batch, which is faster but loses everything because of one row.
+  - titulo: Logs with named events
+    escolha: Events such as `SEM_URL_OU_TITULO`, `FALHA_EXTRACAO` and `RESUMO_INGESTAO`, always with the story id.
+    porque: Any failure can be found with a search in the log file, and each run can be summed up.
+    deixeiDeLado: Free-form messages, easier to write and hard to filter.
+  - titulo: A closed time window
+    escolha: Each run fetches the entire previous day, in São Paulo time, by timestamp.
+    porque: The same run repeated on the same day gets the same set, which keeps the result predictable and easy to check.
+    deixeiDeLado: The "last 24 hours" from now, which changes with every run.
+proximos:
+  - Write tests for every step, with recorded API responses.
+  - Schedule the daily run.
+  - Download pages in parallel, with a concurrency limit.
+  - Add sources beyond Hacker News.
+  - Generate an AI summary and a search interface.
+seo:
+  descricao: >-
+    TechNews case study: a Python and PostgreSQL ingestion pipeline with idempotency, per-row commits
+    and named log events.

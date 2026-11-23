@@ -1,0 +1,222 @@
+titulo: RodoviariaOS
+ordem: 1
+destaque: true
+frase: CRM, finance and an AI assistant for my family's car dealership.
+status: producao
+statusTexto: In production · closed source
+statusDetalhe: >-
+  CRM, WhatsApp and inventory are in daily use. Finance, the assistant and the purchase radar are
+  built and tested, and are being rolled out.
+papel: Everything, from the database to the UI, on my own
+periodo: Since July 2026
+stack: [TypeScript, Next.js 15, React 19, Fastify 5, PostgreSQL 18, Drizzle ORM, Zod 4, Vitest]
+links:
+  vitrine: https://github.com/Vitor-Brosque/rodoviariaos-showcase
+cartao: capa
+capa:
+  imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
+  alt: RodoviariaOS daily dashboard with summary, tasks, alerts, inventory and finance, using made-up data
+resumo:
+  problema: >-
+    Hundreds of leads coming in through WhatsApp and ads. Salespeople got lost in the conversations,
+    and each partner worked out the numbers for their own cars by hand.
+  construi: >-
+    A system that recognizes each customer, builds the queue of who needs an answer and calculates
+    the result of each car, with finance and an assistant ready to go live.
+  orgulho: >-
+    The database itself enforces isolation between partners, WhatsApp ingestion never loses or
+    duplicates messages, and the AI classifies requests without ever seeing the store's data.
+problema: |-
+  Before I wrote code, I worked the counter at Rodoviária Veículos, my family's car dealership. I took care of the ads, the inventory and customer service on WhatsApp.
+
+  The bottleneck was always the same. Leads came in by the hundreds, mostly through WhatsApp, and the salesperson couldn't tell who was waiting for an answer, who had already been helped and who had gone cold. There was also no way to know which ad actually led to a sale.
+
+  On the finance side, the dealership has more than one partner, and each one owns different cars. Each partner needs to see the cost and result of their own cars, but not the other's. That was handled with spreadsheets and conversation.
+rota:
+  titulo: The route of a lead
+  paradas:
+    - titulo: A lead arrives
+      curto: WhatsApp, a Meta ad or the website.
+      texto: >-
+        Through WhatsApp, a Meta click-to-WhatsApp ad or the website form. The message comes in
+        through a signed webhook and is stored before it is processed.
+    - titulo: Who is this person
+      curto: Recognizes the person, without duplicates.
+      texto: >-
+        A normalized phone number and an identity layer link lead, customer and supplier to the same
+        person, without duplicates. The origin of the contact is recorded.
+    - titulo: Queue by next action
+      curto: Reply, First contact, Follow-ups, Negotiation.
+      texto: >-
+        Each lead lands in exactly one queue, in this order: Reply, First contact, Follow-ups and
+        Negotiation. The cadence counts only attempts actually made and suggests the message. The
+        system never sends anything on its own.
+      midia:
+        imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
+        alt: Daily dashboard showing leads waiting for an answer and new unanswered leads
+    - titulo: Negotiation
+      curto: The origin is required and frozen.
+      texto: >-
+        Opening a negotiation requires an origin. From then on it is frozen and carries through to
+        the sale, even if the lead changes later.
+      midia:
+        video: /media/rodoviariaos/whatsapp-negociacao-celular.mp4
+        proporcao: 780/1688
+        moldura: celular
+        alt: A WhatsApp conversation turning into a negotiation in RodoviariaOS, using made-up data
+    - titulo: Attributed sale
+      curto: Sales by origin, campaign and car.
+      texto: >-
+        Reports cross leads, negotiations and sales by origin, campaign, ad and car, with cost per
+        lead.
+funcionalidades:
+  - titulo: Daily dashboard
+    texto: >-
+      What needs action today in a single summary: tasks, overdue bills, unanswered leads and cars
+      sitting too long.
+    midia:
+      imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
+      alt: Daily dashboard with summary, tasks, alerts, inventory and finance, using made-up data
+  - titulo: Same car, two partners
+    texto: >-
+      The car's owner sees cost and margin. The other partner sees only the catalog. The rule holds
+      in the screens, the API and the database.
+    midia:
+      imagem: ../../../assets/projetos/rodoviariaos/dois-socios.png
+      video: /media/rodoviariaos/dois-socios.mp4
+      alt: The same car seen by two partners, one with cost and margin and the other with only the catalog
+  - titulo: Result per car
+    texto: >-
+      Sale price minus the car's real cost: acquisition, expenses, commission, warranty and taxes.
+      The result stays Provisional until everything is settled.
+    midia:
+      imagem: ../../../assets/projetos/rodoviariaos/resultado-por-carro.png
+      alt: Result per car screen with sale, acquisition, expenses and result, using made-up data
+  - titulo: Assistant
+    texto: >-
+      Answers questions about inventory, leads and finance, and only records something after a
+      "confirm".
+    midia:
+      video: /media/rodoviariaos/assistente.mp4
+      proporcao: 4/5
+      alt: The RodoviariaOS assistant answering a question and asking for confirmation, using made-up data
+  - titulo: Purchase radar
+    texto: >-
+      Listings of similar cars compared with the market median, adjusted for mileage. A discount
+      that's too big is flagged to check, never hidden.
+    midia:
+      imagem: ../../../assets/projetos/rodoviariaos/radar-de-compra.png
+      alt: List of car listings with opportunity and check badges, using made-up data
+  - titulo: Hide values
+    texto: One click hides every amount on screen, for when there's a customer at the counter.
+    midia:
+      video: /media/rodoviariaos/ocultar-valores.mp4
+      proporcao: 4/5
+      alt: The Hide values button replacing every amount on screen with dots
+arquitetura:
+  titulo: Architecture
+  texto: >-
+    Every request travels the same road to the database, and the database only returns what that
+    store and that partner are allowed to see. WhatsApp messages arrive through a side road, with a
+    table-backed queue.
+  nos:
+    - { id: navegador, rotulo: Browser, detalhe: dashboard and phone, col: 0, lin: 0, explicacao: "The browser only talks to Next.js. Session cookies are httpOnly and first-party." }
+    - { id: next, rotulo: Next.js 15, detalhe: App Router, col: 1, lin: 0, explicacao: "Serves the screens and forwards everything under /api to the API, on the same origin. No CORS, and no API address baked into the browser code." }
+    - { id: api, rotulo: Fastify API, detalhe: deny by default, col: 2, lin: 0, explicacao: "Every request goes through logging with sensitive data masked, authentication that denies by default, a role check and Zod validation of input and output." }
+    - { id: tenant, rotulo: withTenant(), detalhe: store · user · role, col: 3, lin: 0, explicacao: "Opens a transaction and sets, for that transaction only, the store, the user and the role. These values come only from the token, never from the request body." }
+    - { id: banco, rotulo: PostgreSQL 18, detalhe: Row-Level Security, col: 4, lin: 0, destaque: true, explicacao: "RLS policies filter rows by store and, in the finance tables, by partner. The app uses a database user that cannot bypass RLS, so a query without context fails." }
+    - { id: whatsapp, rotulo: WhatsApp, detalhe: signed webhook, col: 0, lin: 1, explicacao: "Every event arrives with an HMAC signature, checked against the raw request body." }
+    - { id: fila, rotulo: Table queue, detalhe: unique key, col: 2, lin: 1, explicacao: "The event is stored before it is processed, with a unique key. Redelivery and replay don't create duplicates." }
+    - { id: processador, rotulo: Processor, detalhe: 4 in parallel, col: 3, lin: 1, explicacao: "Processes in the background, at most 4 at a time, with retries and growing backoff and a sweep every minute. When done, it notifies the salesperson's dashboard over SSE." }
+  faixas:
+    - { de: navegador, para: next }
+    - { de: next, para: api }
+    - { de: api, para: tenant }
+    - { de: tenant, para: banco }
+    - { de: whatsapp, para: fila }
+    - { de: fila, para: processador }
+    - { de: processador, para: banco }
+decisoes:
+  - titulo: Isolation in the database, not in discipline
+    escolha: >-
+      Row-Level Security with `FORCE` on every table that has a `tenant_id`, plus `RESTRICTIVE`
+      per-owner policies on the finance tables.
+    porque: >-
+      Forgetting a `WHERE tenant_id` in any query must not leak another store's or the other
+      partner's data. Without context, the query fails instead of returning data. A test fails if a
+      new table ships without RLS, and a "canary" test walks every read route with the other
+      partner's ids.
+    deixeiDeLado: >-
+      Filtering only in the application, which is simpler to write but relies on nobody ever making a
+      mistake. The cost of my choice: bulk data fixes need a loop per store, some foreign keys go in
+      as `NOT VALID`, and backups need a more privileged user.
+  - titulo: WhatsApp ingestion that never loses or duplicates
+    escolha: >-
+      A webhook with an HMAC signature checked against the raw body, stored in a table with a unique
+      key before processing, then processed in the background with retries and a periodic sweep.
+    porque: >-
+      A lost customer message is a lost sale, and a duplicated message becomes a duplicated lead.
+      Storing first and processing later separates "receiving" from "understanding". If processing
+      fails, the message is still there for the next attempt.
+    deixeiDeLado: >-
+      Processing directly inside the webhook request, which is quicker to build but loses the event
+      if anything fails halfway.
+  - titulo: AI that classifies, not acts
+    escolha: >-
+      Rules recognize most commands. When none does, the AI only picks one intent from a closed list
+      of 26, through tool calling with Zod-validated output. Deterministic code does the work, with
+      the permissions of whoever asked.
+    porque: >-
+      The AI never sees the store's data and never decides permissions. Every write becomes a
+      proposal that only runs after a "confirm", and that "confirm" is recognized by a rule. The
+      assistant works even without an AI key, and each store has a monthly spending cap.
+    deixeiDeLado: >-
+      A free-roaming agent with database access, which would understand more requests but would be
+      unpredictable, expensive and hard to protect against prompt injection.
+  - titulo: Bank statements with a "proof check"
+    escolha: >-
+      Readers for OFX, CSV, XLSX and PDF written in the project itself. For PDFs, the sum of the
+      entries must match, to the cent, every daily balance the bank printed.
+    porque: >-
+      Importing a wrong statement is worse than rejecting it. A repeated file is blocked by its
+      SHA-256, and identical lines only count as duplicates if the previous statement had the same
+      number of them: two identical fees on the same day are still two. Reconciliation suggests
+      scored candidates but never links anything on its own.
+    deixeiDeLado: >-
+      Classifying lines with AI. I chose rules learned from every confirmed classification, which are
+      predictable and can be undone line by line.
+  - titulo: No Redis, no queue, no cron, on purpose
+    escolha: >-
+      Postgres plays the role of queue (webhooks), cache (license plate lookup) and rate limiter
+      (login). Jobs are timers inside the API process.
+    porque: >-
+      A single server with fewer moving parts to run and monitor is the right size for one
+      dealership. Every part you don't have is a part that can't go down.
+    deixeiDeLado: >-
+      Horizontal scaling. SSE lives in memory, a job only runs while the API is up, and a restart
+      resets the timers. It's a deliberate trade-off for the current size, and moving to a dedicated
+      queue is simple because the queue is already a table.
+  - titulo: Gated deploys
+    escolha: >-
+      Every release goes through steps that only start if the previous one passed: tests and
+      typecheck, database backup, migrations in a transaction, an isolated build with a sha256 for
+      every artifact, a switch with automatic rollback, and validation.
+    porque: An update that fails halfway must not take the dealership down. If the switch fails, the previous version comes back on its own.
+    deixeiDeLado: Automated CI/CD. Because the code is closed, I chose human control, with a written runbook for every release.
+numeros:
+  - { valor: "~1,000", rotulo: "leads received since July 2026" }
+  - { valor: "~400", rotulo: "leads in the peak month (September)" }
+  - { valor: "~2,600", rotulo: "WhatsApp messages received in the peak month" }
+  - { valor: "1,400+", rotulo: "API tests against a real PostgreSQL, plus 150+ on the front end" }
+numerosFonte: >-
+  Read from the production database on Nov 23, 2026. Leads and messages come from the CRM in use.
+  Finance and the assistant don't have real volume yet.
+proximos:
+  - Put finance and the assistant into daily use at the dealership.
+  - Publish the purchase radar extension and check it against the real listing sites.
+  - Send conversions back to Meta to measure ads more accurately.
+  - Get the system ready for other dealerships.
+seo:
+  descricao: >-
+    RodoviariaOS case study: CRM, finance and AI for a car dealership, with PostgreSQL row-level
+    security and reliable WhatsApp ingestion.

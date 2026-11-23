@@ -1,0 +1,158 @@
+titulo: Life RPG
+ordem: 2
+frase: A pixel-art study and routine app, offline-first, that shows one quest at a time.
+status: aberto
+statusTexto: Open source (MIT) · in daily personal use
+statusDetalhe: Still missing tests on a real iPhone, the AI hasn't been tested with a real key, and there's no CI yet.
+papel: Personal project, from design to infrastructure
+periodo: "2026"
+stack: [TypeScript, React 19, Vite, Dexie (IndexedDB), Zustand, Fastify 5, "SQLite (node:sqlite)", Zod 4, ts-fsrs, Vitest, Docker]
+links:
+  codigo: https://github.com/Vitor-Brosque/life-rpg
+cartao: capa
+capa:
+  imagem: ../../../assets/projetos/life-rpg/mapa.png
+  moldura: celular
+  alt: Life RPG world map in pixel art, with territories, camps and NPCs
+resumo:
+  problema: >-
+    I know what I need to do, but I freeze when it's time to start. Long lists overwhelm me and rigid
+    plans turn into guilt.
+  construi: >-
+    An app that shows one quest at a time, adapts to the kind of day I'm having and works offline,
+    syncing my phone and my PC.
+  orgulho: >-
+    Cursor-based sync with near real-time updates, pure domain rules and decisions grounded in 64
+    scientific sources.
+problema: |-
+  Often I know what I need to do, but I freeze when it's time to start. Long lists overwhelm me, rigid plans turn into guilt when they fail, and to-do apps record what to do without helping me do it.
+
+  Life RPG tries to close the gap between knowing and doing. It shows one quest at a time, with a small first step, and adapts to the kind of day: normal, low energy, recovery or free. Nothing resets, nothing decays and nothing turns red: a slow day doesn't erase progress.
+
+  I use it every day, on my phone and on my PC. That's why it had to work offline and keep both devices in sync.
+rota:
+  titulo: The route of a change
+  paradas:
+    - titulo: You tap on your phone
+      curto: Saved to IndexedDB, no waiting for the network.
+      texto: >-
+        The write goes straight to the device's IndexedDB. The UI never waits for the network, and the
+        app works with the server turned off.
+      midia:
+        imagem: ../../../assets/projetos/life-rpg/agora.png
+        moldura: celular
+        alt: Life RPG Now screen, with the current block and one quest at a time
+    - titulo: Sync
+      curto: Sends the cursor and the changes.
+      texto: >-
+        The device sends `POST /api/sync` with its cursor and local changes, and gets back everything
+        that changed since that cursor.
+    - titulo: Server
+      curto: Last-write-wins and a global revision.
+      texto: >-
+        The Fastify API applies the changes with last-write-wins (the most recent `updatedAt` wins) and
+        bumps the global revision in SQLite.
+    - titulo: Notifying devices
+      curto: Server-Sent Events.
+      texto: When a new revision comes in, the server notifies the other devices through Server-Sent Events.
+    - titulo: Dashboard on the PC
+      curto: Updates in near real time.
+      texto: The Dashboard open on the second monitor updates in near real time.
+      midia:
+        imagem: ../../../assets/projetos/life-rpg/painel.png
+        alt: Life RPG dashboard on the computer, with the current quest, the day's timeline and a timer
+funcionalidades:
+  - titulo: Now
+    texto: One quest at a time, the day's blocks, an optional timer and quick capture with buttons.
+    midia:
+      imagem: ../../../assets/projetos/life-rpg/agora.png
+      moldura: celular
+      alt: Now screen, with the current block and one quest at a time
+  - titulo: Spaced repetition
+    texto: Code, cloze, image and audio cards, scheduled with FSRS-6 and a daily time budget.
+    midia:
+      imagem: ../../../assets/projetos/life-rpg/revisao.png
+      moldura: celular
+      alt: Reviewing a SQL code card, with the written answer next to the correct one
+  - titulo: Character
+    texto: >-
+      XP for effort, not for time or for how much you log, with attributes tied to real areas of
+      life.
+    midia:
+      imagem: ../../../assets/projetos/life-rpg/personagem.png
+      moldura: celular
+      alt: Character sheet with level, XP and attributes by area of life
+  - titulo: Week
+    texto: Planning in blocks, goals, recurring items and one experiment per week.
+    midia:
+      imagem: ../../../assets/projetos/life-rpg/semana.png
+      moldura: celular
+      alt: Plan screen with the week organized in blocks
+arquitetura:
+  titulo: Architecture
+  texto: >-
+    Everything is saved on the device first. The server is where devices meet and where backups live,
+    not a requirement for using the app.
+  nos:
+    - { id: app, rotulo: React 19 PWA, detalhe: Zustand · service worker, col: 0, lin: 0, explicacao: "React screens with state in Zustand. The service worker makes the app installable and available offline." }
+    - { id: idb, rotulo: IndexedDB, detalhe: Dexie 4, col: 1, lin: 0, explicacao: "Everything is saved on the device first. The UI never waits for the network." }
+    - { id: api, rotulo: Fastify 5 API, detalhe: POST /api/sync, col: 2, lin: 0, explicacao: "Receives changes with the device's cursor and returns what changed since then. On conflict, the most recent updatedAt wins." }
+    - { id: sqlite, rotulo: SQLite, detalhe: "node:sqlite", col: 3, lin: 0, destaque: true, explicacao: "Node 24's built-in database, with a global revision that only grows. If the database was restored from a backup and a device knows revisions it doesn't have, the device starts over and resends everything." }
+    - { id: backup, rotulo: Daily backup, detalhe: media by SHA-256, col: 4, lin: 0, explicacao: "Backups kept for 14 days. Media is stored by its SHA-256 hash and mirrored with hard links, using no extra space." }
+    - { id: sse, rotulo: SSE, detalhe: /api/stream, col: 3, lin: 1, explicacao: "Notifies the other devices when a new revision comes in." }
+    - { id: painel, rotulo: Dashboard on PC, detalhe: live updates, col: 4, lin: 1, explicacao: "The Dashboard on the second monitor follows the phone in near real time." }
+  faixas:
+    - { de: app, para: idb }
+    - { de: idb, para: api }
+    - { de: api, para: sqlite }
+    - { de: sqlite, para: backup }
+    - { de: api, para: sse }
+    - { de: sse, para: painel }
+decisoes:
+  - titulo: Truly offline-first
+    escolha: Everything is saved to IndexedDB first, and syncing happens afterwards.
+    porque: I use it on my phone anywhere. The UI never waits for the network, and the app works with the server off.
+    deixeiDeLado: An online-only app, simpler to write but useless without signal.
+  - titulo: Cursor-based sync and last-write-wins
+    escolha: >-
+      The server keeps a global revision. Each device sends its own changes and gets back what changed
+      since its cursor. On conflict, the most recent `updatedAt` wins.
+    porque: >-
+      For a single user with few real conflicts, last-write-wins is predictable and easy to test. If
+      the server is restored from a backup and a device knows revisions it doesn't have, the device
+      starts over and resends everything.
+    deixeiDeLado: >-
+      CRDTs, which would resolve simultaneous edits without loss, at a complexity that doesn't pay off
+      for one person.
+  - titulo: Pure domain rules
+    escolha: >-
+      The day scheduler, XP, recurrence, FSRS, patterns, the Portuguese parser and merging live in
+      `packages/shared`, with no browser or server.
+    porque: The most important rules become pure functions, easy to test and shared by both sides.
+    deixeiDeLado: Logic spread across components, faster at first and a nightmare to test later.
+  - titulo: Content-addressed media
+    escolha: Images and audio are stored by their SHA-256 hash, and the daily backup mirrors media with hard links.
+    porque: The same file is never stored twice, and 14 days of backups take no extra space for repeated media.
+    deixeiDeLado: File names by id, which would duplicate media in every backup.
+  - titulo: Secure even though it's personal
+    escolha: >-
+      A token compared in constant time, a server listening only on `127.0.0.1`, and remote access over
+      Tailscale HTTPS. The AI key lives only on the server.
+    porque: It's a home server with my personal data. Nothing is exposed directly to the internet.
+    deixeiDeLado: Opening a port on the router, which would be simpler and much riskier.
+  - titulo: Evidence before gamification
+    escolha: I gathered 64 scientific sources on habits, learning and sleep, and checked every rule in the app against them.
+    porque: >-
+      Badly designed gamification rewards the wrong thing. That's why logging sleep gives no XP:
+      rewarding the logging instead of the behavior can hurt motivation.
+    deixeiDeLado: >-
+      XP for everything, which feels motivating and creates the wrong incentive. XP, levels and the map
+      are treated as personal taste, not as a proven technique.
+proximos:
+  - "Test on a real iPhone: installing as a PWA, notifications, microphone and offline use."
+  - Test the AI helpers with a real key.
+  - Set up continuous integration (CI).
+seo:
+  descricao: >-
+    Life RPG case study: an offline-first pixel-art PWA with cursor-based sync, SSE and pure domain
+    rules in TypeScript.
