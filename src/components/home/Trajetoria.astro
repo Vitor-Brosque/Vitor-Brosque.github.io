@@ -1,0 +1,45 @@
+---
+import CarrinhoPixel from '../CarrinhoPixel.astro';
+import { textosHome } from '../../i18n/home';
+import type { Idioma } from '../../i18n/ui';
+interface Props { idioma: Idioma }
+const { idioma } = Astro.props;
+const tr = textosHome[idioma].trajetoria;
+---
+<section id="trajetoria" class="secao wrap" aria-labelledby="traj-titulo">
+  <h2 id="traj-titulo">{tr.titulo}</h2>
+  <p class="secao-intro">{tr.intro}</p>
+  <div class="traj" data-trajetoria>
+    <div class="traj-estrada" aria-hidden="true">
+      <div class="traj-preenchida"></div>
+      <div class="traj-carro"><CarrinhoPixel /></div>
+    </div>
+    <ol class="traj-marcos">
+      {tr.marcos.map((m) => (
+        <li class="traj-marco">
+          <p class="rotulo">{m.quando}</p>
+          <h3>{m.titulo}</h3>
+          <p class="traj-texto">{m.texto}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+<style>
+  .traj { --prog: 1; position: relative; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 22px; margin-top: 32px; }
+  :global(.js) .traj:not([data-estatico]) { --prog: 0; }
+  .traj-estrada { position: relative; border-radius: 4px; background: #0c0f0e; }
+  .traj-estrada::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; margin-left: -1.5px; background: repeating-linear-gradient(180deg, rgb(245 184 0 / 0.35) 0 18px, transparent 18px 30px); }
+  .traj-preenchida { position: absolute; inset: 0; background: rgb(245 184 0 / 0.18); transform-origin: top; scale: 1 var(--prog); }
+  .traj-carro { position: absolute; left: 50%; top: calc(var(--prog) * 100%); width: 32px; height: 18px; rotate: 90deg; translate: -50% -50%; }
+  .traj[data-estatico] .traj-carro, :global(html:not(.js)) .traj-carro { display: none; }
+  .traj-marcos { display: grid; gap: 34px; margin: 0; padding: 0; list-style: none; }
+  .traj-marco { position: relative; max-width: 70ch; }
+  .traj-marco::before { content: ''; position: absolute; left: -45px; top: 4px; width: 12px; height: 12px; border-radius: 50%; border: 3px solid var(--line-2); background: var(--bg); transition: border-color 0.3s, background-color 0.3s; }
+  .traj-marco[data-alcancado]::before,
+  .traj[data-estatico] .traj-marco::before,
+  :global(html:not(.js)) .traj-marco::before { border-color: var(--signal); background: var(--signal); }
+  .traj-marco h3 { margin-top: 4px; font-size: 1.2rem; }
+  .traj-texto { margin-top: 6px; color: var(--ink-2); }
+</style>
+<script>import '../../scripts/trajetoria';</script>

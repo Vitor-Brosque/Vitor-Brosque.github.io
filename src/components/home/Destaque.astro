@@ -1,0 +1,56 @@
+---
+import Rota from '../Rota.astro';
+import MolduraMidia from '../MolduraMidia.astro';
+import type { Projeto } from '../../lib/projetos';
+import { slugDe } from '../../lib/projetos-puro';
+import { textoRico } from '../../lib/texto';
+import { t, urlDoProjeto, type Idioma } from '../../i18n/ui';
+
+interface Props { idioma: Idioma; projeto: Projeto }
+const { idioma, projeto } = Astro.props;
+const d = projeto.data;
+const slug = slugDe(projeto.id);
+---
+<section id="projetos" class="secao wrap destaque" aria-labelledby="destaque-titulo">
+  <p class="rotulo rotulo--sinal">01 · {d.statusTexto}</p>
+  <h2 id="destaque-titulo" transition:name={`titulo-${slug}`}>{d.titulo}</h2>
+  <p class="destaque-frase">{d.frase}</p>
+  <div class="resumo">
+    <div class="revelar"><p class="rotulo">{t(idioma, 'destaque.problema')}</p><p>{d.resumo.problema}</p></div>
+    <div class="revelar resumo--sinal"><p class="rotulo">{t(idioma, 'destaque.construi')}</p><p>{d.resumo.construi}</p></div>
+    <div class="revelar"><p class="rotulo">{t(idioma, 'destaque.orgulho')}</p><p>{d.resumo.orgulho}</p></div>
+  </div>
+  <div class="destaque-rota revelar">
+    <Rota titulo={d.rota.titulo} paradas={d.rota.paradas} modo="loop" idioma={idioma} />
+  </div>
+  {d.funcionalidades.length > 0 && (
+    <ul class="galeria">
+      {d.funcionalidades.slice(0, 4).map((f) => (
+        <li class="revelar">
+          <MolduraMidia midia={f.midia} idioma={idioma} sizes="(min-width: 900px) 24vw, 78vw" />
+          <p class="galeria-titulo">{f.titulo}</p>
+          <p class="galeria-texto" set:html={textoRico(f.texto)} />
+        </li>
+      ))}
+    </ul>
+  )}
+  <a class="botao botao--sinal destaque-cta" href={urlDoProjeto(idioma, slug)}>{t(idioma, 'card.verCaso')} →</a>
+</section>
+<style>
+  h2 { margin-top: 10px; font-size: clamp(2.5rem, 5vw, 3.5rem); }
+  .destaque-frase { margin-top: 12px; color: var(--mute); font-size: 1.05rem; }
+  .resumo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; margin-top: 32px; }
+  .resumo > div { border-top: 3px solid var(--line-2); padding-top: 12px; color: var(--ink-2); }
+  .resumo > div.resumo--sinal { border-top-color: var(--signal); }
+  .resumo .rotulo { margin-bottom: 6px; }
+  .destaque-rota { margin-top: 36px; }
+  .galeria { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin: 32px 0 0; padding: 0; list-style: none; }
+  .galeria-titulo { margin-top: 10px; font-weight: 700; font-stretch: 110%; }
+  .galeria-texto { margin-top: 2px; font-size: 0.86rem; line-height: 1.45; color: var(--mute); }
+  .destaque-cta { margin-top: 32px; }
+  @media (max-width: 899px) {
+    .resumo { grid-template-columns: 1fr; }
+    .galeria { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 78%; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; }
+    .galeria li { scroll-snap-align: start; }
+  }
+</style>

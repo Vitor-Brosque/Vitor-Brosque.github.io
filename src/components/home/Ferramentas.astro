@@ -1,0 +1,24 @@
+---
+import { textosHome } from '../../i18n/home';
+import type { Idioma } from '../../i18n/ui';
+interface Props { idioma: Idioma }
+const { idioma } = Astro.props;
+const f = textosHome[idioma].ferramentas;
+---
+<section class="secao wrap" aria-labelledby="ferr-titulo">
+  <h2 id="ferr-titulo">{f.titulo}</h2>
+  <p class="secao-intro">{f.intro}</p>
+  <dl class="grupos">
+    {f.grupos.map((g) => (
+      <div class="revelar">
+        <dt>{g.nome}</dt>
+        <dd><ul class="chips">{g.itens.map((i) => <li>{i}</li>)}</ul></dd>
+      </div>
+    ))}
+  </dl>
+</section>
+<style>
+  .grupos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 24px; margin: 28px 0 0; }
+  dt { font-weight: 800; font-stretch: 115%; padding-bottom: 8px; margin-bottom: 10px; border-bottom: 3px solid var(--signal); }
+  dd { margin: 0; }
+</style>

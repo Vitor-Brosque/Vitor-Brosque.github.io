@@ -1,0 +1,44 @@
+---
+import { Picture } from 'astro:assets';
+import Rota from '../Rota.astro';
+import type { Projeto } from '../../lib/projetos';
+import { slugDe } from '../../lib/projetos-puro';
+import { t, urlDoProjeto, type Idioma } from '../../i18n/ui';
+
+interface Props { idioma: Idioma; projeto: Projeto; numero: number }
+const { idioma, projeto, numero } = Astro.props;
+const d = projeto.data;
+const slug = slugDe(projeto.id);
+const usaCapa = d.cartao === 'capa' && d.capa?.imagem;
+---
+<article class="card revelar">
+  <div class:list={['card-midia', { 'card-midia--rota': !usaCapa }]}>
+    {usaCapa && d.capa?.imagem ? (
+      <Picture src={d.capa.imagem} alt="" formats={['avif', 'webp']} widths={[480, 780]} sizes="(min-width: 900px) 34vw, 92vw" />
+    ) : (
+      <Rota titulo={d.rota.titulo} paradas={d.rota.paradas} modo="loop" idioma={idioma} compacta />
+    )}
+  </div>
+  <div class="card-corpo">
+    <p class="rotulo"><span class:list={['ponto', `ponto--${d.status}`]} aria-hidden="true"></span>{String(numero).padStart(2, '0')} · {d.statusTexto}</p>
+    <h3 transition:name={`titulo-${slug}`}><a class="card-link" href={urlDoProjeto(idioma, slug)}>{d.titulo}</a></h3>
+    <p class="card-frase">{d.frase}</p>
+    <span class="card-mais" aria-hidden="true">{t(idioma, 'card.verCaso')} →</span>
+  </div>
+</article>
+<style>
+  .card { position: relative; display: flex; flex-direction: column; background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--raio); overflow: hidden; transition: border-color 0.25s, translate 0.25s var(--ease); }
+  .card:hover, .card:focus-within { border-color: var(--signal); translate: 0 -4px; }
+  .card-midia { height: 190px; overflow: hidden; background: #0d100f; }
+  .card-midia :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+  .card-midia--rota { display: flex; align-items: center; height: auto; min-height: 190px; padding: 18px; }
+  .card-midia--rota :global(.rota) { width: 100%; }
+  .card-corpo { padding: 18px 18px 20px; }
+  .ponto { display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--ok); }
+  .ponto--desenvolvimento { background: var(--signal); }
+  h3 { margin-top: 6px; font-size: 1.45rem; }
+  .card-link { text-decoration: none; }
+  .card-link::after { content: ''; position: absolute; inset: 0; }
+  .card-frase { margin-top: 6px; color: var(--ink-2); font-size: 0.95rem; }
+  .card-mais { display: inline-block; margin-top: 12px; color: var(--signal); font-weight: 700; font-size: 0.9rem; }
+</style>
