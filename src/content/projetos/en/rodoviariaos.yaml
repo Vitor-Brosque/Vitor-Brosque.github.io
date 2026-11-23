@@ -9,7 +9,7 @@ statusDetalhe: >-
   built and tested, and are being rolled out.
 papel: Everything, from the database to the UI, on my own
 periodo: Since July 2026
-stack: [TypeScript, Next.js 15, React 19, Fastify 5, PostgreSQL 18, Drizzle ORM, Zod 4, Vitest]
+stack: [TypeScript, Next.js 15, React 19, Tailwind CSS 4, Fastify 5, PostgreSQL 18, Drizzle ORM, Zod 4, Vitest]
 links:
   vitrine: https://github.com/Vitor-Brosque/rodoviariaos-showcase
 cartao: capa
@@ -24,8 +24,7 @@ resumo:
     A system that recognizes each customer, builds the queue of who needs an answer and calculates
     the result of each car, with finance and an assistant ready to go live.
   orgulho: >-
-    The database itself enforces isolation between partners, WhatsApp ingestion never loses or
-    duplicates messages, and the AI classifies requests without ever seeing the store's data.
+    The database itself enforces isolation between partners, WhatsApp ingestion is built not to lose or duplicate messages, and the AI classifies requests without ever seeing the store's data.
 problema: |-
   Before I wrote code, I worked the counter at Rodoviária Veículos, my family's car dealership. I took care of the ads, the inventory and customer service on WhatsApp.
 
@@ -61,6 +60,7 @@ rota:
         the sale, even if the lead changes later.
       midia:
         video: /media/rodoviariaos/whatsapp-negociacao-celular.mp4
+        imagem: ../../../assets/projetos/rodoviariaos/whatsapp-negociacao.png
         proporcao: 780/1688
         moldura: celular
         alt: A WhatsApp conversation turning into a negotiation in RodoviariaOS, using made-up data
@@ -98,6 +98,7 @@ funcionalidades:
       "confirm".
     midia:
       video: /media/rodoviariaos/assistente.mp4
+      imagem: ../../../assets/projetos/rodoviariaos/assistente.png
       proporcao: 4/5
       alt: The RodoviariaOS assistant answering a question and asking for confirmation, using made-up data
   - titulo: Purchase radar
@@ -111,6 +112,7 @@ funcionalidades:
     texto: One click hides every amount on screen, for when there's a customer at the counter.
     midia:
       video: /media/rodoviariaos/ocultar-valores.mp4
+      imagem: ../../../assets/projetos/rodoviariaos/ocultar-valores.png
       proporcao: 4/5
       alt: The Hide values button replacing every amount on screen with dots
 arquitetura:
@@ -150,7 +152,7 @@ decisoes:
       Filtering only in the application, which is simpler to write but relies on nobody ever making a
       mistake. The cost of my choice: bulk data fixes need a loop per store, some foreign keys go in
       as `NOT VALID`, and backups need a more privileged user.
-  - titulo: WhatsApp ingestion that never loses or duplicates
+  - titulo: WhatsApp ingestion built not to lose or duplicate
     escolha: >-
       A webhook with an HMAC signature checked against the raw body, stored in a table with a unique
       key before processing, then processed in the background with retries and a periodic sweep.

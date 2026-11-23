@@ -9,7 +9,7 @@ statusDetalhe: >-
   prontos e testados, entrando em uso.
 papel: Tudo, do banco de dados à interface, sozinho
 periodo: Desde julho de 2026
-stack: [TypeScript, Next.js 15, React 19, Fastify 5, PostgreSQL 18, Drizzle ORM, Zod 4, Vitest]
+stack: [TypeScript, Next.js 15, React 19, Tailwind CSS 4, Fastify 5, PostgreSQL 18, Drizzle ORM, Zod 4, Vitest]
 links:
   vitrine: https://github.com/Vitor-Brosque/rodoviariaos-showcase
 cartao: capa
@@ -24,8 +24,7 @@ resumo:
     Um sistema que reconhece cada cliente, monta a fila de quem precisa de resposta e calcula o
     resultado de cada carro, com o financeiro e um assistente prontos para entrar em uso.
   orgulho: >-
-    O isolamento entre sócios é garantido pelo próprio banco de dados, a ingestão do WhatsApp não
-    perde nem duplica mensagens, e a IA classifica pedidos sem nunca ver os dados da loja.
+    O isolamento entre sócios é garantido pelo próprio banco de dados, a ingestão do WhatsApp é feita para não perder nem duplicar mensagens, e a IA classifica pedidos sem nunca ver os dados da loja.
 problema: |-
   Antes de programar, eu trabalhava no balcão da Rodoviária Veículos, a revenda da minha família. Cuidava dos anúncios, do estoque e do atendimento pelo WhatsApp.
 
@@ -61,6 +60,7 @@ rota:
         até a venda, mesmo que o lead mude depois.
       midia:
         video: /media/rodoviariaos/whatsapp-negociacao-celular.mp4
+        imagem: ../../../assets/projetos/rodoviariaos/whatsapp-negociacao.png
         proporcao: 780/1688
         moldura: celular
         alt: Conversa de WhatsApp virando negociação no RodoviariaOS, com dados inventados
@@ -98,6 +98,7 @@ funcionalidades:
       "confirmo".
     midia:
       video: /media/rodoviariaos/assistente.mp4
+      imagem: ../../../assets/projetos/rodoviariaos/assistente.png
       proporcao: 4/5
       alt: Assistente do RodoviariaOS respondendo uma consulta e pedindo confirmação, com dados inventados
   - titulo: Radar de compra
@@ -111,6 +112,7 @@ funcionalidades:
     texto: Um clique esconde todos os valores da tela, para quando tem cliente no balcão.
     midia:
       video: /media/rodoviariaos/ocultar-valores.mp4
+      imagem: ../../../assets/projetos/rodoviariaos/ocultar-valores.png
       proporcao: 4/5
       alt: Botão Ocultar valores trocando os valores da tela por pontos
 arquitetura:
@@ -202,7 +204,7 @@ decisoes:
       O filtro só na aplicação, mais simples de escrever, mas que depende de ninguém errar nunca. O
       custo da minha escolha: correções de dados em massa precisam de um laço por loja, algumas chaves
       estrangeiras entram como `NOT VALID` e o backup precisa de um usuário com mais privilégio.
-  - titulo: Ingestão do WhatsApp que não perde nem duplica
+  - titulo: Ingestão do WhatsApp feita para não perder nem duplicar
     escolha: >-
       Webhook com assinatura HMAC conferida sobre o corpo bruto, gravação numa tabela com chave
       única antes de processar, e processamento em segundo plano com novas tentativas e varredura
