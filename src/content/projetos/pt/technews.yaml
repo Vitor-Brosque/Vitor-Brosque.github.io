@@ -1,0 +1,91 @@
+titulo: TechNews
+ordem: 3
+frase: Pipeline de dados em Python que coleta, valida e guarda notícias de tecnologia no PostgreSQL.
+status: desenvolvimento
+statusTexto: Em desenvolvimento · código aberto
+papel: Projeto de estudo, sozinho
+periodo: "2026"
+stack: [Python, PostgreSQL, psycopg 3, httpx, trafilatura, API do Hacker News]
+links:
+  codigo: https://github.com/Vitor-Brosque/TechNews
+cartao: rota
+resumo:
+  problema: >-
+    Eu queria entender, na prática, como um dado sai de uma API, passa por validação e chega limpo
+    num banco.
+  construi: >-
+    Um pipeline que busca no Hacker News as notícias do dia anterior sobre 10 temas, descarta o que
+    vem incompleto, extrai o texto da página e grava no PostgreSQL.
+  orgulho: >-
+    Rodar de novo não duplica nada, uma notícia com problema não derruba as outras, e cada etapa deixa
+    um log com nome de evento.
+problema: |-
+  O TechNews é o meu laboratório de engenharia de dados. Comecei por ele para entender, na prática, cada etapa de um pipeline: de onde vem o dado, o que fazer quando ele chega quebrado e como garantir que rodar de novo não estraga nada.
+
+  Estou indo devagar de propósito. O código é pequeno, e cada decisão foi tomada para eu entender o porquê dela.
+rota:
+  titulo: Da API ao banco
+  paradas:
+    - titulo: Coleta
+      curto: Hacker News, dia anterior.
+      texto: >-
+        Consulta a API de busca do Hacker News atrás das notícias do dia anterior, no fuso de São
+        Paulo, sobre 10 temas em 4 áreas: linguagens, IA, dados e DevOps.
+    - titulo: Validação
+      curto: Título e URL.
+      texto: Descarta o que vem sem título ou sem URL e registra cada descarte no log.
+    - titulo: Extração
+      curto: Texto da página.
+      texto: >-
+        Baixa a página original e extrai o texto com o trafilatura. Falha no download ou na extração
+        é registrada, e a notícia é pulada.
+    - titulo: PostgreSQL
+      curto: Sem duplicar.
+      texto: >-
+        Grava com `INSERT ... ON CONFLICT (fonte, id_externo) DO NOTHING RETURNING id`. Se não voltou
+        id, era duplicada.
+    - titulo: Resumo
+      curto: Inseridas, duplicadas, rejeitadas.
+      texto: >-
+        No fim, um log diz quantas notícias foram inseridas, quantas eram duplicadas e quantas foram
+        rejeitadas.
+decisoes:
+  - titulo: Idempotência no banco
+    escolha: >-
+      Chave única em `(fonte, id_externo)` e `INSERT ... ON CONFLICT DO NOTHING RETURNING id`.
+    porque: >-
+      Rodar o pipeline de novo, de propósito ou por engano, não duplica notícias. E o `RETURNING` diz,
+      sem uma consulta extra, se a linha era nova ou repetida.
+    deixeiDeLado: >-
+      Checar se a notícia existe antes de inserir, que custa uma consulta a mais e ainda deixa uma
+      janela para duplicar.
+  - titulo: Uma notícia ruim não derruba o lote
+    escolha: >-
+      Commit por notícia. Um `DataError` ou `IntegrityError` desfaz só aquela linha, que entra na
+      conta das rejeitadas.
+    porque: Num pipeline de ingestão, dado estranho é normal. O resto do lote precisa seguir.
+    deixeiDeLado: Uma transação única para o lote, que é mais rápida, mas perde tudo por causa de uma linha.
+  - titulo: Logs com nome de evento
+    escolha: >-
+      Eventos como `SEM_URL_OU_TITULO`, `FALHA_EXTRACAO` e `RESUMO_INGESTAO`, sempre com o id da
+      notícia.
+    porque: >-
+      Dá para achar qualquer falha com uma busca no arquivo de log e contar o que aconteceu em cada
+      execução.
+    deixeiDeLado: Mensagens livres, que são mais fáceis de escrever e difíceis de filtrar.
+  - titulo: Janela de tempo fechada
+    escolha: Cada execução busca o dia anterior inteiro, no fuso de São Paulo, por timestamp.
+    porque: >-
+      A mesma execução, repetida no mesmo dia, pega o mesmo conjunto. Isso deixa o resultado previsível
+      e fácil de conferir.
+    deixeiDeLado: As "últimas 24 horas" a partir de agora, que mudam a cada execução.
+proximos:
+  - Escrever testes para cada etapa, com respostas da API gravadas.
+  - Agendar a execução diária.
+  - Baixar as páginas em paralelo, com limite de concorrência.
+  - Adicionar fontes além do Hacker News.
+  - Gerar um resumo com IA e uma interface de consulta.
+seo:
+  descricao: >-
+    Estudo de caso do TechNews: pipeline de ingestão em Python e PostgreSQL, com idempotência, commit
+    por linha e logs com nome de evento.
