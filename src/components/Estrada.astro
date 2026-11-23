@@ -1,0 +1,12 @@
+<div class="estrada" data-estrada aria-hidden="true"></div>
+<style>
+  .estrada { --desloc: 0px; position: relative; height: 56px; background: #1b211e; border-block: 2px solid var(--line); }
+  .estrada::after {
+    content: '';
+    position: absolute; inset-inline: 0; top: 50%;
+    height: 4px; margin-top: -2px;
+    background: repeating-linear-gradient(90deg, var(--signal) 0 40px, transparent 40px 68px);
+    background-position-x: var(--desloc);
+  }
+</style>
+<script>import '../scripts/estrada';</script>

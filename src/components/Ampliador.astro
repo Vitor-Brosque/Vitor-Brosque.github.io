@@ -1,0 +1,16 @@
+---
+import { t, type Idioma } from '../i18n/ui';
+interface Props { idioma: Idioma }
+const { idioma } = Astro.props;
+---
+<dialog class="ampliador" data-ampliador aria-label={t(idioma, 'midia.ampliar')}>
+  <button type="button" class="ampliador-fechar" data-fechar aria-label={t(idioma, 'midia.fechar')}>×</button>
+  <img alt="" />
+</dialog>
+<style>
+  .ampliador { max-width: min(96vw, 1400px); max-height: 92vh; padding: 0; border: 1px solid var(--line-2); border-radius: var(--raio); background: var(--bg); color: var(--ink); }
+  .ampliador::backdrop { background: rgb(8 10 9 / 0.85); }
+  .ampliador img { max-height: 92vh; width: auto; margin-inline: auto; }
+  .ampliador-fechar { position: absolute; top: 8px; right: 8px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--bg); color: var(--ink); font-size: 1.5rem; cursor: pointer; }
+</style>
+<script>import '../scripts/ampliar';</script>

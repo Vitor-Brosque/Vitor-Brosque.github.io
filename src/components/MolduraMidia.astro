@@ -1,0 +1,78 @@
+---
+import { Picture, getImage } from 'astro:assets';
+import type { Midia } from '../lib/projetos';
+import { t, type Idioma } from '../i18n/ui';
+
+interface Props {
+  midia: Midia;
+  idioma: Idioma;
+  sizes?: string;
+  prioridade?: boolean;
+  class?: string;
+}
+const { midia, idioma, sizes = '(min-width: 900px) 50vw, 92vw', prioridade = false, class: classe } = Astro.props;
+
+const proporcao =
+  midia.proporcao ??
+  (midia.moldura === 'celular' ? '780/1688' : midia.imagem ? `${midia.imagem.width}/${midia.imagem.height}` : '16/10');
+const larguras = midia.imagem ? [480, 800, 1200].filter((w) => w <= midia.imagem!.width) : [];
+const grande = midia.imagem && !midia.video
+  ? await getImage({ src: midia.imagem, width: Math.min(1800, midia.imagem.width), format: 'webp' })
+  : undefined;
+const poster = midia.video && midia.imagem ? await getImage({ src: midia.imagem, width: 960, format: 'webp' }) : undefined;
+---
+<figure class:list={['moldura', `moldura--${midia.moldura}`, classe]}>
+  <div class="moldura-tela">
+    {midia.moldura === 'navegador' && <div class="moldura-barra" aria-hidden="true"><i></i><i></i><i></i></div>}
+    <div class="moldura-midia" style={`aspect-ratio: ${proporcao}`}>
+      {midia.video ? (
+        <>
+          <video data-video muted loop playsinline preload={poster ? 'none' : 'metadata'} poster={poster?.src} aria-label={midia.alt}>
+            <source src={midia.video} type="video/mp4" />
+            <track kind="captions" src={`/media/sem-audio-${idioma}.vtt`} srclang={idioma === 'pt' ? 'pt-BR' : 'en'} label={idioma === 'pt' ? 'Português' : 'English'} />
+          </video>
+          <button
+            type="button"
+            class="moldura-play"
+            data-video-botao
+            data-rotulo-tocar={t(idioma, 'midia.tocar')}
+            data-rotulo-pausar={t(idioma, 'midia.pausar')}
+            aria-label={t(idioma, 'midia.tocar')}
+          ><span aria-hidden="true"></span></button>
+        </>
+      ) : midia.imagem && grande ? (
+        <button type="button" class="moldura-ampliar" data-ampliar={grande.src} aria-label={`${t(idioma, 'midia.ampliar')}: ${midia.alt}`}>
+          <Picture
+            src={midia.imagem}
+            alt={midia.alt}
+            formats={['avif', 'webp']}
+            widths={larguras.length ? larguras : [midia.imagem.width]}
+            sizes={sizes}
+            loading={prioridade ? 'eager' : 'lazy'}
+            fetchpriority={prioridade ? 'high' : 'auto'}
+          />
+        </button>
+      ) : null}
+    </div>
+  </div>
+  {midia.legenda && <figcaption>{midia.legenda}</figcaption>}
+</figure>
+
+<style>
+  .moldura { margin: 0; }
+  .moldura-tela { border: 1px solid var(--line-2); border-radius: var(--raio); overflow: hidden; background: #0c0f0e; box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.8); }
+  .moldura-barra { display: flex; gap: 6px; align-items: center; height: 24px; padding-inline: 10px; background: var(--surface); border-bottom: 1px solid var(--line); }
+  .moldura-barra i { width: 8px; height: 8px; border-radius: 50%; background: var(--line-2); }
+  .moldura-midia { position: relative; overflow: hidden; }
+  .moldura-midia video,
+  .moldura-midia :global(picture),
+  .moldura-midia :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .moldura--celular .moldura-tela { border: 8px solid #2a322e; border-radius: 32px; max-width: 340px; margin-inline: auto; }
+  .moldura--nenhuma .moldura-tela { border: 0; box-shadow: none; background: transparent; }
+  .moldura-ampliar { all: unset; display: block; width: 100%; height: 100%; cursor: zoom-in; }
+  .moldura-ampliar:focus-visible { outline: 3px solid var(--signal); outline-offset: -3px; }
+  .moldura-play { position: absolute; right: 10px; bottom: 10px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgb(17 21 19 / 0.85); cursor: pointer; display: grid; place-items: center; }
+  .moldura-play span { width: 0; height: 0; border-block: 7px solid transparent; border-left: 12px solid var(--signal); margin-left: 3px; }
+  .moldura-play[data-tocando='true'] span { width: 12px; height: 14px; border: 0; margin: 0; border-inline: 4px solid var(--signal); }
+  figcaption { margin-top: 10px; font-size: 0.9rem; color: var(--mute); }
+</style>
