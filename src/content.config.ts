@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { defineCollection, type ImageFunction } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
@@ -6,7 +8,12 @@ const midia = (image: ImageFunction) =>
   z
     .object({
       imagem: image().optional(),
-      video: z.string().regex(/^\/media\/[\w/-]+\.mp4$/).optional(),
+      video: z
+        .string()
+        .regex(/^\/media\/[\w/-]+\.mp4$/)
+        // O caminho do vídeo é só texto: sem esta conferência, um arquivo que não existe só apareceria quebrado no site publicado.
+        .refine((v) => existsSync(join(process.cwd(), 'public', v)), { error: 'Este vídeo não existe na pasta public/.' })
+        .optional(),
       proporcao: z.string().regex(/^\d+\/\d+$/).optional(),
       alt: z.string().min(1),
       legenda: z.string().optional(),
