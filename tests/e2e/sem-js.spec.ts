@@ -19,3 +19,15 @@ test('o estudo de caso é legível sem JavaScript', async ({ page }) => {
   await expect(page.locator('#problema')).toBeVisible();
   await expect(page.locator('#problema + .texto p').first()).toBeVisible();
 });
+
+test('o bloco Em resumo e as decisões aparecem sem JavaScript', async ({ page }) => {
+  await page.goto('/projetos/rodoviariaos/');
+  await expect(page.locator('#em-resumo')).toBeVisible();
+  await expect(page.locator('.em-resumo .numeros dt').first()).toBeVisible();
+  const resumos = page.locator('details.decisao > summary');
+  expect(await resumos.count()).toBe(6);
+  for (let i = 0; i < 6; i++) await expect(resumos.nth(i)).toBeVisible();
+  // O texto completo fica no HTML e abre com o clique nativo do <details>.
+  await resumos.first().click();
+  await expect(page.locator('details.decisao').first().getByText(/O filtro só na aplicação/)).toBeVisible();
+});
