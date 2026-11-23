@@ -1,0 +1,23 @@
+:root {
+  --bg: #111513;
+  --bg-2: #171c19;
+  --surface: #1e2522;
+  --line: #26302b;
+  --line-2: #34403b;
+  --ink: #ecefea;
+  --ink-2: #c9d2ce;
+  --mute: #9aa6a0;
+  --dim: #7f8b85;
+  --signal: #f5b800;
+  --ok: #2e9e5b;
+
+  --fonte: 'Archivo Variable', system-ui, sans-serif;
+  --fonte-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --largura: 1120px;
+  --medida: 62ch;
+  --raio: 10px;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --altura-nav: 64px;
+
+  color-scheme: dark;
+}

@@ -1,0 +1,26 @@
+---
+import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource/jetbrains-mono/latin-400.css';
+import '@fontsource/jetbrains-mono/latin-700.css';
+import '../styles/tokens.css';
+import '../styles/global.css';
+
+interface Props {
+  titulo: string;
+  descricao: string;
+  idioma: 'pt' | 'en';
+}
+const { titulo, descricao, idioma } = Astro.props;
+---
+<!doctype html>
+<html lang={idioma === 'pt' ? 'pt-BR' : 'en'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titulo}</title>
+    <meta name="description" content={descricao} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
