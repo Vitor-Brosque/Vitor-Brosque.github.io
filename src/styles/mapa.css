@@ -4,7 +4,7 @@
 .mapa-tracejado { fill: none; stroke: #3a4642; stroke-width: 2; stroke-dasharray: 8 7; }
 .mapa-faixa.is-ativa .mapa-tracejado { stroke: var(--signal); }
 .mapa-pacote { fill: var(--signal); }
-.mapa-no { cursor: pointer; outline: none; }
+.mapa-no { cursor: pointer; }
 .mapa-no rect { fill: var(--surface); stroke: var(--line-2); stroke-width: 2; transition: stroke 0.2s, fill 0.2s; }
 .mapa-no.is-destaque rect { stroke: #8a6b00; }
 .mapa-no.is-ativo rect, .mapa-no:focus-visible rect { stroke: var(--signal); fill: #262410; }

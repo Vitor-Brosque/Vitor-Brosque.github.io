@@ -73,15 +73,17 @@ function iniciarRolagem(raiz: HTMLElement, placas: HTMLElement[]): () => void {
     });
   });
   mm.add('(max-width: 899px)', () => {
+    const atualizar = (st: ScrollTrigger) => {
+      const e = estadoDaRota(st.progress, n);
+      aplicar(raiz, placas, { ...e, posicao: posicaoReal(raiz, placas, e.posicao) });
+    };
     ScrollTrigger.create({
       trigger: raiz,
       start: 'top 60%',
       end: 'bottom 60%',
       scrub: 0.3,
-      onUpdate: (st) => {
-        const e = estadoDaRota(st.progress, n);
-        aplicar(raiz, placas, { ...e, posicao: posicaoReal(raiz, placas, e.posicao) });
-      },
+      onUpdate: atualizar,
+      onRefresh: atualizar,
     });
   });
   aplicar(raiz, placas, estadoDaRota(0, n));
