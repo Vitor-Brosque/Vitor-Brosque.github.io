@@ -44,8 +44,8 @@ const capa = destaque.data.capa;
   .provas li::before { content: ''; flex: none; width: 16px; height: 3px; background: var(--signal); translate: 0 -4px; }
   .provas span { color: var(--mute); }
   .hero-acoes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
-  .hero-print { position: relative; margin: 0; rotate: 2.5deg; border: 1px solid #2e3833; border-radius: var(--raio); overflow: hidden; background: #fff; box-shadow: 0 34px 70px -24px #000, 0 0 0 7px #1b211e; }
-  .hero-print-barra { display: flex; gap: 5px; align-items: center; height: 22px; padding-left: 10px; background: #1e2522; }
+  .hero-print { position: relative; margin: 0; rotate: 2.5deg; border: 1px solid #2e3833; border-radius: var(--raio); overflow: hidden; background: #fff; box-shadow: 0 34px 70px -24px #000, 0 0 0 7px var(--estrada); }
+  .hero-print-barra { display: flex; gap: 5px; align-items: center; height: 22px; padding-left: 10px; background: var(--surface); }
   .hero-print-barra i { width: 7px; height: 7px; border-radius: 50%; background: #3a4642; }
   .hero-print :global(img) { width: 100%; height: clamp(260px, 32vw, 400px); object-fit: cover; object-position: top; }
   .hero-print figcaption { position: absolute; left: 14px; bottom: 14px; padding: 7px 11px; background: var(--ink); color: var(--bg); font-weight: 700; font-size: 0.8rem; font-stretch: 110%; }

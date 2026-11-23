@@ -28,7 +28,7 @@ const tr = textosHome[idioma].trajetoria;
 <style>
   .traj { --prog: 1; position: relative; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 22px; margin-top: 32px; }
   :global(.js) .traj:not([data-estatico]) { --prog: 0; }
-  .traj-estrada { position: relative; border-radius: 4px; background: #0c0f0e; }
+  .traj-estrada { position: relative; border-radius: 4px; background: var(--asfalto); }
   .traj-estrada::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; margin-left: -1.5px; background: repeating-linear-gradient(180deg, rgb(245 184 0 / 0.35) 0 18px, transparent 18px 30px); }
   .traj-preenchida { position: absolute; inset: 0; background: rgb(245 184 0 / 0.18); transform-origin: top; scale: 1 var(--prog); }
   .traj-carro { position: absolute; left: 50%; top: calc(var(--prog) * 100%); width: 32px; height: 18px; rotate: 90deg; translate: -50% -50%; }
