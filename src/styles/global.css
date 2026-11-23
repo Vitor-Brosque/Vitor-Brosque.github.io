@@ -58,7 +58,8 @@ code { font-family: var(--fonte-mono); font-size: 0.86em; background: var(--surf
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .js [data-hero-titulo] { visibility: hidden; }
+  .js [data-hero-titulo] { visibility: hidden; animation: hero-titulo-seguranca 0s linear 2.5s forwards; }
+  @keyframes hero-titulo-seguranca { to { visibility: visible; } }
   .revelar { transition: opacity 0.7s var(--ease), translate 0.7s var(--ease); }
   .js .revelar:not(.visivel) { opacity: 0; translate: 0 24px; }
 }

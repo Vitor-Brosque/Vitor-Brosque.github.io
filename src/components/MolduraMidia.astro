@@ -71,9 +71,10 @@ const poster = midia.video && midia.imagem ? await getImage({ src: midia.imagem,
   .moldura--nenhuma .moldura-tela { border: 0; box-shadow: none; background: transparent; }
   .moldura-ampliar { all: unset; display: block; width: 100%; height: 100%; cursor: zoom-in; }
   .moldura-ampliar:focus-visible { outline: 3px solid var(--signal); outline-offset: -3px; }
-  .moldura-play { position: absolute; right: 10px; bottom: 10px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgb(from var(--bg) r g b / 0.85); cursor: pointer; display: grid; place-items: center; }
+  .moldura-play { position: absolute; right: 10px; bottom: 10px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgb(17 21 19 / 0.85); cursor: pointer; display: grid; place-items: center; }
   .moldura-play span { width: 0; height: 0; border-block: 7px solid transparent; border-left: 12px solid var(--signal); margin-left: 3px; }
   .moldura-play[data-tocando='true'] span { width: 12px; height: 14px; border: 0; margin: 0; border-inline: 4px solid var(--signal); }
+  :global(html:not(.js)) .moldura-play { display: none; }
   figcaption { margin-top: 10px; font-size: 0.9rem; color: var(--mute); }
 </style>
 <script>import '../scripts/video';</script>

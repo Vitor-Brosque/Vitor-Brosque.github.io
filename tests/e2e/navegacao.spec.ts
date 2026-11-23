@@ -35,8 +35,9 @@ test('navegação pelo ClientRouter mantém a rota, o pin e o idioma funcionando
   const loop = page.locator('[data-rota][data-modo="loop"]').first();
   await loop.scrollIntoViewIfNeeded();
   const pos = () => loop.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--pos'));
+  await expect.poll(pos, { timeout: 8000 }).not.toBe('');
   const inicial = await pos();
-  await expect.poll(pos, { timeout: 8000 }).not.toBe(inicial);
+  await expect.poll(async () => { const v = await pos(); return v !== '' && v !== inicial; }, { timeout: 8000 }).toBe(true);
 
   await page.getByRole('link', { name: /ver esta página em inglês/i }).click();
   await expect(page).toHaveURL(/\/en\/$/);
