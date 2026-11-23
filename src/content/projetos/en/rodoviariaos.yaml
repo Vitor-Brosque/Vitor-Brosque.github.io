@@ -61,7 +61,7 @@ rota:
         To open a negotiation, the lead's origin must be on record. From then on it can't be changed, and it carries through to the sale.
       midia:
         video: /media/rodoviariaos/whatsapp-negociacao-celular.mp4
-        imagem: ../../../assets/projetos/rodoviariaos/whatsapp-negociacao.png
+        imagem: ../../../assets/projetos/rodoviariaos/whatsapp-negociacao-celular.png
         proporcao: 780/1688
         moldura: celular
         alt: A WhatsApp conversation turning into a negotiation in RodoviariaOS, using made-up data

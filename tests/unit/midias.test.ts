@@ -20,12 +20,23 @@ function arquivosDe(pasta: string): string[] {
 }
 
 const projetos = readdirSync(join(CONTEUDO, 'pt')).filter((a) => a.endsWith('.yaml'));
-const referencias = ['pt', 'en'].flatMap((idioma) => projetos.flatMap((p) => midiasDe(idioma, p))).join('\n');
+const referencias = ['pt', 'en'].flatMap((idioma) => projetos.flatMap((p) => midiasDe(idioma, p)));
+/** Caminhos usados nos YAML, no mesmo formato das pastas: `<projeto>/<arquivo>`. */
+const usados = (campo: string, prefixo: string) =>
+  new Set(
+    referencias
+      .filter((r) => r.startsWith(`${campo}: `) && r.includes(prefixo))
+      .map((r) => r.slice(r.indexOf(prefixo) + prefixo.length)),
+  );
+const printsUsados = usados('imagem', '/assets/projetos/');
+const videosUsados = usados('video', '/media/');
 
 describe('mídias dos projetos', () => {
   it('encontra os projetos e as mídias (o teste não passa por lista vazia)', () => {
     expect(projetos.length).toBeGreaterThanOrEqual(3);
     expect(midiasDe('pt', 'rodoviariaos.yaml').length).toBeGreaterThan(5);
+    expect(printsUsados.has('rodoviariaos/painel-do-dia.png')).toBe(true);
+    expect(videosUsados.has('rodoviariaos/assistente.mp4')).toBe(true);
   });
 
   it.each(projetos)('%s usa as mesmas mídias em português e em inglês', (arquivo) => {
@@ -33,12 +44,12 @@ describe('mídias dos projetos', () => {
   });
 
   it('todo print da pasta de prints é usado por algum projeto', () => {
-    const sobrando = arquivosDe(PRINTS).filter((a) => !referencias.includes(`/assets/projetos/${a}`));
+    const sobrando = arquivosDe(PRINTS).filter((a) => !printsUsados.has(a));
     expect(sobrando).toEqual([]);
   });
 
   it('todo vídeo publicado é usado por algum projeto', () => {
-    const sobrando = arquivosDe(VIDEOS).filter((a) => a.endsWith('.mp4') && !referencias.includes(`video: /media/${a}`));
+    const sobrando = arquivosDe(VIDEOS).filter((a) => a.endsWith('.mp4') && !videosUsados.has(a));
     expect(sobrando).toEqual([]);
   });
 });
