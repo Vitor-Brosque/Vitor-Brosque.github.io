@@ -6,8 +6,8 @@ const { idioma } = Astro.props;
 const f = textosHome[idioma].ferramentas;
 ---
 <section class="secao wrap" aria-labelledby="ferr-titulo">
-  <h2 id="ferr-titulo">{f.titulo}</h2>
-  <p class="secao-intro">{f.intro}</p>
+  <h2 id="ferr-titulo" class="revelar">{f.titulo}</h2>
+  <p class="secao-intro revelar">{f.intro}</p>
   <dl class="grupos">
     {f.grupos.map((g) => (
       <div class="revelar">
