@@ -63,7 +63,7 @@ midia:
 
 Ela pode entrar em três lugares:
 
-- `capa`: topo do estudo de caso, cartão da home e imagem que aparece quando o link é compartilhado. A capa do projeto em destaque também é o print do topo da home;
+- `capa`: topo do estudo de caso e imagem que aparece quando o link é compartilhado. Também vai para o cartão da home quando o projeto usa `cartao: capa` (com `cartao: rota`, o cartão mostra a rota em miniatura). A capa do projeto em destaque é o print do topo da home;
 - `rota.paradas[].midia`: uma parada do caminho;
 - `funcionalidades[].midia`: a seção "O que ele faz". As quatro primeiras do projeto em destaque também aparecem na home.
 

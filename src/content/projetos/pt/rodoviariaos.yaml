@@ -61,7 +61,7 @@ rota:
         Para abrir uma negociação, a origem do lead precisa estar registrada. A partir daí ela não pode mais ser alterada e segue até a venda.
       midia:
         video: /media/rodoviariaos/whatsapp-negociacao-celular.mp4
-        imagem: ../../../assets/projetos/rodoviariaos/whatsapp-negociacao.png
+        imagem: ../../../assets/projetos/rodoviariaos/whatsapp-negociacao-celular.png
         proporcao: 780/1688
         moldura: celular
         alt: Conversa de WhatsApp virando negociação no RodoviariaOS, com dados inventados
