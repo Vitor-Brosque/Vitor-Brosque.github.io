@@ -15,6 +15,7 @@ const slug = slugDe(projeto.id);
   <p class="rotulo rotulo--sinal">01 · {d.statusTexto}</p>
   <h2 id="destaque-titulo" transition:name={`titulo-${slug}`}>{d.titulo}</h2>
   <p class="destaque-frase">{d.frase}</p>
+  {d.statusDetalhe && <p class="destaque-nota">{d.statusDetalhe}</p>}
   <div class="resumo">
     <div class="revelar"><p class="rotulo">{t(idioma, 'destaque.problema')}</p><p>{d.resumo.problema}</p></div>
     <div class="revelar resumo--sinal"><p class="rotulo">{t(idioma, 'destaque.construi')}</p><p>{d.resumo.construi}</p></div>
@@ -39,6 +40,7 @@ const slug = slugDe(projeto.id);
 <style>
   h2 { margin-top: 10px; font-size: clamp(2.5rem, 5vw, 3.5rem); }
   .destaque-frase { margin-top: 12px; color: var(--mute); font-size: 1.05rem; }
+  .destaque-nota { margin-top: 8px; max-width: var(--medida); color: var(--mute); font-size: 0.95rem; }
   .resumo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; margin-top: 32px; }
   .resumo > div { border-top: 3px solid var(--line-2); padding-top: 12px; color: var(--ink-2); }
   .resumo > div.resumo--sinal { border-top-color: var(--signal); }
