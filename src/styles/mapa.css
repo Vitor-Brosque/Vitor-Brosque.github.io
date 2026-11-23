@@ -1,5 +1,10 @@
-.mapa { margin-top: 24px; }
+.mapa { margin-top: 24px; container-type: inline-size; }
 .mapa-svg { width: 100%; height: auto; overflow: visible; }
+.mapa-svg--vertical { display: none; }
+@container (max-width: 759px) {
+  .mapa-svg--largo { display: none; }
+  .mapa-svg--vertical { display: block; }
+}
 .mapa-asfalto { fill: none; stroke: #0c0f0e; stroke-width: 14; stroke-linecap: round; }
 .mapa-tracejado { fill: none; stroke: #3a4642; stroke-width: 2; stroke-dasharray: 8 7; }
 .mapa-faixa.is-ativa .mapa-tracejado { stroke: var(--signal); }
