@@ -35,4 +35,11 @@ const ancora = (id: string) => (naHome ? `#${id}` : urlDaHome(idioma, id));
     .nav-links { display: none; }
     .nav-idioma { margin-left: auto; }
   }
+  /* Barra de progresso de leitura na borda de baixo (melhoria progressiva, só com movimento permitido). */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: scroll()) {
+      .nav::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--signal); transform-origin: left; scale: 0 1; animation: progresso-leitura linear both; animation-timeline: scroll(root); }
+      @keyframes progresso-leitura { to { scale: 1 1; } }
+    }
+  }
 </style>

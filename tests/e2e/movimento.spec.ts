@@ -12,22 +12,50 @@ async function rolarAteOFim(page: Page, passo = 500, aCada?: () => Promise<void>
   }
 }
 
+/** Animações em curso que deslocam algo ou repetem para sempre (proibidas com movimento reduzido). */
+function animacoesProibidas(page: Page) {
+  return page.evaluate(() => {
+    const deslocamento = /^(transform|translate|rotate|scale|backgroundPosition.*|background-position.*)$/;
+    const ruins: string[] = [];
+    for (const a of document.getAnimations()) {
+      const efeito = a.effect as KeyframeEffect | null;
+      const alvo = efeito?.target as Element | null;
+      const nome = `${alvo?.tagName ?? '?'}.${alvo?.className ?? ''} ${(a as CSSAnimation).animationName ?? (a as CSSTransition).transitionProperty ?? ''}`;
+      if (efeito?.getTiming().iterations === Infinity) ruins.push(`loop: ${nome}`);
+      const props = new Set<string>();
+      for (const k of efeito?.getKeyframes() ?? []) Object.keys(k).forEach((p) => props.add(p));
+      if ('transitionProperty' in a) props.add((a as CSSTransition).transitionProperty);
+      for (const p of props) if (deslocamento.test(p)) ruins.push(`${p}: ${nome}`);
+    }
+    return ruins;
+  });
+}
+
+const indiceAtivo = (page: Page, seletor: string) =>
+  page.locator(seletor).first().locator('.placa').evaluateAll((ps) => ps.findIndex((p) => p.hasAttribute('data-ativa')));
+
 test.describe('com movimento reduzido', () => {
   test.use({ reducedMotion: 'reduce' });
 
-  test('com movimento reduzido a rota fica estática e nenhum vídeo toca', async ({ page }) => {
-    await page.goto('/projetos/rodoviariaos/');
-    const rota = page.locator('[data-rota][data-modo="rolagem"]');
-    await expect(rota).toHaveAttribute('data-estatico', '');
-    await rota.locator('.rota-detalhe-texto').first().scrollIntoViewIfNeeded();
-    await expect(rota.locator('.rota-detalhe-texto').first()).toBeVisible();
-    const videos = page.locator('video[data-video]');
-    expect(await videos.count()).toBeGreaterThan(0);
-    await videos.first().scrollIntoViewIfNeeded();
-    // pausa curta: a decisão de tocar vem de um callback do IntersectionObserver; ler antes não provaria nada
-    await page.waitForTimeout(800);
-    const tocando = await page.$$eval('video', (vs) => vs.filter((v) => !(v as HTMLVideoElement).paused).length);
-    expect(tocando).toBe(0);
+  for (const caminho of ['/', '/projetos/rodoviariaos/']) {
+    test(`${caminho}: nada desliza e nada fica em loop`, async ({ page }) => {
+      await page.goto(caminho);
+      const ruins = new Set<string>();
+      const juntar = async () => (await animacoesProibidas(page)).forEach((r) => ruins.add(r));
+      await juntar();
+      await rolarAteOFim(page, 400, juntar);
+      expect([...ruins]).toEqual([]);
+    });
+  }
+
+  test('a estrada fica parada', async ({ page }) => {
+    await page.goto('/');
+    const estrada = page.locator('[data-estrada]').first();
+    await estrada.scrollIntoViewIfNeeded();
+    const desloc = () => estrada.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--desloc'));
+    const antes = await desloc();
+    await page.waitForTimeout(1000);
+    expect(await desloc()).toBe(antes);
   });
 
   test('o conteúdo entra com fade ao rolar e nada fica escondido', async ({ page }) => {
@@ -42,18 +70,132 @@ test.describe('com movimento reduzido', () => {
       .poll(() => page.$$eval('.revelar', (els) => els.filter((e) => getComputedStyle(e).opacity !== '1').length))
       .toBe(0);
   });
+
+  test('a rota em loop troca o KM em destaque sozinha e o botão de pausa segura a troca', async ({ page }) => {
+    await page.goto('/');
+    const seletor = '#projetos [data-rota][data-modo="loop"]';
+    await page.locator(seletor).scrollIntoViewIfNeeded();
+    const inicial = await indiceAtivo(page, seletor);
+    await expect.poll(() => indiceAtivo(page, seletor), { timeout: 8000 }).not.toBe(inicial);
+    const pausa = page.locator(`${seletor} [data-rota-pausa]`);
+    await pausa.click();
+    await expect(pausa).toHaveAttribute('aria-pressed', 'true');
+    const pausado = await indiceAtivo(page, seletor);
+    await page.waitForTimeout(3500);
+    expect(await indiceAtivo(page, seletor)).toBe(pausado);
+  });
+
+  test('no estudo de caso o KM em destaque acompanha a rolagem', async ({ page }) => {
+    await page.goto('/projetos/rodoviariaos/');
+    const rota = page.locator('[data-rota][data-modo="rolagem"]');
+    await expect(rota).toHaveAttribute('data-estatico', '');
+    const primeiro = rota.locator('.rota-detalhe-texto').first();
+    await primeiro.scrollIntoViewIfNeeded();
+    await expect(primeiro).toBeVisible();
+    const terceira = rota.locator('.placa').nth(2);
+    await terceira.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    await expect(terceira).toHaveAttribute('data-ativa', '');
+    await expect(rota.locator('.placa').first()).not.toHaveAttribute('data-ativa', '');
+  });
+
+  test('nenhum vídeo toca sozinho', async ({ page }) => {
+    await page.goto('/projetos/rodoviariaos/');
+    const videos = page.locator('video[data-video]');
+    expect(await videos.count()).toBeGreaterThan(0);
+    await videos.first().scrollIntoViewIfNeeded();
+    // pausa curta: a decisão de tocar vem de um callback do IntersectionObserver; ler antes não provaria nada
+    await page.waitForTimeout(800);
+    const tocando = await page.$$eval('video', (vs) => vs.filter((v) => !(v as HTMLVideoElement).paused).length);
+    expect(tocando).toBe(0);
+  });
+
+  test('os números do hero já estão no valor final', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('[data-contar]').first()).toHaveText('~1.000');
+    await expect(page.locator('[data-contar]').nth(1)).toHaveText('1.400+');
+  });
 });
 
 test.describe('com movimento permitido', () => {
   test.use({ reducedMotion: 'no-preference' });
 
-  test('a rota em loop da home anda quando o movimento é permitido', async ({ page }) => {
+  test('o carro percorre a rota inteira e todas as placas acendem', async ({ page }) => {
+    test.setTimeout(45_000);
     await page.goto('/');
-    const rota = page.locator('[data-rota][data-modo="loop"]').first();
+    const rota = page.locator('#projetos [data-rota][data-modo="loop"]');
     await rota.scrollIntoViewIfNeeded();
     await expect(rota).not.toHaveAttribute('data-estatico');
+    // Observa uma volta inteira (cerca de 13 s) dentro da página, a cada quadro.
+    const visto = await rota.evaluate(
+      (el) =>
+        new Promise<{ min: number; max: number; acesas: number[] }>((resolve) => {
+          const r = el as HTMLElement;
+          const placas = [...r.querySelectorAll('.placa')];
+          let min = Infinity;
+          let max = -Infinity;
+          const acesas = new Set<number>();
+          const fim = performance.now() + 15_000;
+          const olhar = () => {
+            const pos = Number(r.style.getPropertyValue('--pos'));
+            min = Math.min(min, pos);
+            max = Math.max(max, pos);
+            placas.forEach((p, i) => p.hasAttribute('data-ativa') && acesas.add(i));
+            if (performance.now() < fim) requestAnimationFrame(olhar);
+            else resolve({ min, max, acesas: [...acesas].sort() });
+          };
+          requestAnimationFrame(olhar);
+        }),
+    );
+    expect(visto.min).toBeLessThan(0);
+    expect(visto.max).toBeGreaterThan(1);
+    expect(visto.acesas).toEqual([0, 1, 2, 3, 4]);
+  });
+
+  test('o botão de pausa segura o carro e troca o texto', async ({ page }) => {
+    await page.goto('/');
+    const rota = page.locator('#projetos [data-rota][data-modo="loop"]');
+    await rota.scrollIntoViewIfNeeded();
     const pos = () => rota.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--pos'));
     const inicial = await pos();
     await expect.poll(pos, { timeout: 8000 }).not.toBe(inicial);
+    const pausa = rota.locator('[data-rota-pausa]');
+    await expect(pausa).toHaveText('Pausar');
+    await pausa.click();
+    await expect(pausa).toHaveText('Continuar');
+    await expect(pausa).toHaveAttribute('aria-pressed', 'true');
+    const parado = await pos();
+    await page.waitForTimeout(1500);
+    expect(await pos()).toBe(parado);
+    await pausa.click();
+    await expect(pausa).toHaveText('Pausar');
+    await expect.poll(pos, { timeout: 5000 }).not.toBe(parado);
+  });
+
+  test('os números do hero contam até o valor final', async ({ page }) => {
+    await page.addInitScript(() => {
+      const w = window as unknown as { __contagem: string[] };
+      w.__contagem = [];
+      document.addEventListener('DOMContentLoaded', () => {
+        const el = document.querySelector('[data-contar]');
+        if (!el) return;
+        w.__contagem.push(el.textContent ?? '');
+        new MutationObserver(() => w.__contagem.push(el.textContent ?? '')).observe(el, { childList: true, characterData: true, subtree: true });
+      });
+    });
+    await page.goto('/');
+    await page.waitForTimeout(2800);
+    const textos = await page.evaluate(() => (window as unknown as { __contagem: string[] }).__contagem);
+    expect(new Set(textos).size).toBeGreaterThan(3);
+    expect(textos[textos.length - 1]).toBe('~1.000');
+  });
+
+  test('a estrada do hero anda', async ({ page }) => {
+    await page.goto('/');
+    const estrada = page.locator('[data-estrada]').first();
+    await estrada.scrollIntoViewIfNeeded();
+    const desloc = () => estrada.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--desloc'));
+    await expect.poll(desloc).not.toBe('');
+    const antes = await desloc();
+    await expect.poll(desloc, { timeout: 3000 }).not.toBe(antes);
   });
 });

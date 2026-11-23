@@ -74,3 +74,36 @@ code { font-family: var(--fonte-mono); font-size: 0.86em; background: var(--surf
   [data-entrada] { animation-name: surgir-subindo; }
   @keyframes surgir-subindo { from { opacity: 0; translate: 0 18px; } }
 }
+
+/* Seta dos botões: avança no hover, só com movimento permitido. */
+.botao .seta { display: inline-block; transition: translate 0.2s var(--ease); }
+@media (prefers-reduced-motion: no-preference) {
+  .botao:hover .seta { translate: 3px 0; }
+  .botao:hover .seta--baixo { translate: 0 3px; }
+}
+
+/* Blocos recolhidos (<details>): resumo, texto, ícone de abrir e conteúdo. Usados em EstudoDeCaso e Decisao. */
+.recolhivel > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; align-items: start; padding: 18px clamp(16px, 3vw, 24px); min-height: 44px; cursor: pointer; list-style: none; border-radius: var(--raio); }
+.recolhivel > summary::-webkit-details-marker { display: none; }
+.resumo-titulo { grid-column: 1; font-size: 1.125rem; font-weight: 800; color: var(--ink); transition: color 0.2s; }
+.recolhivel > summary:hover .resumo-titulo { color: var(--signal); }
+.resumo-texto { grid-column: 1; max-width: var(--medida); color: var(--ink-2); font-size: 0.95rem; }
+.resumo-icone { grid-column: 2; grid-row: 1 / span 2; align-self: center; position: relative; width: 28px; height: 28px; border: 1px solid var(--line-2); border-radius: 50%; transition: border-color 0.2s, background-color 0.2s; }
+.recolhivel > summary:hover .resumo-icone, .recolhivel[open] .resumo-icone { border-color: var(--signal); }
+.resumo-icone::before, .resumo-icone::after { content: ''; position: absolute; left: 50%; top: 50%; width: 12px; height: 2px; margin: -1px 0 0 -6px; background: var(--signal); transition: opacity 0.25s; }
+.resumo-icone::after { rotate: 90deg; }
+/* Aberto: o "+" vira "−". Com movimento reduzido a barra vertical some com fade; com movimento, ela gira. */
+.recolhivel[open] .resumo-icone::after { opacity: 0; }
+.recolhivel[open] > .recolhivel-corpo { animation: surgir 0.4s var(--ease) both; }
+@media (prefers-reduced-motion: no-preference) {
+  .resumo-icone::after { transition: rotate 0.25s var(--ease); }
+  .recolhivel[open] .resumo-icone::after { opacity: 1; rotate: 0deg; }
+  .recolhivel[open] > .recolhivel-corpo { animation-name: abrir-subindo; }
+  @keyframes abrir-subindo { from { opacity: 0; translate: 0 8px; } }
+  @supports (interpolate-size: allow-keywords) {
+    .recolhivel { interpolate-size: allow-keywords; }
+    .recolhivel::details-content { height: 0; overflow: clip; transition: height 0.3s var(--ease), content-visibility 0.3s allow-discrete; }
+    .recolhivel[open]::details-content { height: auto; }
+  }
+}
+

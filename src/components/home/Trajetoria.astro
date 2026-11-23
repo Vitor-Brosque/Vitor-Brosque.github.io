@@ -26,18 +26,17 @@ const tr = textosHome[idioma].trajetoria;
   </div>
 </section>
 <style>
-  .traj { --prog: 1; position: relative; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 22px; margin-top: 32px; }
+  .traj { --prog: 1; position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 22px; margin-top: 32px; }
   :global(.js) .traj:not([data-estatico]) { --prog: 0; }
   .traj-estrada { position: relative; border-radius: 4px; background: var(--asfalto); }
   .traj-estrada::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; margin-left: -1.5px; background: repeating-linear-gradient(180deg, rgb(245 184 0 / 0.35) 0 18px, transparent 18px 30px); }
   .traj-preenchida { position: absolute; inset: 0; background: rgb(245 184 0 / 0.18); transform-origin: top; scale: 1 var(--prog); }
-  .traj-carro { position: absolute; left: 50%; top: calc(var(--prog) * 100%); width: 32px; height: 18px; rotate: 90deg; translate: -50% -50%; }
+  .traj-carro { position: absolute; left: 50%; top: calc(var(--prog) * 100%); width: 44px; height: 24px; rotate: 90deg; translate: -50% -50%; }
   .traj[data-estatico] .traj-carro, :global(html:not(.js)) .traj-carro { display: none; }
   .traj-marcos { display: grid; gap: 34px; margin: 0; padding: 0; list-style: none; }
   .traj-marco { position: relative; max-width: 70ch; }
-  .traj-marco::before { content: ''; position: absolute; left: -45px; top: 4px; width: 12px; height: 12px; border-radius: 50%; border: 3px solid var(--line-2); background: var(--bg); transition: border-color 0.3s, background-color 0.3s; }
+  .traj-marco::before { content: ''; position: absolute; left: -51px; top: 4px; width: 12px; height: 12px; border-radius: 50%; border: 3px solid var(--line-2); background: var(--bg); transition: border-color 0.3s, background-color 0.3s; }
   .traj-marco[data-alcancado]::before,
-  .traj[data-estatico] .traj-marco::before,
   :global(html:not(.js)) .traj-marco::before { border-color: var(--signal); background: var(--signal); }
   .traj-marco h3 { margin-top: 4px; font-size: 1.2rem; }
   .traj-texto { margin-top: 6px; color: var(--ink-2); }
