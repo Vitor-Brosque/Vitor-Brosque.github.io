@@ -25,7 +25,10 @@ const { titulo, paradas, modo, idioma, compacta = false } = Astro.props;
   {modo === 'loop' && !compacta && (
     <div class="rota-topo">
       <span class="rotulo">{titulo}</span>
-      <span class="rotulo rotulo--sinal" aria-hidden="true">● {t(idioma, 'rota.aoVivo')}</span>
+      <div class="rota-controles">
+        <span class="rotulo rotulo--sinal ao-vivo" aria-hidden="true"><i class="ponto-vivo"></i>{t(idioma, 'rota.aoVivo')}</span>
+        <button type="button" class="rota-pausa" data-rota-pausa aria-pressed="false" data-pausar={t(idioma, 'rota.pausar')} data-continuar={t(idioma, 'rota.continuar')}>{t(idioma, 'rota.pausar')}</button>
+      </div>
     </div>
   )}
   <div class="rota-palco">
@@ -52,50 +55,85 @@ const { titulo, paradas, modo, idioma, compacta = false } = Astro.props;
 </div>
 
 <style>
-  .rota { --pos: 0.1; --area: min(52vh, 460px); background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 18px clamp(14px, 2vw, 22px) 22px; }
+  .rota { --pos: 0.1; --feito: 0; --area: min(52vh, 460px); background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 18px clamp(14px, 2vw, 22px) 22px; }
   .rota--compacta { background: transparent; border: 0; padding: 0; }
-  .rota-topo { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .rota-topo { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .rota-controles { display: flex; align-items: center; gap: 12px; }
+  .ao-vivo { display: inline-flex; align-items: center; gap: 7px; transition: color 0.3s; }
+  .ponto-vivo { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 3px rgb(245 184 0 / 0.18); transition: box-shadow 0.3s; }
+  .rota[data-pausada] .ao-vivo { color: var(--mute); }
+  .rota[data-pausada] .ponto-vivo { box-shadow: none; }
+  .rota-pausa { min-height: 32px; padding: 4px 12px; border: 1px solid var(--line-2); border-radius: 4px; background: transparent; color: var(--ink-2); font: 700 0.72rem/1 var(--fonte-mono); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: border-color 0.2s, color 0.2s, background-color 0.2s; }
+  .rota-pausa:hover { border-color: var(--signal); color: var(--signal); }
+  .rota-pausa[aria-pressed='true'] { border-color: var(--signal); background: var(--signal-fundo); color: var(--signal); }
+  :global(html:not(.js)) .rota-pausa { display: none; }
+
   .placas { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 12px; }
-  .placa-corpo { height: 100%; background: var(--surface); border: 2px solid var(--line-2); border-radius: 6px; padding: 10px 12px 12px; transition: border-color 0.3s, background-color 0.3s, box-shadow 0.3s; }
-  .placa[data-ativa] .placa-corpo,
-  .rota[data-estatico] .placa-corpo { border-color: var(--signal); background: var(--signal-fundo); box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12); }
-  .rota[data-estatico] .placa-corpo { transition: none; }
-  .km { font-family: var(--fonte-mono); font-size: 0.7rem; letter-spacing: 0.08em; color: var(--mute); }
+  .placa-corpo { height: 100%; background: var(--surface); border: 2px solid var(--line-2); border-radius: 6px; padding: 10px 12px 12px; transition: border-color 0.3s, background-color 0.3s, box-shadow 0.3s, translate 0.4s var(--ease); }
+  .placa[data-ativa] .placa-corpo { border-color: var(--signal); background: var(--signal-fundo); box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12), 0 10px 24px -12px rgb(245 184 0 / 0.45); }
+  .km { font-family: var(--fonte-mono); font-size: 0.7rem; letter-spacing: 0.08em; color: var(--mute); transition: color 0.3s; }
+  .placa[data-ativa] .km { color: var(--signal); }
   .placa-titulo { display: block; margin-top: 4px; font-stretch: 115%; font-weight: 800; font-size: 1rem; line-height: 1.2; }
-  .placa-texto { margin-top: 6px; font-size: 0.86rem; line-height: 1.45; color: var(--mute); }
+  .placa-texto { margin-top: 6px; font-size: 0.86rem; line-height: 1.45; color: var(--mute); transition: color 0.3s; }
+  .placa[data-ativa] .placa-texto { color: var(--ink-2); }
   .rota--compacta .placas { gap: 6px; }
   .rota--compacta .placa-corpo { padding: 6px 6px; }
   .rota--compacta .placa-titulo { font-size: 0.74rem; }
-  .poste { width: 4px; height: 16px; margin-left: 22px; background: var(--line-2); }
+  .poste { width: 4px; height: 16px; margin-left: 22px; background: var(--line-2); transition: background-color 0.3s; }
+  .placa[data-ativa] .poste { background: var(--signal); }
   .rota--compacta .poste { height: 10px; margin-left: 14px; }
-  .asfalto { position: relative; height: 46px; border-radius: 4px; background: var(--asfalto); overflow: hidden; }
-  .rota--compacta .asfalto { height: 34px; }
-  .asfalto::before { content: ''; position: absolute; inset-inline: 0; top: 50%; height: 3px; margin-top: -1.5px; background: repeating-linear-gradient(90deg, rgb(245 184 0 / 0.4) 0 26px, transparent 26px 44px); }
-  .carro { position: absolute; top: 50%; left: calc(var(--pos) * 100%); width: 44px; height: 24px; translate: -50% -55%; }
-  .rota--compacta .carro { width: 32px; height: 18px; }
+
+  .asfalto { position: relative; height: 60px; border-radius: 4px; background: var(--asfalto); overflow: hidden; }
+  .rota--compacta .asfalto { height: 38px; }
+  /* Tracejado apagado e, por cima, o trecho já percorrido (do início até o carro). */
+  .asfalto::before { content: ''; position: absolute; inset-inline: 0; top: 50%; height: 3px; margin-top: -1.5px; background: repeating-linear-gradient(90deg, rgb(245 184 0 / 0.32) 0 26px, transparent 26px 44px); }
+  .asfalto::after { content: ''; position: absolute; left: 0; top: 50%; width: calc(var(--feito) * 100%); height: 3px; margin-top: -1.5px; background: var(--signal); box-shadow: 0 0 10px rgb(245 184 0 / 0.5); }
+  .carro { position: absolute; z-index: 1; top: 50%; left: calc(var(--pos) * 100%); width: 66px; height: 36px; translate: -50% -55%; transition: opacity 0.2s; }
+  .carro :global(.carrinho) { position: relative; z-index: 1; filter: drop-shadow(0 3px 0 rgb(0 0 0 / 0.55)); }
+  .rota--compacta .carro { width: 40px; height: 22px; }
+  .rota[data-trocando] .carro { opacity: 0; }
+  /* Farol: cone de luz à frente do carro, mais forte quando ele anda. */
+  .carro::after { content: ''; position: absolute; left: 92%; top: 22%; width: 120%; height: 70%; background: linear-gradient(90deg, rgb(255 246 204 / 0.4), transparent); clip-path: polygon(0 38%, 100% 0, 100% 100%, 0 62%); opacity: 0.55; transition: opacity 0.3s; }
+  .rota[data-andando] .carro::after { opacity: 1; }
   .rota[data-estatico] .carro { display: none; }
   .rota-detalhe-texto { color: var(--ink-2); max-width: 52ch; }
   .rota-detalhe :global(.moldura) { margin-top: 14px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .placa[data-ativa] .placa-corpo { translate: 0 -4px; }
+    .asfalto::before { animation: tracejar 0.5s linear infinite paused; }
+    .rota[data-andando] .asfalto::before { animation-play-state: running; }
+    .rota[data-andando] .carro :global(.carrinho) { animation: quicar 0.24s steps(2) infinite; }
+    .rota:not([data-pausada]) .ponto-vivo { animation: piscar-vivo 1.4s infinite; }
+    @keyframes tracejar { to { background-position-x: -44px; } }
+    @keyframes quicar { 50% { translate: 0 -1px; } }
+    @keyframes piscar-vivo { 50% { opacity: 0.25; } }
+  }
 
   @media (max-width: 559px) {
     .rota--compacta .placa-titulo { display: none; }
   }
 
   @media (max-width: 899px) {
-    .rota:not(.rota--compacta) .rota-palco { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 14px; }
+    .rota:not(.rota--compacta) .rota-palco { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 14px; }
     .rota:not(.rota--compacta) .placas { grid-column: 2; grid-row: 1; grid-template-columns: 1fr; gap: 16px; }
     .rota:not(.rota--compacta) .asfalto { grid-column: 1; grid-row: 1; height: auto; }
-    .rota:not(.rota--compacta) .asfalto::before { inset-inline: auto; left: 50%; top: 0; bottom: 0; width: 3px; height: auto; margin: 0 0 0 -1.5px; background: repeating-linear-gradient(180deg, rgb(245 184 0 / 0.4) 0 26px, transparent 26px 44px); }
-    .rota:not(.rota--compacta) .carro { left: 50%; top: calc(var(--pos) * 100%); rotate: 90deg; translate: -50% -50%; }
+    .rota:not(.rota--compacta) .asfalto::before { inset-inline: auto; left: 50%; top: 0; bottom: 0; width: 3px; height: auto; margin: 0 0 0 -1.5px; background: repeating-linear-gradient(180deg, rgb(245 184 0 / 0.32) 0 26px, transparent 26px 44px); }
+    .rota:not(.rota--compacta) .asfalto::after { left: 50%; top: 0; width: 3px; height: calc(var(--feito) * 100%); margin: 0 0 0 -1.5px; }
+    .rota:not(.rota--compacta) .carro { left: 50%; top: calc(var(--pos) * 100%); width: 58px; height: 32px; rotate: 90deg; translate: -50% -50%; }
     .rota:not(.rota--compacta) .poste { display: none; }
     .rota-detalhe { margin-top: 10px; }
     /* No celular o detalhe fica dentro da placa: o quadro passa a ser o próprio li. */
     .rota[data-modo='rolagem']:not(.rota--compacta) .placa { background: var(--surface); border: 2px solid var(--line-2); border-radius: 6px; padding: 10px 12px 14px; transition: border-color 0.3s, background-color 0.3s, box-shadow 0.3s; }
     .rota[data-modo='rolagem']:not(.rota--compacta) .placa[data-ativa],
-    .rota[data-modo='rolagem'][data-estatico]:not(.rota--compacta) .placa { border-color: var(--signal); background: var(--signal-fundo); box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12); }
-    .rota[data-modo='rolagem'][data-estatico]:not(.rota--compacta) .placa { transition: none; }
-    .rota[data-modo='rolagem']:not(.rota--compacta) .placa-corpo,
-    .rota[data-modo='rolagem'][data-estatico]:not(.rota--compacta) .placa-corpo { height: auto; padding: 0; border: 0; background: none; box-shadow: none; }
+    :global(html:not(.js)) .rota[data-modo='rolagem']:not(.rota--compacta) .placa { border-color: var(--signal); background: var(--signal-fundo); box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12); }
+    .rota[data-modo='rolagem']:not(.rota--compacta) .placa-corpo { height: auto; padding: 0; border: 0; background: none; box-shadow: none; }
+  }
+  @media (max-width: 899px) and (prefers-reduced-motion: no-preference) {
+    .rota:not(.rota--compacta) .placa[data-ativa] .placa-corpo { translate: 4px 0; }
+    .rota[data-modo='rolagem']:not(.rota--compacta) .placa[data-ativa] .placa-corpo { translate: none; }
+    .rota:not(.rota--compacta) .asfalto::before { animation-name: tracejar-vertical; }
+    @keyframes tracejar-vertical { to { background-position-y: 44px; } }
   }
 
   @media (min-width: 900px) {
@@ -117,11 +155,14 @@ const { titulo, paradas, modo, idioma, compacta = false } = Astro.props;
     .rota[data-modo='rolagem'][data-estatico] .poste,
     :global(html:not(.js)) .rota[data-modo='rolagem'] .poste,
     :global(html:not(.js)) .rota[data-modo='rolagem'] .asfalto { display: none; }
-    /* Estático (movimento reduzido ou sem JS) no desktop: o quadro também é o li, para o detalhe ficar dentro da placa. */
+    /* Estático (movimento reduzido) ou sem JS no desktop: o quadro é o li, para o detalhe ficar dentro da placa.
+       Com movimento reduzido só acende a placa no meio da janela; sem JS todas ficam acesas. */
     .rota[data-modo='rolagem'][data-estatico] .placa,
-    :global(html:not(.js)) .rota[data-modo='rolagem'] .placa { padding: 12px 16px 16px; background: var(--signal-fundo); border: 2px solid var(--signal); border-radius: 6px; box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12); }
+    :global(html:not(.js)) .rota[data-modo='rolagem'] .placa { padding: 12px 16px 16px; background: var(--surface); border: 2px solid var(--line-2); border-radius: 6px; transition: border-color 0.3s, background-color 0.3s, box-shadow 0.3s; }
+    .rota[data-modo='rolagem'][data-estatico] .placa[data-ativa],
+    :global(html:not(.js)) .rota[data-modo='rolagem'] .placa { background: var(--signal-fundo); border-color: var(--signal); box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12); }
     .rota[data-modo='rolagem'][data-estatico] .placa-corpo,
-    :global(html:not(.js)) .rota[data-modo='rolagem'] .placa-corpo { height: auto; padding: 0; border: 0; background: none; box-shadow: none; }
+    :global(html:not(.js)) .rota[data-modo='rolagem'] .placa-corpo { height: auto; padding: 0; border: 0; background: none; box-shadow: none; translate: none; }
     .rota[data-modo='rolagem'][data-estatico] .rota-detalhe :global(.moldura),
     :global(html:not(.js)) .rota[data-modo='rolagem'] .rota-detalhe :global(.moldura) { margin: 0; height: var(--area); display: flex; justify-content: center; }
     .rota[data-modo='rolagem'][data-estatico] .rota-detalhe :global(.moldura-tela),

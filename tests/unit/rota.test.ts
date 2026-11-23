@@ -1,33 +1,93 @@
 import { describe, expect, it } from 'vitest';
-import { estadoDaRota } from '../../src/scripts/rota-estado';
+import { estadoDaRolagem, estadoDoLoop, fracaoDoCarro, unidadesDoLoop } from '../../src/scripts/rota-estado';
 
-describe('estadoDaRota', () => {
+describe('estadoDaRolagem', () => {
   it('começa parado na primeira placa', () => {
-    expect(estadoDaRota(0, 5)).toEqual({ ativa: 0, posicao: 0.1 });
+    expect(estadoDaRolagem(0, 5)).toEqual({ ativa: 0, u: 0, andando: false });
   });
   it('termina parado na última placa', () => {
-    expect(estadoDaRota(1, 5)).toEqual({ ativa: 4, posicao: 0.9 });
+    expect(estadoDaRolagem(1, 5)).toEqual({ ativa: 4, u: 4, andando: false });
   });
   it('fica parado na placa durante 60% do trecho', () => {
-    expect(estadoDaRota(0.11, 5)).toEqual({ ativa: 0, posicao: 0.1 });
+    expect(estadoDaRolagem(0.11, 5)).toEqual({ ativa: 0, u: 0, andando: false });
   });
   it('anda entre placas no fim do trecho e troca a ativa na metade do caminho', () => {
-    const indo = estadoDaRota(0.15, 5);
-    expect(indo.posicao).toBeGreaterThan(0.1);
-    expect(indo.posicao).toBeLessThan(0.3);
+    const indo = estadoDaRolagem(0.15, 5);
+    expect(indo.andando).toBe(true);
+    expect(indo.u).toBeGreaterThan(0);
+    expect(indo.u).toBeLessThan(1);
     expect(indo.ativa).toBe(0);
-    expect(estadoDaRota(0.19, 5).ativa).toBe(1);
+    expect(estadoDaRolagem(0.19, 5).ativa).toBe(1);
   });
-  it('a posição nunca volta para trás', () => {
-    let anterior = -1;
-    for (let p = 0; p <= 1; p += 0.01) {
-      const { posicao } = estadoDaRota(p, 4);
-      expect(posicao).toBeGreaterThanOrEqual(anterior);
-      anterior = posicao;
+  it('u nunca volta para trás', () => {
+    let anterior = -Infinity;
+    for (let p = 0; p <= 1.0001; p += 0.005) {
+      const { u } = estadoDaRolagem(p, 4);
+      expect(u).toBeGreaterThanOrEqual(anterior);
+      anterior = u;
     }
   });
+  it('com uma placa só fica nela', () => {
+    expect(estadoDaRolagem(0.7, 1)).toMatchObject({ ativa: 0, u: 0 });
+  });
   it('limita progresso fora de 0..1', () => {
-    expect(estadoDaRota(-3, 3)).toEqual(estadoDaRota(0, 3));
-    expect(estadoDaRota(7, 3)).toEqual(estadoDaRota(1, 3));
+    expect(estadoDaRolagem(-3, 3)).toEqual(estadoDaRolagem(0, 3));
+    expect(estadoDaRolagem(7, 3)).toEqual(estadoDaRolagem(1, 3));
+  });
+});
+
+describe('estadoDoLoop', () => {
+  it('começa antes da entrada, sem placa acesa', () => {
+    expect(estadoDoLoop(0, 5)).toMatchObject({ u: -1, ativa: -1, andando: true });
+  });
+  it('termina depois da saída, sem placa acesa', () => {
+    expect(estadoDoLoop(1, 5)).toMatchObject({ u: 5, ativa: -1 });
+  });
+  it('para em todas as placas, na ordem', () => {
+    const paradas: number[] = [];
+    for (let p = 0; p <= 1; p += 0.001) {
+      const e = estadoDoLoop(p, 5);
+      if (!e.andando) {
+        expect(Number.isInteger(e.u)).toBe(true);
+        expect(e.ativa).toBe(e.u);
+        if (paradas[paradas.length - 1] !== e.u) paradas.push(e.u);
+      }
+    }
+    expect(paradas).toEqual([0, 1, 2, 3, 4]);
+  });
+  it('u nunca volta para trás numa volta', () => {
+    let anterior = -Infinity;
+    for (let p = 0; p <= 1.0001; p += 0.002) {
+      const { u } = estadoDoLoop(p, 4);
+      expect(u).toBeGreaterThanOrEqual(anterior);
+      anterior = u;
+    }
+  });
+  it('a placa acesa percorre 0..total-1', () => {
+    const acesas = new Set<number>();
+    for (let p = 0; p <= 1; p += 0.002) acesas.add(estadoDoLoop(p, 4).ativa);
+    expect([...acesas].sort()).toEqual([-1, 0, 1, 2, 3]);
+  });
+  it('a volta soma entrada, paradas, trechos e saída', () => {
+    expect(unidadesDoLoop(5)).toBeCloseTo(0.7 + 5 + 4 * 0.6 + 0.7);
+  });
+});
+
+describe('fracaoDoCarro', () => {
+  const centros = [0.1, 0.3, 0.5, 0.7, 0.9];
+  it('antes da entrada fica fora, à esquerda', () => {
+    expect(fracaoDoCarro(-1, centros, 0.05)).toBeCloseTo(-0.05);
+  });
+  it('depois da saída fica fora, à direita', () => {
+    expect(fracaoDoCarro(5, centros, 0.05)).toBeCloseTo(1.05);
+  });
+  it('em cada placa fica no centro dela', () => {
+    centros.forEach((c, i) => expect(fracaoDoCarro(i, centros, 0.05)).toBeCloseTo(c));
+  });
+  it('no meio do caminho fica na média dos centros', () => {
+    expect(fracaoDoCarro(1.5, [0.1, 0.2, 0.6], 0.05)).toBeCloseTo(0.4);
+  });
+  it('sem placas fica no meio', () => {
+    expect(fracaoDoCarro(2, [], 0.05)).toBe(0.5);
   });
 });
