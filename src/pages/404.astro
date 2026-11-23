@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+import CarrinhoPixel from '../components/CarrinhoPixel.astro';
+---
+<Base titulo="Saiu da estrada · Vitor Brosque" descricao="Página não encontrada." idioma="pt" indexar={false}>
+  <main id="conteudo" class="wrap erro">
+    <div class="erro-cena" aria-hidden="true">
+      <div class="erro-estrada"></div>
+      <div class="erro-carro"><CarrinhoPixel /></div>
+    </div>
+    <p class="rotulo rotulo--sinal">Erro 404</p>
+    <h1>Saiu da estrada.</h1>
+    <p class="erro-texto">Esta página não existe. <span lang="en">This page doesn't exist.</span></p>
+    <div class="erro-acoes">
+      <a class="botao botao--sinal" href="/">Voltar para o início</a>
+      <a class="botao" href="/en/" lang="en">Back to home</a>
+    </div>
+  </main>
+</Base>
+<style>
+  .erro { padding-block: clamp(48px, 10vw, 120px); }
+  .erro-cena { position: relative; height: 120px; margin-bottom: 28px; }
+  .erro-estrada { position: absolute; left: 0; right: 0; bottom: 30px; height: 40px; background: #1b211e; border-block: 2px solid var(--line); }
+  .erro-estrada::after { content: ''; position: absolute; inset-inline: 0; top: 50%; height: 3px; margin-top: -1.5px; background: repeating-linear-gradient(90deg, rgb(245 184 0 / 0.5) 0 30px, transparent 30px 52px); }
+  .erro-carro { position: absolute; left: min(60%, 420px); bottom: 0; width: 66px; height: 36px; rotate: 14deg; }
+  h1 { margin-top: 10px; font-size: clamp(2.75rem, 8vw, 5rem); }
+  .erro-texto { margin-top: 14px; color: var(--ink-2); }
+  .erro-acoes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+</style>
