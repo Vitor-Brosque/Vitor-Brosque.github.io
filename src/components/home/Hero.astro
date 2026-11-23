@@ -124,6 +124,8 @@ const formato = new Intl.NumberFormat(locale);
     .hero-acoes { margin-top: clamp(16px, 2.8svh, 30px); }
     .hero-print { rotate: 2.5deg; }
     .hero-print :global(img) { height: clamp(220px, min(32vw, 46svh), 400px); }
+    /* Colunas proporcionais ao conteúdo: o primeiro rótulo é o mais longo e o terceiro número tem um dígito só. */
+    .numeros { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1.15fr) minmax(0, 1fr); }
     .numeros li { display: flex; align-items: center; gap: clamp(12px, 1.4vw, 18px); padding-block: clamp(10px, 1.8svh, 18px); }
     .numero { font-size: clamp(2rem, min(2.9vw, 5svh), 2.6rem); font-stretch: 112%; }
     .rotulo-numero { margin-top: 0; }
