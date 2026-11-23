@@ -1,0 +1,11 @@
+---
+import { t, type Idioma } from '../i18n/ui';
+interface Props { idioma: Idioma }
+const { idioma } = Astro.props;
+---
+<footer class="rodape">
+  <div class="wrap"><p>© 2026 Vitor Brosque · {t(idioma, 'rodape.feito')}</p></div>
+</footer>
+<style>
+  .rodape { margin-top: clamp(64px, 10vw, 120px); padding-block: 28px; border-top: 1px solid var(--line); font-size: 0.85rem; color: var(--mute); }
+</style>
