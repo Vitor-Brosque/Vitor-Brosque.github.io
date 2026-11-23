@@ -8,7 +8,7 @@ const ancora = (id: string) => (naHome ? `#${id}` : urlDaHome(idioma, id));
 ---
 <nav class="nav" aria-label={t(idioma, 'nav.rotulo')}>
   <div class="wrap nav-dentro">
-    <a class="nav-logo" href={urlDaHome(idioma)} aria-label={t(idioma, 'nav.inicio')}>VITOR<span>.</span>BROSQUE</a>
+    <a class="nav-logo" href={urlDaHome(idioma)}>VITOR<span>.</span>BROSQUE<span class="sr-only"> — {t(idioma, 'nav.inicio')}</span></a>
     <ul class="nav-links">
       <li><a href={ancora('projetos')}>{t(idioma, 'nav.projetos')}</a></li>
       <li><a href={ancora('trajetoria')}>{t(idioma, 'nav.trajetoria')}</a></li>
@@ -18,15 +18,14 @@ const ancora = (id: string) => (naHome ? `#${id}` : urlDaHome(idioma, id));
       class="nav-idioma"
       href={urlEquivalente(Astro.url.pathname, outro)}
       hreflang={outro === 'pt' ? 'pt-BR' : 'en'}
-      aria-label={t(idioma, 'nav.trocarIdiomaAria')}
-    >{t(idioma, 'nav.trocarIdioma')}</a>
+    >{t(idioma, 'nav.trocarIdioma')}<span class="sr-only"> — {t(idioma, 'nav.trocarIdiomaAria')}</span></a>
   </div>
 </nav>
 <style>
   .nav { position: sticky; top: 0; z-index: 50; height: var(--altura-nav); background: rgb(17 21 19 / 0.82); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
   .nav-dentro { height: 100%; display: flex; align-items: center; gap: 24px; }
   .nav-logo { font-stretch: 125%; font-weight: 800; font-size: 0.95rem; text-decoration: none; letter-spacing: 0.01em; }
-  .nav-logo span { color: var(--signal); }
+  .nav-logo span:not(.sr-only) { color: var(--signal); }
   .nav-links { display: flex; gap: 22px; margin: 0 0 0 auto; padding: 0; list-style: none; font-family: var(--fonte-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
   .nav-links a { color: var(--mute); text-decoration: none; }
   .nav-links a:hover { color: var(--ink); }
