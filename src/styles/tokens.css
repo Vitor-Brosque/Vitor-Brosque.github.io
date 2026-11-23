@@ -10,6 +10,10 @@
   --dim: #7f8b85;
   --signal: #f5b800;
   --ok: #2e9e5b;
+  --asfalto: #0c0f0e;
+  --estrada: #1b211e;
+  --signal-fundo: #262410;
+  --signal-hover: #ffcb2e;
 
   --fonte: 'Archivo Variable', system-ui, sans-serif;
   --fonte-mono: 'JetBrains Mono', ui-monospace, monospace;

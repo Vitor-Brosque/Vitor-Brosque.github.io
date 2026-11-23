@@ -58,7 +58,7 @@ const { titulo, paradas, modo, idioma, compacta = false } = Astro.props;
   .placas { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 12px; }
   .placa-corpo { height: 100%; background: var(--surface); border: 2px solid var(--line-2); border-radius: 6px; padding: 10px 12px 12px; transition: border-color 0.3s, background-color 0.3s, box-shadow 0.3s; }
   .placa[data-ativa] .placa-corpo,
-  .rota[data-estatico] .placa-corpo { border-color: var(--signal); background: #262410; box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12); }
+  .rota[data-estatico] .placa-corpo { border-color: var(--signal); background: var(--signal-fundo); box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12); }
   .rota[data-estatico] .placa-corpo { transition: none; }
   .km { font-family: var(--fonte-mono); font-size: 0.7rem; letter-spacing: 0.08em; color: var(--mute); }
   .placa-titulo { display: block; margin-top: 4px; font-stretch: 115%; font-weight: 800; font-size: 1rem; line-height: 1.2; }
@@ -68,7 +68,7 @@ const { titulo, paradas, modo, idioma, compacta = false } = Astro.props;
   .rota--compacta .placa-titulo { font-size: 0.74rem; }
   .poste { width: 4px; height: 16px; margin-left: 22px; background: var(--line-2); }
   .rota--compacta .poste { height: 10px; margin-left: 14px; }
-  .asfalto { position: relative; height: 46px; border-radius: 4px; background: #0c0f0e; overflow: hidden; }
+  .asfalto { position: relative; height: 46px; border-radius: 4px; background: var(--asfalto); overflow: hidden; }
   .rota--compacta .asfalto { height: 34px; }
   .asfalto::before { content: ''; position: absolute; inset-inline: 0; top: 50%; height: 3px; margin-top: -1.5px; background: repeating-linear-gradient(90deg, rgb(245 184 0 / 0.4) 0 26px, transparent 26px 44px); }
   .carro { position: absolute; top: 50%; left: calc(var(--pos) * 100%); width: 44px; height: 24px; translate: -50% -55%; }
@@ -92,7 +92,7 @@ const { titulo, paradas, modo, idioma, compacta = false } = Astro.props;
     /* No celular o detalhe fica dentro da placa: o quadro passa a ser o próprio li. */
     .rota[data-modo='rolagem']:not(.rota--compacta) .placa { background: var(--surface); border: 2px solid var(--line-2); border-radius: 6px; padding: 10px 12px 14px; transition: border-color 0.3s, background-color 0.3s, box-shadow 0.3s; }
     .rota[data-modo='rolagem']:not(.rota--compacta) .placa[data-ativa],
-    .rota[data-modo='rolagem'][data-estatico]:not(.rota--compacta) .placa { border-color: var(--signal); background: #262410; box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12); }
+    .rota[data-modo='rolagem'][data-estatico]:not(.rota--compacta) .placa { border-color: var(--signal); background: var(--signal-fundo); box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12); }
     .rota[data-modo='rolagem'][data-estatico]:not(.rota--compacta) .placa { transition: none; }
     .rota[data-modo='rolagem']:not(.rota--compacta) .placa-corpo,
     .rota[data-modo='rolagem'][data-estatico]:not(.rota--compacta) .placa-corpo { height: auto; padding: 0; border: 0; background: none; box-shadow: none; }
@@ -119,7 +119,7 @@ const { titulo, paradas, modo, idioma, compacta = false } = Astro.props;
     :global(html:not(.js)) .rota[data-modo='rolagem'] .asfalto { display: none; }
     /* Estático (movimento reduzido ou sem JS) no desktop: o quadro também é o li, para o detalhe ficar dentro da placa. */
     .rota[data-modo='rolagem'][data-estatico] .placa,
-    :global(html:not(.js)) .rota[data-modo='rolagem'] .placa { padding: 12px 16px 16px; background: #262410; border: 2px solid var(--signal); border-radius: 6px; box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12); }
+    :global(html:not(.js)) .rota[data-modo='rolagem'] .placa { padding: 12px 16px 16px; background: var(--signal-fundo); border: 2px solid var(--signal); border-radius: 6px; box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12); }
     .rota[data-modo='rolagem'][data-estatico] .placa-corpo,
     :global(html:not(.js)) .rota[data-modo='rolagem'] .placa-corpo { height: auto; padding: 0; border: 0; background: none; box-shadow: none; }
     .rota[data-modo='rolagem'][data-estatico] .rota-detalhe :global(.moldura),

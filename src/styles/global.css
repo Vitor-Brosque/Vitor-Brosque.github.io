@@ -41,7 +41,7 @@ code { font-family: var(--fonte-mono); font-size: 0.86em; background: var(--surf
   .botao:active { translate: 0 1px; }
 }
 .botao--sinal { background: var(--signal); border-color: var(--signal); color: var(--bg); }
-.botao--sinal:hover { background: #ffcb2e; }
+.botao--sinal:hover { background: var(--signal-hover); }
 
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .chips li { font-family: var(--fonte-mono); font-size: 0.75rem; padding: 4px 8px; border: 1px solid var(--line-2); border-radius: 4px; color: var(--ink-2); background: var(--bg-2); }
