@@ -58,7 +58,8 @@ const { titulo, paradas, modo, idioma, compacta = false } = Astro.props;
   .placas { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 12px; }
   .placa-corpo { height: 100%; background: var(--surface); border: 2px solid var(--line-2); border-radius: 6px; padding: 10px 12px 12px; transition: border-color 0.3s, background-color 0.3s, box-shadow 0.3s; }
   .placa[data-ativa] .placa-corpo,
-  .rota[data-estatico] .placa-corpo { border-color: var(--signal); background: #262410; box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12); transition: none; }
+  .rota[data-estatico] .placa-corpo { border-color: var(--signal); background: #262410; box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12); }
+  .rota[data-estatico] .placa-corpo { transition: none; }
   .km { font-family: var(--fonte-mono); font-size: 0.7rem; letter-spacing: 0.08em; color: var(--mute); }
   .placa-titulo { display: block; margin-top: 4px; font-stretch: 115%; font-weight: 800; font-size: 1rem; line-height: 1.2; }
   .placa-texto { margin-top: 6px; font-size: 0.86rem; line-height: 1.45; color: var(--mute); }
