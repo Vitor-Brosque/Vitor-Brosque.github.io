@@ -16,6 +16,8 @@ cartao: capa
 capa:
   imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
   alt: Painel do dia do RodoviariaOS com resumo, tarefas, alertas, estoque e financeiro, com dados inventados
+emResumo: >-
+  Sistema que a revenda da minha família usa todos os dias. Desde julho de 2026 ele recebeu cerca de 1.000 leads e, no mês de pico, 2,6 mil mensagens de WhatsApp. Fiz tudo sozinho, do banco de dados às telas, com mais de 1.400 testes automáticos da API. O CRM, o WhatsApp e o estoque estão em uso; o financeiro, o assistente com IA e o radar de compra estão prontos e entrando em uso.
 resumo:
   problema: >-
     Centenas de leads chegando pelo WhatsApp e por anúncios. O vendedor se perdia nas conversas,
@@ -191,6 +193,8 @@ arquitetura:
     - { de: processador, para: banco }
 decisoes:
   - titulo: Isolamento no banco, não na disciplina
+    resumo: >-
+      Quem garante que uma loja não vê os dados da outra, nem um sócio os do outro, é o próprio banco de dados, e não o cuidado de quem escreve o código.
     escolha: >-
       Row-Level Security com `FORCE` em todas as tabelas com `tenant_id`, mais políticas
       `RESTRICTIVE` por dono nas tabelas financeiras.
@@ -204,6 +208,8 @@ decisoes:
       custo da minha escolha: correções de dados em massa precisam de um laço por loja, algumas chaves
       estrangeiras entram como `NOT VALID` e o backup precisa de um usuário com mais privilégio.
   - titulo: Ingestão do WhatsApp feita para não perder nem duplicar
+    resumo: >-
+      Cada mensagem é guardada assim que chega e só depois é processada. Se algo falhar no meio, ela continua lá para a próxima tentativa.
     escolha: >-
       Webhook com assinatura HMAC conferida sobre o corpo bruto, gravação numa tabela com chave
       única antes de processar, e processamento em segundo plano com novas tentativas e varredura
@@ -216,6 +222,8 @@ decisoes:
       Processar direto na requisição do webhook, que é mais rápido de fazer, mas perde o evento se
       algo falhar no meio.
   - titulo: IA que classifica, não que age
+    resumo: >-
+      A IA só entende o pedido. Quem executa é código comum, com as permissões de quem pediu, e nada é gravado sem um "confirmo".
     escolha: >-
       Regras reconhecem a maioria dos comandos. Quando nenhuma reconhece, a IA só escolhe uma
       intenção numa lista fechada de 26, por tool calling com a saída validada pelo Zod. Quem executa
@@ -228,6 +236,8 @@ decisoes:
       Um agente livre com acesso ao banco, que entenderia mais pedidos, mas seria imprevisível, caro
       e difícil de proteger contra injeção de prompt.
   - titulo: Extrato com "prova real"
+    resumo: >-
+      Ao importar um extrato, a soma dos lançamentos precisa bater com o saldo que o banco imprimiu. Se não bater, o arquivo é recusado.
     escolha: >-
       Leitores de OFX, CSV, XLSX e PDF escritos no próprio projeto. Nos PDFs, a soma dos lançamentos
       precisa bater, centavo a centavo, com cada saldo diário impresso pelo banco.
@@ -240,6 +250,8 @@ decisoes:
       Classificar as linhas com IA. Preferi regras aprendidas a cada classificação confirmada, que são
       previsíveis e podem ser desfeitas linha a linha.
   - titulo: Sem Redis, sem fila e sem cron, de propósito
+    resumo: >-
+      Menos peças para manter: o banco de dados faz também o papel de fila e de cache, o que é suficiente para o tamanho de uma loja.
     escolha: >-
       O Postgres faz o papel de fila (webhooks), cache (consulta de placa) e rate limit (login). Os
       jobs são timers dentro do processo da API.
@@ -251,6 +263,8 @@ decisoes:
       relógios. É uma troca consciente para o tamanho atual, e migrar para uma fila dedicada é simples,
       porque a fila já é uma tabela.
   - titulo: Deploy em gates
+    resumo: >-
+      Cada atualização passa por etapas que só avançam se a anterior deu certo, com backup antes e volta automática se algo falhar.
     escolha: >-
       Cada rodada passa por etapas que só começam se a anterior passou: testes e typecheck, backup do
       banco, migrations numa transação, build isolado com sha256 de cada artefato, troca com rollback

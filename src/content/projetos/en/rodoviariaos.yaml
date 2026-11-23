@@ -16,6 +16,8 @@ cartao: capa
 capa:
   imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
   alt: RodoviariaOS daily dashboard with summary, tasks, alerts, inventory and finance, using made-up data
+emResumo: >-
+  The system my family's dealership uses every day. Since July 2026 it has received about 1,000 leads and, in the peak month, 2,600 WhatsApp messages. I built all of it myself, from the database to the screens, with more than 1,400 automated API tests. CRM, WhatsApp and inventory are in use; finance, the AI assistant and the purchase radar are built and being rolled out.
 resumo:
   problema: >-
     Hundreds of leads coming in through WhatsApp and ads. The salesperson got lost in the conversations,
@@ -139,6 +141,8 @@ arquitetura:
     - { de: processador, para: banco }
 decisoes:
   - titulo: Isolation in the database, not in discipline
+    resumo: >-
+      The database itself guarantees that one store can't see another's data and one partner can't see the other's. It doesn't depend on the care of whoever writes the code.
     escolha: >-
       Row-Level Security with `FORCE` on every table that has a `tenant_id`, plus `RESTRICTIVE`
       per-owner policies on the finance tables.
@@ -152,6 +156,8 @@ decisoes:
       mistake. The cost of my choice: bulk data fixes need a loop per store, some foreign keys go in
       as `NOT VALID`, and backups need a more privileged user.
   - titulo: WhatsApp ingestion built not to lose or duplicate
+    resumo: >-
+      Every message is stored the moment it arrives and processed afterwards. If something fails halfway, it is still there for the next attempt.
     escolha: >-
       A webhook with an HMAC signature checked against the raw body, stored in a table with a unique
       key before processing, then processed in the background with retries and a periodic sweep.
@@ -163,6 +169,8 @@ decisoes:
       Processing directly inside the webhook request, which is quicker to build but loses the event
       if anything fails halfway.
   - titulo: AI that classifies, not acts
+    resumo: >-
+      The AI only understands the request. Ordinary code does the work, with the permissions of whoever asked, and nothing is saved without a "confirm".
     escolha: >-
       Rules recognize most commands. When none does, the AI only picks one intent from a closed list
       of 26, through tool calling with Zod-validated output. Deterministic code does the work, with
@@ -175,6 +183,8 @@ decisoes:
       A free-roaming agent with database access, which would understand more requests but would be
       unpredictable, expensive and hard to protect against prompt injection.
   - titulo: Bank statements with a "proof check"
+    resumo: >-
+      When a bank statement is imported, the entries must add up to the balance the bank printed. If they don't, the file is rejected.
     escolha: >-
       Readers for OFX, CSV, XLSX and PDF written in the project itself. For PDFs, the sum of the
       entries must match, to the cent, every daily balance the bank printed.
@@ -187,6 +197,8 @@ decisoes:
       Classifying lines with AI. I chose rules learned from every confirmed classification, which are
       predictable and can be undone line by line.
   - titulo: No Redis, no queue, no cron, on purpose
+    resumo: >-
+      Fewer parts to maintain: the database also plays the role of queue and cache, which is enough for a single dealership.
     escolha: >-
       Postgres plays the role of queue (webhooks), cache (license plate lookup) and rate limiter
       (login). Jobs are timers inside the API process.
@@ -198,6 +210,8 @@ decisoes:
       resets the timers. It's a deliberate trade-off for the current size, and moving to a dedicated
       queue is simple because the queue is already a table.
   - titulo: Gated deploys
+    resumo: >-
+      Every update goes through steps that only move forward if the previous one succeeded, with a backup first and an automatic rollback if anything fails.
     escolha: >-
       Every release goes through steps that only start if the previous one passed: tests and
       typecheck, database backup, migrations in a transaction, an isolated build with a sha256 for

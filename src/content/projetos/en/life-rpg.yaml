@@ -3,7 +3,7 @@ ordem: 2
 frase: A pixel-art study and routine app, offline-first, that shows one quest at a time.
 status: aberto
 statusTexto: Open source (MIT) · in daily personal use
-statusDetalhe: Still missing tests on a real iPhone, the AI hasn't been tested with a real key, and there's no CI yet.
+statusDetalhe: "In daily use. Still missing: iPhone tests, AI with a real key, and CI."
 papel: Personal project, from design to infrastructure
 periodo: "2026"
 stack: [TypeScript, React 19, Vite, Dexie (IndexedDB), Zustand, Fastify 5, "SQLite (node:sqlite)", Zod 4, ts-fsrs, Vitest, Docker]
@@ -14,6 +14,8 @@ capa:
   imagem: ../../../assets/projetos/life-rpg/mapa.png
   moldura: celular
   alt: Life RPG world map in pixel art, with territories, camps and NPCs
+emResumo: >-
+  The app I use every day to study and organize my routine. It works offline on the phone and syncs with the PC in near real time. The code is open, with tests, and the app's rules were checked against 64 scientific sources on habits and learning.
 resumo:
   problema: >-
     I know what I need to do, but I freeze when it's time to start. Long lists overwhelm me and rigid
@@ -110,10 +112,14 @@ arquitetura:
     - { de: sse, para: painel }
 decisoes:
   - titulo: Truly offline-first
+    resumo: >-
+      The app saves everything on the device first, so it works offline and never waits for the network.
     escolha: Everything is saved to IndexedDB first, and syncing happens afterwards.
     porque: I use it on my phone anywhere. The UI never waits for the network, and the app works with the server off.
     deixeiDeLado: An online-only app, simpler to write but useless without signal.
   - titulo: Cursor-based sync and last-write-wins
+    resumo: >-
+      Each device sends what it changed and receives what the others changed. If two edit the same thing, the most recent change wins.
     escolha: >-
       The server keeps a global revision. Each device sends its own changes and gets back what changed
       since its cursor. On conflict, the most recent `updatedAt` wins.
@@ -125,23 +131,31 @@ decisoes:
       CRDTs, which would resolve simultaneous edits without loss, at a complexity that doesn't pay off
       for one person.
   - titulo: Pure domain rules
+    resumo: >-
+      The app's most important rules live in a package separate from the UI and the server, which makes each one easy to test.
     escolha: >-
-      The day scheduler, XP, recurrence, FSRS, patterns, the Portuguese parser and merging live in
-      `packages/shared`, with no browser or server.
+      The day scheduler, XP, recurrence, spaced repetition (FSRS), routine analysis (planned vs. done, postponements and trends), the Portuguese parser and merging live in `packages/shared`, with no browser or server.
     porque: The most important rules become pure functions, easy to test and shared by both sides.
     deixeiDeLado: Logic spread across components, faster at first and a nightmare to test later.
   - titulo: Content-addressed media
+    resumo: >-
+      Images and audio are identified by their own content, so the same file is never stored twice, not even in backups.
     escolha: Images and audio are stored by their SHA-256 hash, and the daily backup mirrors media with hard links.
     porque: The same file is never stored twice, and 14 days of backups take no extra space for repeated media.
     deixeiDeLado: File names by id, which would duplicate media in every backup.
   - titulo: Secure even though it's personal
+    resumo: >-
+      The server sits at home and isn't exposed directly to the internet: outside access goes through a private network with HTTPS.
     escolha: >-
       A token compared in constant time, a server listening only on `127.0.0.1`, and remote access over
       Tailscale HTTPS. The AI key lives only on the server.
     porque: It's a home server with my personal data. Nothing is exposed directly to the internet.
     deixeiDeLado: Opening a port on the router, which would be simpler and much riskier.
   - titulo: Evidence before gamification
-    escolha: I gathered 64 scientific sources on habits, learning and sleep, and checked every rule in the app against them.
+    resumo: >-
+      Before deciding what earns points, I checked every rule in the app against research on habits and learning.
+    escolha: >-
+      I gathered [64 scientific sources](https://github.com/Vitor-Brosque/life-rpg/blob/main/docs/analise-pesquisa-cientifica-2026-11-13.md) on habits, learning and sleep, and checked every rule in the app against them.
     porque: >-
       Badly designed gamification rewards the wrong thing. That's why logging sleep gives no XP:
       rewarding the logging instead of the behavior can hurt motivation.
