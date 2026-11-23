@@ -1,0 +1,275 @@
+titulo: RodoviariaOS
+ordem: 1
+destaque: true
+frase: CRM, financeiro e assistente com IA para a revenda de carros da minha família.
+status: producao
+statusTexto: Em produção · código fechado
+statusDetalhe: >-
+  CRM, WhatsApp e estoque em uso todos os dias. Financeiro, assistente e radar de compra
+  prontos e testados, entrando em uso.
+papel: Tudo, do banco de dados à interface, sozinho
+periodo: Desde julho de 2026
+stack: [TypeScript, Next.js 15, React 19, Fastify 5, PostgreSQL 18, Drizzle ORM, Zod 4, Vitest]
+links:
+  vitrine: https://github.com/Vitor-Brosque/rodoviariaos-showcase
+cartao: capa
+capa:
+  imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
+  alt: Painel do dia do RodoviariaOS com resumo, tarefas, alertas, estoque e financeiro, com dados inventados
+resumo:
+  problema: >-
+    Centenas de leads chegando pelo WhatsApp e por anúncios. O vendedor se perdia nas conversas,
+    e cada sócio fazia a conta dos próprios carros à mão.
+  construi: >-
+    Um sistema que reconhece cada cliente, monta a fila de quem precisa de resposta e calcula o
+    resultado de cada carro, com o financeiro e um assistente prontos para entrar em uso.
+  orgulho: >-
+    O isolamento entre sócios é garantido pelo próprio banco de dados, a ingestão do WhatsApp não
+    perde nem duplica mensagens, e a IA classifica pedidos sem nunca ver os dados da loja.
+problema: |-
+  Antes de programar, eu trabalhava no balcão da Rodoviária Veículos, a revenda da minha família. Cuidava dos anúncios, do estoque e do atendimento pelo WhatsApp.
+
+  O gargalo era sempre o mesmo. Os leads chegavam aos montes, a maioria pelo WhatsApp, e o vendedor não sabia quem estava esperando resposta, quem já tinha sido atendido e quem tinha esfriado. Também não dava para saber qual anúncio trazia venda.
+
+  No financeiro, a loja tem mais de um sócio, e cada um é dono de carros diferentes. Cada sócio precisa ver o custo e o resultado dos próprios carros, mas não os do outro. Isso era resolvido com planilha e conversa.
+rota:
+  titulo: A rota de um lead
+  paradas:
+    - titulo: O lead chega
+      curto: WhatsApp, anúncio da Meta ou site.
+      texto: >-
+        Pelo WhatsApp, por um anúncio da Meta de clique para o WhatsApp ou pelo formulário do site.
+        A mensagem entra por um webhook assinado e é gravada antes de ser processada.
+    - titulo: Quem é essa pessoa
+      curto: Reconhece a pessoa, sem duplicar.
+      texto: >-
+        O telefone normalizado e uma camada de identidade ligam lead, cliente e fornecedor à mesma
+        pessoa, sem duplicar. A origem do contato fica registrada.
+    - titulo: Fila por próxima ação
+      curto: Responder, Primeiro contato, Tentativas, Negociação.
+      texto: >-
+        Cada lead cai numa fila só, nesta ordem: Responder, Primeiro contato, Tentativas e Negociação.
+        A cadência conta só as tentativas realmente feitas e sugere a mensagem. O sistema nunca
+        envia nada sozinho.
+      midia:
+        imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
+        alt: Painel do dia mostrando leads esperando resposta e leads novos sem resposta
+    - titulo: Negociação
+      curto: A origem é obrigatória e congelada.
+      texto: >-
+        Para abrir uma negociação, a origem é obrigatória. A partir daí ela fica congelada e segue
+        até a venda, mesmo que o lead mude depois.
+      midia:
+        video: /media/rodoviariaos/whatsapp-negociacao-celular.mp4
+        proporcao: 780/1688
+        moldura: celular
+        alt: Conversa de WhatsApp virando negociação no RodoviariaOS, com dados inventados
+    - titulo: Venda atribuída
+      curto: Vendas por origem, campanha e carro.
+      texto: >-
+        Os relatórios cruzam leads, negociações e vendas por origem, campanha, anúncio e carro,
+        com o custo por lead.
+funcionalidades:
+  - titulo: Painel do dia
+    texto: >-
+      O que pede ação hoje num resumo só: tarefas, contas vencidas, leads sem resposta e carros
+      parados.
+    midia:
+      imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
+      alt: Painel do dia com resumo, tarefas, alertas, estoque e financeiro, com dados inventados
+  - titulo: Mesmo carro, dois sócios
+    texto: >-
+      O dono do carro vê custo e margem. O outro sócio vê só o catálogo. A regra vale nas telas,
+      na API e no banco.
+    midia:
+      imagem: ../../../assets/projetos/rodoviariaos/dois-socios.png
+      video: /media/rodoviariaos/dois-socios.mp4
+      alt: O mesmo carro visto por dois sócios, um com custo e margem e outro só com o catálogo
+  - titulo: Resultado por carro
+    texto: >-
+      Preço de venda menos o custo real do carro: aquisição, despesas, comissão, garantia e
+      tributos. O resultado fica Provisório até tudo ser realizado.
+    midia:
+      imagem: ../../../assets/projetos/rodoviariaos/resultado-por-carro.png
+      alt: Tela de resultado por carro com venda, aquisição, despesas e resultado, com dados inventados
+  - titulo: Radar de compra
+    texto: >-
+      Anúncios de carros parecidos comparados com a mediana do mercado, corrigida pela
+      quilometragem. Desconto grande demais vira "conferir" e nunca some.
+    midia:
+      imagem: ../../../assets/projetos/rodoviariaos/radar-de-compra.png
+      alt: Lista de anúncios com selos de oportunidade e de conferir, com dados inventados
+  - titulo: Assistente
+    texto: >-
+      Responde perguntas sobre estoque, leads e financeiro, e só registra algo depois de um
+      "confirmo".
+    midia:
+      video: /media/rodoviariaos/assistente.mp4
+      proporcao: 4/5
+      alt: Assistente do RodoviariaOS respondendo uma consulta e pedindo confirmação, com dados inventados
+  - titulo: Ocultar valores
+    texto: Um clique esconde todos os valores da tela, para quando tem cliente no balcão.
+    midia:
+      video: /media/rodoviariaos/ocultar-valores.mp4
+      proporcao: 4/5
+      alt: Botão Ocultar valores trocando os valores da tela por pontos
+arquitetura:
+  titulo: Arquitetura
+  texto: >-
+    Toda requisição passa pela mesma estrada até o banco, e o banco só devolve o que aquela loja e
+    aquele sócio podem ver. As mensagens do WhatsApp chegam por uma via lateral, com fila em tabela.
+  nos:
+    - id: navegador
+      rotulo: Navegador
+      detalhe: painel e celular
+      col: 0
+      lin: 0
+      explicacao: >-
+        O navegador só conversa com o Next.js. Os cookies de sessão são httpOnly e de primeira parte.
+    - id: next
+      rotulo: Next.js 15
+      detalhe: App Router
+      col: 1
+      lin: 0
+      explicacao: >-
+        Serve as telas e repassa tudo o que é /api para a API, na mesma origem. Sem CORS e sem
+        endereço da API embutido no código do navegador.
+    - id: api
+      rotulo: API Fastify
+      detalhe: nega por padrão
+      col: 2
+      lin: 0
+      explicacao: >-
+        Cada requisição passa por log com dados sensíveis mascarados, autenticação que nega por
+        padrão, checagem de papel e validação Zod da entrada e da saída.
+    - id: tenant
+      rotulo: withTenant()
+      detalhe: loja · usuário · papel
+      col: 3
+      lin: 0
+      explicacao: >-
+        Abre uma transação e grava, só para ela, a loja, o usuário e o papel. Esses valores vêm só do
+        token, nunca do corpo da requisição.
+    - id: banco
+      rotulo: PostgreSQL 18
+      detalhe: Row-Level Security
+      col: 4
+      lin: 0
+      destaque: true
+      explicacao: >-
+        As políticas de RLS filtram as linhas por loja e, nas tabelas financeiras, por sócio. A
+        aplicação usa um usuário que não pode ignorar a RLS, então uma consulta sem contexto dá erro.
+    - id: whatsapp
+      rotulo: WhatsApp
+      detalhe: webhook assinado
+      col: 0
+      lin: 1
+      explicacao: Cada evento chega com uma assinatura HMAC, conferida sobre o corpo bruto da requisição.
+    - id: fila
+      rotulo: Fila em tabela
+      detalhe: chave única
+      col: 2
+      lin: 1
+      explicacao: >-
+        O evento é gravado antes de ser processado, com chave única. Reentrega e replay não duplicam.
+    - id: processador
+      rotulo: Processador
+      detalhe: 4 em paralelo
+      col: 3
+      lin: 1
+      explicacao: >-
+        Processa em segundo plano, com no máximo 4 ao mesmo tempo, novas tentativas com espera
+        crescente e uma varredura a cada minuto. Ao terminar, avisa o painel do vendedor por SSE.
+  faixas:
+    - { de: navegador, para: next }
+    - { de: next, para: api }
+    - { de: api, para: tenant }
+    - { de: tenant, para: banco }
+    - { de: whatsapp, para: fila }
+    - { de: fila, para: processador }
+    - { de: processador, para: banco }
+decisoes:
+  - titulo: Isolamento no banco, não na disciplina
+    escolha: >-
+      Row-Level Security com `FORCE` em todas as tabelas com `tenant_id`, mais políticas
+      `RESTRICTIVE` por dono nas tabelas financeiras.
+    porque: >-
+      Esquecer um `WHERE tenant_id` em qualquer consulta não pode vazar dados de outra loja nem do
+      outro sócio. Sem contexto, a consulta falha em vez de devolver dados. Um teste falha se uma
+      tabela nova ficar sem RLS, e um teste "canário" percorre todas as rotas de leitura com ids do
+      outro sócio.
+    deixeiDeLado: >-
+      O filtro só na aplicação, mais simples de escrever, mas que depende de ninguém errar nunca. O
+      custo da minha escolha: correções de dados em massa precisam de um laço por loja, algumas chaves
+      estrangeiras entram como `NOT VALID` e o backup precisa de um usuário com mais privilégio.
+  - titulo: Ingestão do WhatsApp que não perde nem duplica
+    escolha: >-
+      Webhook com assinatura HMAC conferida sobre o corpo bruto, gravação numa tabela com chave
+      única antes de processar, e processamento em segundo plano com novas tentativas e varredura
+      periódica.
+    porque: >-
+      Mensagem de cliente perdida é venda perdida, e mensagem duplicada vira lead duplicado. Gravar
+      primeiro e processar depois separa "receber" de "entender". Se o processamento falha, a
+      mensagem continua lá para a próxima tentativa.
+    deixeiDeLado: >-
+      Processar direto na requisição do webhook, que é mais rápido de fazer, mas perde o evento se
+      algo falhar no meio.
+  - titulo: IA que classifica, não que age
+    escolha: >-
+      Regras reconhecem a maioria dos comandos. Quando nenhuma reconhece, a IA só escolhe uma
+      intenção numa lista fechada de 26, por tool calling com a saída validada pelo Zod. Quem executa
+      é código determinístico, com as permissões de quem pediu.
+    porque: >-
+      A IA nunca vê os dados da loja e nunca decide permissão. Toda escrita vira uma proposta que só
+      executa com "confirmo", e esse "confirmo" é reconhecido por regra. O assistente funciona até sem
+      chave de IA, e cada loja tem um teto mensal de gasto.
+    deixeiDeLado: >-
+      Um agente livre com acesso ao banco, que entenderia mais pedidos, mas seria imprevisível, caro
+      e difícil de proteger contra injeção de prompt.
+  - titulo: Extrato com "prova real"
+    escolha: >-
+      Leitores de OFX, CSV, XLSX e PDF escritos no próprio projeto. Nos PDFs, a soma dos lançamentos
+      precisa bater, centavo a centavo, com cada saldo diário impresso pelo banco.
+    porque: >-
+      Importar um extrato errado é pior do que recusar. Arquivo repetido é barrado pelo SHA-256, e
+      linhas iguais só viram duplicata se o extrato anterior tinha a mesma quantidade delas: duas
+      tarifas iguais no mesmo dia continuam sendo duas. A conciliação sugere candidatos com nota, mas
+      nunca vincula sozinha.
+    deixeiDeLado: >-
+      Classificar as linhas com IA. Preferi regras aprendidas a cada classificação confirmada, que são
+      previsíveis e podem ser desfeitas linha a linha.
+  - titulo: Sem Redis, sem fila e sem cron, de propósito
+    escolha: >-
+      O Postgres faz o papel de fila (webhooks), cache (consulta de placa) e rate limit (login). Os
+      jobs são timers dentro do processo da API.
+    porque: >-
+      Um servidor só, com menos peças para operar e monitorar, é o tamanho certo para uma loja. Cada
+      peça a menos é uma peça a menos para cair.
+    deixeiDeLado: >-
+      A escala horizontal. O SSE é em memória, um job só roda com a API no ar, e reiniciar zera os
+      relógios. É uma troca consciente para o tamanho atual, e migrar para uma fila dedicada é simples,
+      porque a fila já é uma tabela.
+  - titulo: Deploy em gates
+    escolha: >-
+      Cada rodada passa por etapas que só começam se a anterior passou: testes e typecheck, backup do
+      banco, migrations numa transação, build isolado com sha256 de cada artefato, troca com rollback
+      automático e validação.
+    porque: Uma atualização que falha no meio não pode derrubar a loja. Se a troca falha, a versão anterior volta sozinha.
+    deixeiDeLado: O CI/CD automático. Como o código é fechado, preferi controle humano, com um roteiro escrito para cada rodada.
+numeros:
+  - { valor: "~1.000", rotulo: "leads recebidos desde julho de 2026" }
+  - { valor: "~400", rotulo: "leads no mês de pico (setembro)" }
+  - { valor: "~2,6 mil", rotulo: "mensagens de WhatsApp recebidas no mês de pico" }
+  - { valor: "1.400+", rotulo: "testes de API contra PostgreSQL real, mais 150+ no front" }
+numerosFonte: >-
+  Lidos no banco de produção em 23/11/2026. Leads e mensagens vêm do CRM em uso. O financeiro e o
+  assistente ainda não têm volume real.
+proximos:
+  - Colocar o financeiro e o assistente em uso diário na loja.
+  - Publicar a extensão do radar de compra e conferir com os portais reais.
+  - Enviar as conversões de volta para a Meta, para medir melhor os anúncios.
+  - Preparar o sistema para outras revendas.
+seo:
+  descricao: >-
+    Estudo de caso do RodoviariaOS: CRM, financeiro e IA para uma revenda, com isolamento por RLS no
+    PostgreSQL e ingestão confiável do WhatsApp.
