@@ -8,7 +8,7 @@ export interface TextosHome {
     tituloDestaque: string;
     tituloDepois: string;
     apresentacao: string;
-    provas: Array<{ texto: string; detalhe: string }>;
+    numeros: Array<{ numero: number; prefixo?: string; sufixo?: string; rotulo: string }>;
     ctaPrincipal: string;
     ctaLinkedin: string;
     rotuloPrint: string;
@@ -36,10 +36,10 @@ export const textosHome: Record<Idioma, TextosHome> = {
       tituloDepois: ' que roda nela.',
       apresentacao:
         'Sou o Vitor, estudante de Sistemas de Informação na UNESP, em Bauru. Comecei atendendo clientes na loja de carros da minha família e hoje construo o software que organiza a loja.',
-      provas: [
-        { texto: 'Em uso todo dia numa revenda de carros', detalhe: 'RodoviariaOS' },
-        { texto: 'Código aberto, com testes', detalhe: 'Life RPG' },
-        { texto: 'TypeScript, Python e PostgreSQL', detalhe: 'do banco à interface' },
+      numeros: [
+        { numero: 1000, prefixo: '~', rotulo: 'leads recebidos pelo sistema que eu construí, desde jul/2026' },
+        { numero: 1400, sufixo: '+', rotulo: 'testes de API contra PostgreSQL real' },
+        { numero: 3, rotulo: 'projetos: 1 em produção e 2 de código aberto' },
       ],
       ctaPrincipal: 'Ver o RodoviariaOS',
       ctaLinkedin: 'LinkedIn',
@@ -97,10 +97,10 @@ export const textosHome: Record<Idioma, TextosHome> = {
       tituloDepois: ' that runs it.',
       apresentacao:
         "I'm Vitor, an Information Systems student at UNESP, in Brazil. I started out serving customers at my family's car dealership, and now I build the software that keeps the dealership organized.",
-      provas: [
-        { texto: 'Used every day at a car dealership', detalhe: 'RodoviariaOS' },
-        { texto: 'Open source, with tests', detalhe: 'Life RPG' },
-        { texto: 'TypeScript, Python and PostgreSQL', detalhe: 'from the database to the UI' },
+      numeros: [
+        { numero: 1000, prefixo: '~', rotulo: 'leads received by the system I built, since Jul 2026' },
+        { numero: 1400, sufixo: '+', rotulo: 'API tests against a real PostgreSQL' },
+        { numero: 3, rotulo: 'projects: 1 in production and 2 open source' },
       ],
       ctaPrincipal: 'See RodoviariaOS',
       ctaLinkedin: 'LinkedIn',
