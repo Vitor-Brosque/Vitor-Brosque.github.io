@@ -11,7 +11,6 @@ import type { ImageMetadata } from 'astro';
 import Nav from '../components/Nav.astro';
 import Rodape from '../components/Rodape.astro';
 import Ampliador from '../components/Ampliador.astro';
-import capaPadrao from '../assets/projetos/rodoviariaos/painel-do-dia.png';
 import { langHtml, t, urlEquivalente, type Idioma } from '../i18n/ui';
 
 interface Props {
@@ -23,13 +22,14 @@ interface Props {
   indexar?: boolean;
   altOg?: string;
 }
-const { titulo, descricao, idioma, imagemOg = capaPadrao, jsonLd, indexar = true, altOg = titulo } = Astro.props;
+const { titulo, descricao, idioma, imagemOg, jsonLd, indexar = true, altOg = titulo } = Astro.props;
 const site = Astro.site ?? new URL('https://vitor-brosque.github.io');
 const canonica = new URL(Astro.url.pathname, site).href;
 const urlPt = new URL(urlEquivalente(Astro.url.pathname, 'pt'), site).href;
 const urlEn = new URL(urlEquivalente(Astro.url.pathname, 'en'), site).href;
-const og = await getImage({ src: imagemOg, width: 1200, height: 630, fit: 'cover', position: 'top', format: 'png' });
-const ogUrl = new URL(og.src, site).href;
+// Imagem de compartilhamento: vem de quem usa o layout (a capa do projeto). Sem ela, a página sai sem og:image.
+const og = imagemOg ? await getImage({ src: imagemOg, width: 1200, height: 630, fit: 'cover', position: 'top', format: 'png' }) : undefined;
+const ogUrl = og ? new URL(og.src, site).href : undefined;
 ---
 <!doctype html>
 <html lang={langHtml(idioma)}>
@@ -52,12 +52,12 @@ const ogUrl = new URL(og.src, site).href;
     <meta property="og:title" content={titulo} />
     <meta property="og:description" content={descricao} />
     <meta property="og:url" content={canonica} />
-    <meta property="og:image" content={ogUrl} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={altOg} />
+    {ogUrl && <meta property="og:image" content={ogUrl} />}
+    {ogUrl && <meta property="og:image:width" content="1200" />}
+    {ogUrl && <meta property="og:image:height" content="630" />}
+    {ogUrl && <meta property="og:image:alt" content={altOg} />}
     <meta property="og:locale" content={idioma === 'pt' ? 'pt_BR' : 'en_US'} />
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content={ogUrl ? 'summary_large_image' : 'summary'} />
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     <script is:inline>
       (() => {

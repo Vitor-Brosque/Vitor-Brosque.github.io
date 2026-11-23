@@ -11,6 +11,7 @@
     "preview": "astro preview --port 4321",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "capa": "node scripts/gerar-capa.mjs",
     "checar:vazamento": "node scripts/checar-vazamento.mjs --obrigatorio",
     "checar:repo": "node scripts/checar-vazamento.mjs --obrigatorio --repo",
     "publicar:checar": "npm run build && npm run checar:vazamento && npm run checar:repo"

@@ -30,7 +30,7 @@ const jsonLd = {
   sameAs: [LINKEDIN, GITHUB],
 };
 ---
-<Base titulo={h.meta.titulo} descricao={h.meta.descricao} idioma={idioma} jsonLd={jsonLd}>
+<Base titulo={h.meta.titulo} descricao={h.meta.descricao} idioma={idioma} imagemOg={destaque.data.capa?.imagem} altOg={destaque.data.capa?.alt} jsonLd={jsonLd}>
   <main id="conteudo">
     <Hero idioma={idioma} destaque={destaque} />
     <Estrada />
