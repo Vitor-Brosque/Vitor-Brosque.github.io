@@ -1,0 +1,114 @@
+---
+import CarrinhoPixel from './CarrinhoPixel.astro';
+import MolduraMidia from './MolduraMidia.astro';
+import type { Parada } from '../lib/projetos';
+import { textoRico } from '../lib/texto';
+import { t, type Idioma } from '../i18n/ui';
+
+interface Props {
+  titulo: string;
+  paradas: Parada[];
+  modo: 'loop' | 'rolagem';
+  idioma: Idioma;
+  compacta?: boolean;
+}
+const { titulo, paradas, modo, idioma, compacta = false } = Astro.props;
+---
+<div
+  class:list={['rota', { 'rota--compacta': compacta }]}
+  data-rota
+  data-modo={modo}
+  style={`--n: ${paradas.length}`}
+  role="group"
+  aria-label={titulo}
+>
+  {modo === 'loop' && !compacta && (
+    <div class="rota-topo">
+      <span class="rotulo">{titulo}</span>
+      <span class="rotulo rotulo--sinal" aria-hidden="true">● {t(idioma, 'rota.aoVivo')}</span>
+    </div>
+  )}
+  <div class="rota-palco">
+    <ol class="placas">
+      {paradas.map((p, i) => (
+        <li class="placa" data-ativa={i === 0 ? '' : undefined}>
+          <div class="placa-corpo">
+            <span class="km">KM {i}</span>
+            <strong class="placa-titulo">{p.titulo}</strong>
+            {modo === 'loop' && !compacta && <p class="placa-texto" set:html={textoRico(p.curto ?? p.texto)} />}
+          </div>
+          <div class="poste" aria-hidden="true"></div>
+          {modo === 'rolagem' && (
+            <div class:list={['rota-detalhe', { 'rota-detalhe--midia': p.midia }]}>
+              <p class="rota-detalhe-texto" set:html={textoRico(p.texto)} />
+              {p.midia && <MolduraMidia midia={p.midia} idioma={idioma} sizes="(min-width: 900px) 40vw, 90vw" />}
+            </div>
+          )}
+        </li>
+      ))}
+    </ol>
+    <div class="asfalto" aria-hidden="true"><div class="carro"><CarrinhoPixel /></div></div>
+  </div>
+</div>
+
+<style>
+  .rota { --pos: 0.1; --area: min(52vh, 460px); background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 18px clamp(14px, 2vw, 22px) 22px; }
+  .rota--compacta { background: transparent; border: 0; padding: 0; }
+  .rota-topo { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .placas { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 12px; }
+  .placa-corpo { height: 100%; background: var(--surface); border: 2px solid var(--line-2); border-radius: 6px; padding: 10px 12px 12px; transition: border-color 0.3s, background-color 0.3s, box-shadow 0.3s; }
+  .placa[data-ativa] .placa-corpo,
+  .rota[data-estatico] .placa-corpo { border-color: var(--signal); background: #262410; box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12); }
+  .km { font-family: var(--fonte-mono); font-size: 0.7rem; letter-spacing: 0.08em; color: var(--mute); }
+  .placa-titulo { display: block; margin-top: 4px; font-stretch: 115%; font-weight: 800; font-size: 1rem; line-height: 1.2; }
+  .placa-texto { margin-top: 6px; font-size: 0.86rem; line-height: 1.45; color: var(--mute); }
+  .rota--compacta .placas { gap: 6px; }
+  .rota--compacta .placa-corpo { padding: 6px 8px; }
+  .rota--compacta .placa-titulo { font-size: 0.78rem; }
+  .poste { width: 4px; height: 16px; margin-left: 22px; background: var(--line-2); }
+  .rota--compacta .poste { height: 10px; margin-left: 14px; }
+  .asfalto { position: relative; height: 46px; border-radius: 4px; background: #0c0f0e; overflow: hidden; }
+  .rota--compacta .asfalto { height: 34px; }
+  .asfalto::before { content: ''; position: absolute; inset-inline: 0; top: 50%; height: 3px; margin-top: -1.5px; background: repeating-linear-gradient(90deg, rgb(245 184 0 / 0.4) 0 26px, transparent 26px 44px); }
+  .carro { position: absolute; top: 50%; left: calc(var(--pos) * 100%); width: 44px; height: 24px; translate: -50% -55%; }
+  .rota--compacta .carro { width: 32px; height: 18px; }
+  .rota[data-estatico] .carro { display: none; }
+  .rota-detalhe-texto { color: var(--ink-2); max-width: 52ch; }
+  .rota-detalhe :global(.moldura) { margin-top: 14px; }
+
+  @media (max-width: 559px) {
+    .rota--compacta .placa-titulo { display: none; }
+  }
+
+  @media (max-width: 899px) {
+    .rota:not(.rota--compacta) .rota-palco { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 14px; }
+    .rota:not(.rota--compacta) .placas { grid-column: 2; grid-row: 1; grid-template-columns: 1fr; gap: 16px; }
+    .rota:not(.rota--compacta) .asfalto { grid-column: 1; grid-row: 1; height: auto; }
+    .rota:not(.rota--compacta) .asfalto::before { inset-inline: auto; left: 50%; top: 0; bottom: 0; width: 3px; height: auto; margin: 0 0 0 -1.5px; background: repeating-linear-gradient(180deg, rgb(245 184 0 / 0.4) 0 26px, transparent 26px 44px); }
+    .rota:not(.rota--compacta) .carro { left: 50%; top: calc(var(--pos) * 100%); rotate: 90deg; translate: -50% -50%; }
+    .rota:not(.rota--compacta) .poste { display: none; }
+    .rota-detalhe { margin-top: 10px; }
+  }
+
+  @media (min-width: 900px) {
+    :global(.js) .rota[data-modo='rolagem']:not([data-estatico]) .rota-palco { position: relative; padding-bottom: calc(var(--area) + 24px); }
+    :global(.js) .rota[data-modo='rolagem']:not([data-estatico]) .rota-detalhe {
+      position: absolute; inset-inline: 0; bottom: 0; height: var(--area);
+      display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; gap: 28px;
+      opacity: 0; visibility: hidden; transition: opacity 0.35s, visibility 0.35s;
+    }
+    :global(.js) .rota[data-modo='rolagem']:not([data-estatico]) .rota-detalhe--midia { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); align-items: center; }
+    :global(.js) .rota[data-modo='rolagem']:not([data-estatico]) .placa[data-ativa] .rota-detalhe { opacity: 1; visibility: visible; }
+    :global(.js) .rota[data-modo='rolagem']:not([data-estatico]) .rota-detalhe-texto { font-size: 1.2rem; line-height: 1.5; }
+    :global(.js) .rota[data-modo='rolagem']:not([data-estatico]) .rota-detalhe :global(.moldura) { margin: 0; height: var(--area); display: flex; justify-content: center; }
+    :global(.js) .rota[data-modo='rolagem']:not([data-estatico]) .rota-detalhe :global(.moldura-tela) { height: 100%; display: flex; flex-direction: column; }
+    :global(.js) .rota[data-modo='rolagem']:not([data-estatico]) .rota-detalhe :global(.moldura-midia) { flex: 1; min-height: 0; width: auto; }
+    .rota[data-estatico] .placas,
+    :global(html:not(.js)) .rota[data-modo='rolagem'] .placas { grid-template-columns: 1fr; }
+    .rota[data-estatico] .asfalto,
+    .rota[data-estatico] .poste,
+    :global(html:not(.js)) .rota[data-modo='rolagem'] .asfalto { display: none; }
+    .rota[data-estatico] .rota-detalhe--midia { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; margin-top: 12px; align-items: start; }
+  }
+</style>
+<script>import '../scripts/rota';</script>
