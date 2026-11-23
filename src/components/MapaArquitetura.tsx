@@ -10,37 +10,28 @@ interface Props {
   todas: string;
 }
 
-export default function MapaArquitetura({ nos, faixas, rotulo, dica, todas }: Props) {
-  const [selecionado, setSelecionado] = useState<string | null>(null);
-  const [animar, setAnimar] = useState(false);
-  const [transposto, setTransposto] = useState(false);
-  const caixa = useRef<HTMLDivElement>(null);
-  const prefixo = useId().replace(/[^a-zA-Z0-9]/g, '');
+interface SvgProps {
+  nos: NoMapa[];
+  faixas: FaixaMapa[];
+  rotulo: string;
+  transposto: boolean;
+  prefixo: string;
+  animar: boolean;
+  selecionado: string | null;
+  ativas: Set<number>;
+  porId: Map<string, NoMapa>;
+  aoSelecionar: (id: string) => void;
+}
 
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const atualizar = () => setAnimar(!mq.matches);
-    atualizar();
-    mq.addEventListener('change', atualizar);
-    return () => mq.removeEventListener('change', atualizar);
-  }, []);
-
-  useEffect(() => {
-    const el = caixa.current;
-    if (!el) return;
-    const obs = new ResizeObserver(([e]) => setTransposto(e.contentRect.width < 760));
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  const porId = useMemo(() => new Map(nos.map((n) => [n.id, n])), [nos]);
-  const ativas = useMemo(() => new Set(selecionado ? faixasDoNo(selecionado, faixas) : []), [selecionado, faixas]);
+function SvgMapa({ nos, faixas, rotulo, transposto, prefixo, animar, selecionado, ativas, porId, aoSelecionar }: SvgProps) {
   const { largura, altura } = dimensoesDoMapa(nos, transposto);
-  const atual = selecionado ? porId.get(selecionado) : undefined;
-
   return (
-    <div className="mapa" ref={caixa}>
-      <svg className="mapa-svg" viewBox={`0 0 ${largura} ${altura}`} role="group" aria-label={rotulo}>
+    <svg
+      className={`mapa-svg ${transposto ? 'mapa-svg--vertical' : 'mapa-svg--largo'}`}
+      viewBox={`0 0 ${largura} ${altura}`}
+      role="group"
+      aria-label={rotulo}
+    >
         {faixas.map((f, i) => {
           const de = porId.get(f.de);
           const para = porId.get(f.para);
@@ -73,13 +64,13 @@ export default function MapaArquitetura({ nos, faixas, rotulo, dica, todas }: Pr
               role="button"
               aria-pressed={ativo}
               aria-label={`${n.rotulo}: ${n.detalhe}`}
-              onMouseEnter={() => setSelecionado(n.id)}
-              onFocus={() => setSelecionado(n.id)}
-              onClick={() => setSelecionado(n.id)}
+              onMouseEnter={() => aoSelecionar(n.id)}
+              onFocus={() => aoSelecionar(n.id)}
+              onClick={() => aoSelecionar(n.id)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  setSelecionado(n.id);
+                  aoSelecionar(n.id);
                 }
               }}
             >
@@ -89,7 +80,43 @@ export default function MapaArquitetura({ nos, faixas, rotulo, dica, todas }: Pr
             </g>
           );
         })}
-      </svg>
+    </svg>
+  );
+}
+
+export default function MapaArquitetura({ nos, faixas, rotulo, dica, todas }: Props) {
+  const [selecionado, setSelecionado] = useState<string | null>(null);
+  const [movimentoOk, setMovimentoOk] = useState(false);
+  const [visivel, setVisivel] = useState(false);
+  const caixa = useRef<HTMLDivElement>(null);
+  const prefixo = useId().replace(/[^a-zA-Z0-9]/g, '');
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const atualizar = () => setMovimentoOk(!mq.matches);
+    atualizar();
+    mq.addEventListener('change', atualizar);
+    return () => mq.removeEventListener('change', atualizar);
+  }, []);
+
+  useEffect(() => {
+    const el = caixa.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => setVisivel(e.isIntersecting));
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  const porId = useMemo(() => new Map(nos.map((n) => [n.id, n])), [nos]);
+  const ativas = useMemo(() => new Set(selecionado ? faixasDoNo(selecionado, faixas) : []), [selecionado, faixas]);
+  const atual = selecionado ? porId.get(selecionado) : undefined;
+  const animar = movimentoOk && visivel;
+  const comum = { nos, faixas, rotulo, animar, selecionado, ativas, porId, aoSelecionar: setSelecionado };
+
+  return (
+    <div className="mapa" ref={caixa}>
+      <SvgMapa {...comum} transposto={false} prefixo={`${prefixo}-l`} />
+      <SvgMapa {...comum} transposto prefixo={`${prefixo}-v`} />
       <div className="mapa-explicacao" aria-live="polite">
         {atual ? (
           <>
