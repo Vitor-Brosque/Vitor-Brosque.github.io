@@ -202,7 +202,27 @@ test.describe('com movimento permitido', () => {
     await expect.poll(pos, { timeout: 5000 }).not.toBe(parado);
   });
 
+  /** Fixa a entrada dos números: 'escondidos' segura o início do fade (opacidade 0), 'visiveis' tira a entrada. */
+  async function entradaDosNumeros(page: Page, estado: 'escondidos' | 'visiveis') {
+    // Antes de qualquer script da página: o estilo entra no <html> assim que ele existe.
+    await page.addInitScript((e) => {
+      const estilo = document.createElement('style');
+      estilo.textContent = `[data-hero-prova] { ${e === 'escondidos' ? 'animation-play-state: paused' : 'animation: none'} !important; }`;
+      const por = () => document.documentElement.append(estilo);
+      if (document.documentElement) por();
+      else
+        new MutationObserver((_, obs) => {
+          if (!document.documentElement) return;
+          obs.disconnect();
+          por();
+        }).observe(document, { childList: true });
+    }, estado);
+  }
+
   test('os números do hero contam até o valor final', async ({ page }) => {
+    // O caso normal: o script começa antes de os números aparecerem. Sob carga, o script pode chegar depois
+    // da entrada; aí ele não conta (teste seguinte), então a entrada fica segurada aqui para o teste não depender da máquina.
+    await entradaDosNumeros(page, 'escondidos');
     await registrarContagem(page);
     await page.goto('/');
     // Espera a contagem terminar: o último texto registrado é o final, depois de ter passado por outros.
@@ -213,6 +233,15 @@ test.describe('com movimento permitido', () => {
       }, { timeout: 8000 })
       .toBe(true);
     expect(new Set(await textosDaContagem(page)).size).toBeGreaterThan(3);
+  });
+
+  test('os números do hero não contam se já estão à vista quando o script começa', async ({ page }) => {
+    await entradaDosNumeros(page, 'visiveis');
+    await registrarContagem(page);
+    await page.goto('/');
+    await page.waitForLoadState('load');
+    await page.waitForTimeout(2500);
+    expect(await textosDaContagem(page)).toEqual(['~1.000']);
   });
 
   test('a estrada do hero anda', async ({ page }) => {
