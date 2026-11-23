@@ -1,23 +1,66 @@
 export interface EstadoRota {
-  /** Índice da placa acesa. */
+  /** Índice da placa acesa, ou -1 quando o carro está fora da rota (entrando ou saindo). */
   ativa: number;
-  /** Posição do carro de 0 a 1 ao longo da estrada (o centro da placa i é (i + 0.5) / total). */
-  posicao: number;
+  /** Posição do carro em unidades de placa: i é o centro da placa i; -1 é antes da entrada; total é depois da saída. */
+  u: number;
+  /** O carro está andando (entre placas, entrando ou saindo). */
+  andando: boolean;
 }
 
 const PARADO = 0.6;
+const suave = (t: number) => t * t * (3 - 2 * t);
+const limitar = (v: number, a: number, b: number) => Math.min(Math.max(v, a), b);
 
-export function estadoDaRota(progresso: number, total: number): EstadoRota {
-  if (total <= 1) return { ativa: 0, posicao: 0.5 };
-  const p = Math.min(Math.max(progresso, 0), 1);
-  const centro = (i: number) => Math.round(((i + 0.5) / total) * 1e6) / 1e6;
+/** Rolagem (estudo de caso): o progresso de 0 a 1 leva o carro da primeira à última placa, parando em cada uma. */
+export function estadoDaRolagem(progresso: number, total: number): EstadoRota {
+  if (total <= 1) return { ativa: 0, u: 0, andando: false };
+  const p = limitar(progresso, 0, 1);
   const trecho = Math.min(total - 1, Math.floor(p * total));
   const local = p * total - trecho;
-  if (trecho === total - 1 || local <= PARADO) return { ativa: trecho, posicao: centro(trecho) };
+  if (trecho === total - 1 || local <= PARADO) return { ativa: trecho, u: trecho, andando: false };
   const t = (local - PARADO) / (1 - PARADO);
-  const suave = t * t * (3 - 2 * t);
-  return {
-    ativa: t < 0.5 ? trecho : trecho + 1,
-    posicao: Math.min(centro(trecho + 1), centro(trecho) + (centro(trecho + 1) - centro(trecho)) * suave),
-  };
+  return { ativa: t < 0.5 ? trecho : trecho + 1, u: trecho + suave(t), andando: true };
+}
+
+/** Tempos do loop, em unidades: entrada, parada em cada placa, trecho entre placas e saída. */
+export const LOOP = { entrada: 0.7, parada: 1, trecho: 0.6, saida: 0.7 } as const;
+
+export function unidadesDoLoop(total: number): number {
+  const n = Math.max(total, 1);
+  return LOOP.entrada + n * LOOP.parada + (n - 1) * LOOP.trecho + LOOP.saida;
+}
+
+/** Loop (home): o carro entra por um lado, para em cada placa e sai pelo outro. O progresso de 0 a 1 é uma volta. */
+export function estadoDoLoop(progresso: number, total: number): EstadoRota {
+  const n = Math.max(total, 1);
+  let t = limitar(progresso, 0, 1) * unidadesDoLoop(n);
+  if (t < LOOP.entrada) {
+    const f = t / LOOP.entrada;
+    const u = -1 + (1 - (1 - f) * (1 - f));
+    return { ativa: u > -0.5 ? 0 : -1, u, andando: true };
+  }
+  t -= LOOP.entrada;
+  for (let i = 0; i < n; i++) {
+    if (t < LOOP.parada) return { ativa: i, u: i, andando: false };
+    t -= LOOP.parada;
+    if (i === n - 1) break;
+    if (t < LOOP.trecho) {
+      const f = suave(t / LOOP.trecho);
+      return { ativa: f < 0.5 ? i : i + 1, u: i + f, andando: true };
+    }
+    t -= LOOP.trecho;
+  }
+  const f = Math.min(t / LOOP.saida, 1);
+  const u = n - 1 + f * f;
+  return { ativa: u < n - 0.5 ? n - 1 : -1, u, andando: true };
+}
+
+/** Converte `u` na fração (0 a 1) ao longo do asfalto, usando os centros medidos das placas. A margem deixa o carro sair inteiro. */
+export function fracaoDoCarro(u: number, centros: number[], margem: number): number {
+  const n = centros.length;
+  if (n === 0) return 0.5;
+  if (u <= 0) return centros[0] + (centros[0] + margem) * limitar(u, -1, 0);
+  if (u >= n - 1) return centros[n - 1] + (1 + margem - centros[n - 1]) * limitar(u - (n - 1), 0, 1);
+  const k = Math.floor(u);
+  return centros[k] + (centros[k + 1] - centros[k]) * (u - k);
 }
