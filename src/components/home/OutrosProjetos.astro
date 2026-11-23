@@ -1,0 +1,18 @@
+---
+import CardProjeto from './CardProjeto.astro';
+import type { Projeto } from '../../lib/projetos';
+import { textosHome } from '../../i18n/home';
+import type { Idioma } from '../../i18n/ui';
+
+interface Props { idioma: Idioma; projetos: Projeto[] }
+const { idioma, projetos } = Astro.props;
+---
+<section class="secao wrap" aria-labelledby="outros-titulo">
+  <h2 id="outros-titulo">{textosHome[idioma].outros.titulo}</h2>
+  <div class="cards">
+    {projetos.map((p, i) => <CardProjeto projeto={p} numero={i + 2} idioma={idioma} />)}
+  </div>
+</section>
+<style>
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 18px; margin-top: 24px; }
+</style>
