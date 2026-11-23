@@ -27,7 +27,7 @@ export const textosHome: Record<Idioma, TextosHome> = {
     meta: {
       titulo: 'Vitor Brosque · Backend e Dados',
       descricao:
-        'Estudante de Sistemas de Informação na UNESP. Construí o RodoviariaOS, CRM e financeiro de uma revenda de carros, e o Life RPG, PWA offline-first de código aberto.',
+        'Estudante de Sistemas de Informação na UNESP. Construí o RodoviariaOS, sistema em produção numa revenda de carros, e o Life RPG, PWA offline-first de código aberto.',
     },
     hero: {
       selo: 'Aberto a estágio · Backend e Dados',
@@ -88,7 +88,7 @@ export const textosHome: Record<Idioma, TextosHome> = {
     meta: {
       titulo: 'Vitor Brosque · Backend and Data',
       descricao:
-        'Information Systems student at UNESP. I built RodoviariaOS, the CRM and finance system of a car dealership, and Life RPG, an open-source offline-first PWA.',
+        'Information Systems student at UNESP. I built RodoviariaOS, a system running in production at a car dealership, and Life RPG, an open-source offline-first PWA.',
     },
     hero: {
       selo: 'Open to internships · Backend and Data',

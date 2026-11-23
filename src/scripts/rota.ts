@@ -20,7 +20,8 @@ function iniciarLoop(raiz: HTMLElement, placas: HTMLElement[]): () => void {
     aplicar(raiz, placas, estadoDaRota(((agora - inicio) % duracao) / duracao, n));
     raf = requestAnimationFrame(passo);
   };
-  const obs = new IntersectionObserver(([entrada]) => {
+  const obs = new IntersectionObserver((entradas) => {
+    const entrada = entradas[entradas.length - 1];
     if (entrada.isIntersecting && !raf) {
       inicio = performance.now();
       raf = requestAnimationFrame(passo);
