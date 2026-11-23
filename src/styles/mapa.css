@@ -1,0 +1,20 @@
+.mapa { margin-top: 24px; }
+.mapa-svg { width: 100%; height: auto; overflow: visible; }
+.mapa-asfalto { fill: none; stroke: #0c0f0e; stroke-width: 14; stroke-linecap: round; }
+.mapa-tracejado { fill: none; stroke: #3a4642; stroke-width: 2; stroke-dasharray: 8 7; }
+.mapa-faixa.is-ativa .mapa-tracejado { stroke: var(--signal); }
+.mapa-pacote { fill: var(--signal); }
+.mapa-no { cursor: pointer; outline: none; }
+.mapa-no rect { fill: var(--surface); stroke: var(--line-2); stroke-width: 2; transition: stroke 0.2s, fill 0.2s; }
+.mapa-no.is-destaque rect { stroke: #8a6b00; }
+.mapa-no.is-ativo rect, .mapa-no:focus-visible rect { stroke: var(--signal); fill: #262410; }
+.mapa-rotulo { fill: var(--ink); font: 800 15px var(--fonte); font-stretch: 112%; }
+.mapa-detalhe { fill: var(--mute); font: 400 11px var(--fonte-mono); }
+.mapa-explicacao { min-height: 5.5em; margin-top: 14px; padding: 14px 16px; border-left: 3px solid var(--signal); background: var(--bg-2); color: var(--ink-2); }
+.mapa-explicacao strong { display: block; color: var(--ink); font-stretch: 112%; }
+.mapa-dica { color: var(--mute); }
+.mapa-todas { margin-top: 12px; color: var(--mute); }
+.mapa-todas summary { cursor: pointer; }
+.mapa-todas dl { display: grid; gap: 10px; margin: 12px 0 0; }
+.mapa-todas dt { color: var(--ink); font-weight: 700; }
+.mapa-todas dd { margin: 0; }

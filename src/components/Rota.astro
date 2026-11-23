@@ -89,6 +89,13 @@ const { titulo, paradas, modo, idioma, compacta = false } = Astro.props;
     .rota:not(.rota--compacta) .carro { left: 50%; top: calc(var(--pos) * 100%); rotate: 90deg; translate: -50% -50%; }
     .rota:not(.rota--compacta) .poste { display: none; }
     .rota-detalhe { margin-top: 10px; }
+    /* No celular o detalhe fica dentro da placa: o quadro passa a ser o próprio li. */
+    .rota[data-modo='rolagem']:not(.rota--compacta) .placa { background: var(--surface); border: 2px solid var(--line-2); border-radius: 6px; padding: 10px 12px 14px; transition: border-color 0.3s, background-color 0.3s, box-shadow 0.3s; }
+    .rota[data-modo='rolagem']:not(.rota--compacta) .placa[data-ativa],
+    .rota[data-modo='rolagem'][data-estatico]:not(.rota--compacta) .placa { border-color: var(--signal); background: #262410; box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12); }
+    .rota[data-modo='rolagem'][data-estatico]:not(.rota--compacta) .placa { transition: none; }
+    .rota[data-modo='rolagem']:not(.rota--compacta) .placa-corpo,
+    .rota[data-modo='rolagem'][data-estatico]:not(.rota--compacta) .placa-corpo { height: auto; padding: 0; border: 0; background: none; box-shadow: none; }
   }
 
   @media (min-width: 900px) {
@@ -109,6 +116,12 @@ const { titulo, paradas, modo, idioma, compacta = false } = Astro.props;
     .rota[data-modo='rolagem'][data-estatico] .asfalto,
     .rota[data-modo='rolagem'][data-estatico] .poste,
     :global(html:not(.js)) .rota[data-modo='rolagem'] .asfalto { display: none; }
+    /* Estático no desktop: o quadro também é o li, para o detalhe ficar dentro da placa. */
+    .rota[data-modo='rolagem'][data-estatico] .placa { padding: 12px 16px 16px; background: #262410; border: 2px solid var(--signal); border-radius: 6px; box-shadow: 0 0 0 4px rgb(245 184 0 / 0.12); }
+    .rota[data-modo='rolagem'][data-estatico] .placa-corpo { height: auto; padding: 0; border: 0; background: none; box-shadow: none; }
+    .rota[data-modo='rolagem'][data-estatico] .rota-detalhe :global(.moldura) { margin: 0; height: var(--area); display: flex; justify-content: center; }
+    .rota[data-modo='rolagem'][data-estatico] .rota-detalhe :global(.moldura-tela) { height: 100%; display: flex; flex-direction: column; }
+    .rota[data-modo='rolagem'][data-estatico] .rota-detalhe :global(.moldura-midia) { flex: 1; min-height: 0; width: auto; }
     .rota[data-modo='rolagem'][data-estatico] .rota-detalhe--midia { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; margin-top: 12px; align-items: start; }
   }
 </style>
