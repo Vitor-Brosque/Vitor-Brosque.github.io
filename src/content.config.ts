@@ -64,7 +64,6 @@ const projetos = defineCollection({
       decisoes: z
         .array(z.object({ titulo: z.string(), escolha: z.string(), porque: z.string(), deixeiDeLado: z.string() }))
         .min(1),
-      desafios: z.array(z.object({ titulo: z.string(), texto: z.string() })).default([]),
       numeros: z.array(z.object({ valor: z.string(), rotulo: z.string() })).default([]),
       numerosFonte: z.string().optional(),
       proximos: z.array(z.string()).default([]),
