@@ -12,7 +12,6 @@ test.describe('com movimento reduzido', () => {
     const videos = page.locator('video[data-video]');
     expect(await videos.count()).toBeGreaterThan(0);
     await videos.first().scrollIntoViewIfNeeded();
-    await page.mouse.wheel(0, 4000);
     // pausa curta: a decisão de tocar vem de um callback do IntersectionObserver; ler antes não provaria nada
     await page.waitForTimeout(800);
     const tocando = await page.$$eval('video', (vs) => vs.filter((v) => !(v as HTMLVideoElement).paused).length);
