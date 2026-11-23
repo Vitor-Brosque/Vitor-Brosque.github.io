@@ -1,0 +1,39 @@
+---
+import { t, urlDaHome, urlEquivalente, type Idioma } from '../i18n/ui';
+interface Props { idioma: Idioma }
+const { idioma } = Astro.props;
+const outro: Idioma = idioma === 'pt' ? 'en' : 'pt';
+const naHome = Astro.url.pathname === urlDaHome(idioma);
+const ancora = (id: string) => (naHome ? `#${id}` : urlDaHome(idioma, id));
+---
+<nav class="nav" aria-label={t(idioma, 'nav.rotulo')}>
+  <div class="wrap nav-dentro">
+    <a class="nav-logo" href={urlDaHome(idioma)} aria-label={t(idioma, 'nav.inicio')}>VITOR<span>.</span>BROSQUE</a>
+    <ul class="nav-links">
+      <li><a href={ancora('projetos')}>{t(idioma, 'nav.projetos')}</a></li>
+      <li><a href={ancora('trajetoria')}>{t(idioma, 'nav.trajetoria')}</a></li>
+      <li><a href={ancora('contato')}>{t(idioma, 'nav.contato')}</a></li>
+    </ul>
+    <a
+      class="nav-idioma"
+      href={urlEquivalente(Astro.url.pathname, outro)}
+      hreflang={outro === 'pt' ? 'pt-BR' : 'en'}
+      aria-label={t(idioma, 'nav.trocarIdiomaAria')}
+    >{t(idioma, 'nav.trocarIdioma')}</a>
+  </div>
+</nav>
+<style>
+  .nav { position: sticky; top: 0; z-index: 50; height: var(--altura-nav); background: rgb(17 21 19 / 0.82); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  .nav-dentro { height: 100%; display: flex; align-items: center; gap: 24px; }
+  .nav-logo { font-stretch: 125%; font-weight: 800; font-size: 0.95rem; text-decoration: none; letter-spacing: 0.01em; }
+  .nav-logo span { color: var(--signal); }
+  .nav-links { display: flex; gap: 22px; margin: 0 0 0 auto; padding: 0; list-style: none; font-family: var(--fonte-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .nav-links a { color: var(--mute); text-decoration: none; }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-idioma { font-family: var(--fonte-mono); font-size: 0.75rem; font-weight: 700; padding: 6px 10px; border: 1px solid var(--line-2); border-radius: 4px; text-decoration: none; }
+  .nav-idioma:hover { border-color: var(--signal); color: var(--signal); }
+  @media (max-width: 639px) {
+    .nav-links { display: none; }
+    .nav-idioma { margin-left: auto; }
+  }
+</style>
