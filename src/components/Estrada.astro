@@ -1,12 +1,32 @@
-<div class="estrada" data-estrada aria-hidden="true"></div>
+---
+import CarrinhoPixel from './CarrinhoPixel.astro';
+interface Props { carro?: boolean }
+const { carro = false } = Astro.props;
+---
+<div class:list={['estrada', { 'estrada--carro': carro }]} data-estrada aria-hidden="true">
+  {carro && <div class="estrada-carro"><CarrinhoPixel /></div>}
+</div>
 <style>
-  .estrada { --desloc: 0px; position: relative; height: 56px; background: var(--estrada); border-block: 2px solid var(--line); }
+  .estrada { --desloc: 0px; --avanco: 0; position: relative; height: 56px; background: var(--estrada); border-block: 2px solid var(--line); overflow: hidden; }
+  .estrada--carro { height: 84px; }
   .estrada::after {
     content: '';
     position: absolute; inset-inline: 0; top: 50%;
     height: 4px; margin-top: -2px;
     background: repeating-linear-gradient(90deg, var(--signal) 0 40px, transparent 40px 68px);
     background-position-x: var(--desloc);
+  }
+  /* O carro fica a 12% da largura e, com movimento, avança e sai pela direita conforme a página rola. */
+  .estrada-carro { position: absolute; z-index: 1; top: 50%; left: calc(12% + var(--avanco) * 95%); width: 92px; height: 50px; margin: -27px 0 0 -46px; }
+  .estrada-carro :global(.carrinho) { position: relative; z-index: 1; filter: drop-shadow(0 4px 0 rgb(0 0 0 / 0.5)); }
+  /* Farol aceso nos dois modos. */
+  .estrada-carro::after { content: ''; position: absolute; left: 92%; top: 22%; width: 150%; height: 70%; background: linear-gradient(90deg, rgb(255 246 204 / 0.42), transparent); clip-path: polygon(0 38%, 100% 0, 100% 100%, 0 62%); }
+  @media (max-width: 639px) { .estrada-carro { left: calc(14% + var(--avanco) * 95%); } }
+  @media (prefers-reduced-motion: no-preference) {
+    .estrada-carro { animation: chegar 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
+    .estrada-carro :global(.carrinho) { animation: quicar-estrada 0.26s steps(2) infinite; }
+    @keyframes chegar { from { translate: calc(-12vw - 140px) 0; } }
+    @keyframes quicar-estrada { 50% { translate: 0 -1px; } }
   }
 </style>
 <script>import '../scripts/estrada';</script>

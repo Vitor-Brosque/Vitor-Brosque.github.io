@@ -2,7 +2,7 @@
 export const PERIODO = 68;
 
 export function proximoDeslocamento(atual: number, dtMs: number, deltaScroll: number): number {
-  const base = 0.06 * dtMs;
+  const base = 0.14 * dtMs;
   const extra = Math.min(Math.abs(deltaScroll) * 0.8, 40);
   return (atual - base - extra) % PERIODO;
 }

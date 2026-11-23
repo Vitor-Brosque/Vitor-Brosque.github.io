@@ -13,32 +13,38 @@ const formato = new Intl.NumberFormat(locale);
 ---
 <header class="hero wrap">
   <div class="hero-texto">
-    <span class="selo">{h.selo}</span>
+    <span class="selo" data-entrada style="--ordem: 0">{h.selo}</span>
     <h1 data-hero-titulo>{h.tituloAntes}<em>{h.tituloDestaque}</em>{h.tituloDepois}</h1>
-    <p class="hero-apresentacao">{h.apresentacao}</p>
+    <p class="hero-apresentacao" data-entrada style="--ordem: 3">{h.apresentacao}</p>
     <ul class="numeros">
-      {h.numeros.map((n) => (
-        <li data-hero-prova>
-          <strong class="numero" data-contar={n.numero} data-prefixo={n.prefixo ?? ''} data-sufixo={n.sufixo ?? ''} data-locale={locale}>{(n.prefixo ?? '') + formato.format(n.numero) + (n.sufixo ?? '')}</strong>
+      {h.numeros.map((n, i) => (
+        <li data-hero-prova data-entrada style={`--ordem: ${4 + i}`}>
+          <strong class="numero">
+            <span class="sr-only">{(n.prefixo ?? '') + formato.format(n.numero) + (n.sufixo ?? '')}</span>
+            <span aria-hidden="true" data-contar={n.numero} data-prefixo={n.prefixo ?? ''} data-sufixo={n.sufixo ?? ''} data-locale={locale}>{(n.prefixo ?? '') + formato.format(n.numero) + (n.sufixo ?? '')}</span>
+          </strong>
           <span class="rotulo-numero">{n.rotulo}</span>
         </li>
       ))}
     </ul>
-    <div class="hero-acoes">
+    <div class="hero-acoes" data-entrada style="--ordem: 7">
       <a class="botao botao--sinal" href="#projetos">{h.ctaPrincipal} ↓</a>
       <a class="botao" href={LINKEDIN} rel="me">{h.ctaLinkedin}</a>
     </div>
   </div>
   {capa?.imagem && (
+    <div class="hero-visual">
+    <div class="hero-halo" aria-hidden="true"></div>
     <figure class="hero-print" data-hero-print>
       <div class="hero-print-barra" aria-hidden="true"><i></i><i></i><i></i></div>
       <Picture src={capa.imagem} alt={capa.alt} formats={['avif', 'webp']} widths={[480, 800, 1100]} sizes="(min-width: 900px) 42vw, 92vw" loading="eager" fetchpriority="high" />
       <figcaption>{h.rotuloPrint}</figcaption>
     </figure>
+    </div>
   )}
 </header>
 <style>
-  .hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: clamp(28px, 4vw, 48px); align-items: center; padding-block: clamp(40px, 7vw, 88px) clamp(56px, 8vw, 96px); }
+  .hero { overflow-x: clip; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: clamp(28px, 4vw, 48px); align-items: center; padding-block: clamp(40px, 7vw, 88px) clamp(56px, 8vw, 96px); }
   .selo { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--signal); color: var(--bg); font-family: var(--fonte-mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
   .selo::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--bg); }
   @media (prefers-reduced-motion: no-preference) { .selo::before { animation: piscar 1.4s infinite; } }
@@ -46,17 +52,24 @@ const formato = new Intl.NumberFormat(locale);
   h1 { margin-top: 20px; font-size: clamp(2.5rem, 5.2vw, 4.1rem); line-height: 0.97; }
   h1 em { font-style: normal; color: var(--signal); }
   .hero-apresentacao { margin-top: 20px; max-width: 46ch; color: var(--ink-2); font-size: clamp(1rem, 1.4vw, 1.125rem); }
-  .numeros { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 22px; margin: 28px 0 0; padding: 20px 0 0; border-top: 1px solid var(--line-2); list-style: none; }
-  .numero { display: block; font-size: clamp(1.8rem, 3.2vw, 2.6rem); font-weight: 850; font-stretch: 125%; line-height: 1.05; color: var(--signal); font-variant-numeric: tabular-nums; }
+  .numeros { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 30px; margin: 28px 0 0; padding: 20px 0 0; border-top: 1px solid var(--line-2); list-style: none; }
+  .numero { display: block; font-size: clamp(1.8rem, 2.5vw, 2.3rem); white-space: nowrap; font-weight: 850; font-stretch: 125%; line-height: 1.05; color: var(--signal); font-variant-numeric: tabular-nums; }
   .rotulo-numero { display: block; margin-top: 6px; color: var(--mute); font-size: 0.9rem; line-height: 1.35; }
   .hero-acoes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+  .hero-visual { position: relative; isolation: isolate; }
+  /* Halo amarelo difuso atrás do print: parado com movimento reduzido, respirando com movimento. */
+  .hero-halo { position: absolute; z-index: -1; inset: -28% -22%; background: radial-gradient(closest-side, rgb(245 184 0 / 0.3), rgb(245 184 0 / 0.12) 50%, transparent); filter: blur(20px); pointer-events: none; }
   .hero-print { position: relative; margin: 0; rotate: 2.5deg; border: 1px solid #2e3833; border-radius: var(--raio); overflow: hidden; background: #fff; box-shadow: 0 34px 70px -24px #000, 0 0 0 7px var(--estrada); }
   .hero-print-barra { display: flex; gap: 5px; align-items: center; height: 22px; padding-left: 10px; background: var(--surface); }
   .hero-print-barra i { width: 7px; height: 7px; border-radius: 50%; background: #3a4642; }
   .hero-print :global(img) { width: 100%; height: clamp(260px, 32vw, 400px); object-fit: cover; object-position: top; }
   .hero-print figcaption { position: absolute; left: 14px; bottom: 14px; padding: 7px 11px; background: var(--ink); color: var(--bg); font-weight: 700; font-size: 0.8rem; font-stretch: 110%; }
-  @media (prefers-reduced-motion: no-preference) { .hero-print { animation: flutuar 7s ease-in-out infinite; } }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-print { animation: flutuar 7s ease-in-out infinite; }
+    .hero-halo { animation: respirar 6s ease-in-out infinite; }
+  }
   @keyframes flutuar { 50% { translate: 0 -8px; } }
+  @keyframes respirar { 50% { opacity: 0.55; } }
   @media (max-width: 639px) { .numeros { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 899px) {
     .hero { grid-template-columns: 1fr; }
