@@ -7,13 +7,13 @@ interface Props {
 }
 const { idioma, decisao } = Astro.props;
 ---
-<details class="decisao revelar">
+<details class="decisao recolhivel revelar">
   <summary>
     <span class="resumo-titulo">{decisao.titulo}</span>
     <span class="resumo-texto">{decisao.resumo}</span>
     <span class="resumo-icone" aria-hidden="true"></span>
   </summary>
-  <div class="corpo">
+  <div class="corpo recolhivel-corpo">
     <p class="rotulo">{t(idioma, 'caso.escolhi')}</p>
     <p set:html={textoRico(decisao.escolha)} />
     <p class="rotulo">{t(idioma, 'caso.porque')}</p>
@@ -24,20 +24,6 @@ const { idioma, decisao } = Astro.props;
 </details>
 <style>
   .decisao { background: var(--bg-2); border: 1px solid var(--line); border-top: 3px solid var(--signal); border-radius: var(--raio); color: var(--ink-2); }
-  summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; align-items: start; padding: 18px clamp(16px, 3vw, 24px); min-height: 44px; cursor: pointer; list-style: none; border-radius: var(--raio); }
-  summary::-webkit-details-marker { display: none; }
-  summary:hover .resumo-titulo { color: var(--signal); }
-  .resumo-titulo { grid-column: 1; font-size: 1.1rem; font-weight: 800; color: var(--ink); }
-  .resumo-texto { grid-column: 1; max-width: var(--medida); color: var(--ink-2); font-size: 0.95rem; }
-  .resumo-icone { grid-column: 2; grid-row: 1 / span 2; align-self: center; position: relative; width: 28px; height: 28px; border: 1px solid var(--line-2); border-radius: 50%; }
-  .resumo-icone::before, .resumo-icone::after { content: ''; position: absolute; left: 50%; top: 50%; width: 12px; height: 2px; margin: -1px 0 0 -6px; background: var(--signal); transition: rotate 0.25s var(--ease); }
-  .resumo-icone::after { rotate: 90deg; }
-  .decisao[open] .resumo-icone::after { rotate: 0deg; }
   .corpo { display: flex; flex-direction: column; gap: 6px; max-width: var(--medida); padding: 4px clamp(16px, 3vw, 24px) 22px; }
   .rotulo { margin-top: 10px; }
-  @supports (interpolate-size: allow-keywords) {
-    .decisao { interpolate-size: allow-keywords; }
-    .decisao::details-content { height: 0; overflow: clip; transition: height 0.3s var(--ease), content-visibility 0.3s allow-discrete; }
-    .decisao[open]::details-content { height: auto; }
-  }
 </style>

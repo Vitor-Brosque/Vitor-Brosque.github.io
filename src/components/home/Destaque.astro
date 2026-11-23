@@ -35,7 +35,7 @@ const slug = slugDe(projeto.id);
       ))}
     </ul>
   )}
-  <a class="botao botao--sinal destaque-cta" href={urlDoProjeto(idioma, slug)}>{t(idioma, 'card.verCaso')} →</a>
+  <a class="botao botao--sinal destaque-cta" href={urlDoProjeto(idioma, slug)}>{t(idioma, 'card.verCaso')} <span class="seta" aria-hidden="true">→</span></a>
 </section>
 <style>
   h2 { margin-top: 10px; font-size: clamp(2.5rem, 5vw, 3.5rem); }

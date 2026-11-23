@@ -23,14 +23,21 @@ const usaCapa = d.cartao === 'capa' && d.capa?.imagem;
     <p class="rotulo"><span class:list={['ponto', `ponto--${d.status}`]} aria-hidden="true"></span>{String(numero).padStart(2, '0')} · {d.statusTexto}</p>
     <h3 transition:name={`titulo-${slug}`}><a class="card-link" href={urlDoProjeto(idioma, slug)}>{d.titulo}</a></h3>
     <p class="card-frase">{d.frase}</p>
-    <span class="card-mais" aria-hidden="true">{t(idioma, 'card.verCaso')} →</span>
+    <span class="card-mais" aria-hidden="true">{t(idioma, 'card.verCaso')} <span class="seta">→</span></span>
   </div>
 </article>
 <style>
-  .card { position: relative; display: flex; flex-direction: column; background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--raio); overflow: hidden; transition: border-color 0.25s, translate 0.25s var(--ease); }
-  .card:hover, .card:focus-within { border-color: var(--signal); }
+  /* A transição repete a da revelação (.revelar), que esta regra sobrescreve: fade e, com movimento, subida. */
+  .card { position: relative; display: flex; flex-direction: column; background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--raio); overflow: hidden; transition: border-color 0.25s, box-shadow 0.25s, opacity 0.7s var(--ease), translate 0.5s var(--ease), scale 0.8s var(--ease); transition-delay: calc(var(--ordem, 0) * 70ms); }
+  .card:hover, .card:focus-within { border-color: var(--signal); box-shadow: 0 18px 40px -24px rgb(245 184 0 / 0.35); }
+  .card-mais { transition: color 0.2s; }
+  .card:hover .card-mais, .card:focus-within .card-mais { color: var(--signal-hover); }
+  .seta { display: inline-block; transition: translate 0.25s var(--ease); }
   @media (prefers-reduced-motion: no-preference) {
-    .card:hover, .card:focus-within { translate: 0 -4px; }
+    .card:hover, .card:focus-within { translate: 0 -6px; }
+    .card-midia :global(img) { transition: scale 0.5s var(--ease); }
+    .card:hover .card-midia :global(img), .card:focus-within .card-midia :global(img) { scale: 1.04; }
+    .card:hover .seta, .card:focus-within .seta { translate: 4px 0; }
   }
   .card-midia { height: 220px; overflow: hidden; background: #0d100f; }
   .card-midia :global(picture) { display: block; height: 100%; }
