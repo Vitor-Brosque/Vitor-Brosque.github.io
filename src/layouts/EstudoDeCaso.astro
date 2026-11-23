@@ -27,7 +27,7 @@ const jsonLd = {
   author: { '@type': 'Person', name: 'Vitor Brosque', url: site.href },
 };
 ---
-<Base titulo={`${d.titulo} · Vitor Brosque`} descricao={d.seo.descricao} idioma={idioma} imagemOg={d.capa?.imagem} jsonLd={jsonLd}>
+<Base titulo={`${d.titulo} · Vitor Brosque`} descricao={d.seo.descricao} idioma={idioma} imagemOg={d.capa?.imagem} altOg={d.capa?.alt} jsonLd={jsonLd}>
   <main id="conteudo">
     <header class="wrap caso-topo">
       <a class="voltar" href={urlDaHome(idioma, 'projetos')}>← {t(idioma, 'caso.voltar')}</a>

@@ -34,14 +34,18 @@ jobs:
     needs: qualidade
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: withastro/action@v6
+        with:
+          node-version: 24
 
   deploy:
     needs: build
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       pages: write
       id-token: write

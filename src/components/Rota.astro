@@ -115,6 +115,7 @@ const { titulo, paradas, modo, idioma, compacta = false } = Astro.props;
     :global(html:not(.js)) .rota[data-modo='rolagem'] .placas { grid-template-columns: 1fr; }
     .rota[data-modo='rolagem'][data-estatico] .asfalto,
     .rota[data-modo='rolagem'][data-estatico] .poste,
+    :global(html:not(.js)) .rota[data-modo='rolagem'] .poste,
     :global(html:not(.js)) .rota[data-modo='rolagem'] .asfalto { display: none; }
     /* Estático (movimento reduzido ou sem JS) no desktop: o quadro também é o li, para o detalhe ficar dentro da placa. */
     .rota[data-modo='rolagem'][data-estatico] .placa,
