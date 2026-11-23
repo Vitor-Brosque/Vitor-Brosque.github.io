@@ -27,7 +27,7 @@ const { titulo, paradas, modo, idioma, compacta = false } = Astro.props;
       <span class="rotulo">{titulo}</span>
       <div class="rota-controles">
         <span class="rotulo rotulo--sinal ao-vivo" aria-hidden="true"><i class="ponto-vivo"></i>{t(idioma, 'rota.aoVivo')}</span>
-        <button type="button" class="rota-pausa" data-rota-pausa aria-pressed="false" data-pausar={t(idioma, 'rota.pausar')} data-continuar={t(idioma, 'rota.continuar')}>{t(idioma, 'rota.pausar')}</button>
+        <button type="button" class="rota-pausa" data-rota-pausa data-pausar={t(idioma, 'rota.pausar')} data-continuar={t(idioma, 'rota.continuar')}>{t(idioma, 'rota.pausar')}</button>
       </div>
     </div>
   )}
@@ -65,7 +65,7 @@ const { titulo, paradas, modo, idioma, compacta = false } = Astro.props;
   .rota[data-pausada] .ponto-vivo { box-shadow: none; }
   .rota-pausa { min-height: 32px; padding: 4px 12px; border: 1px solid var(--line-2); border-radius: 4px; background: transparent; color: var(--ink-2); font: 700 0.72rem/1 var(--fonte-mono); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: border-color 0.2s, color 0.2s, background-color 0.2s; }
   .rota-pausa:hover { border-color: var(--signal); color: var(--signal); }
-  .rota-pausa[aria-pressed='true'] { border-color: var(--signal); background: var(--signal-fundo); color: var(--signal); }
+  .rota[data-pausada] .rota-pausa { border-color: var(--signal); background: var(--signal-fundo); color: var(--signal); }
   :global(html:not(.js)) .rota-pausa { display: none; }
 
   .placas { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 12px; }

@@ -31,6 +31,21 @@ function animacoesProibidas(page: Page) {
   });
 }
 
+/** Registra, desde o carregamento, cada texto mostrado no primeiro número do hero (em window.__contagem). */
+async function registrarContagem(page: Page) {
+  await page.addInitScript(() => {
+    const w = window as unknown as { __contagem: string[] };
+    w.__contagem = [];
+    document.addEventListener('DOMContentLoaded', () => {
+      const el = document.querySelector('[data-contar]');
+      if (!el) return;
+      w.__contagem.push(el.textContent ?? '');
+      new MutationObserver(() => w.__contagem.push(el.textContent ?? '')).observe(el, { childList: true, characterData: true, subtree: true });
+    });
+  });
+}
+const textosDaContagem = (page: Page) => page.evaluate(() => (window as unknown as { __contagem: string[] }).__contagem);
+
 const indiceAtivo = (page: Page, seletor: string) =>
   page.locator(seletor).first().locator('.placa').evaluateAll((ps) => ps.findIndex((p) => p.hasAttribute('data-ativa')));
 
@@ -79,7 +94,7 @@ test.describe('com movimento reduzido', () => {
     await expect.poll(() => indiceAtivo(page, seletor), { timeout: 8000 }).not.toBe(inicial);
     const pausa = page.locator(`${seletor} [data-rota-pausa]`);
     await pausa.click();
-    await expect(pausa).toHaveAttribute('aria-pressed', 'true');
+    await expect(pausa).toHaveText('Continuar');
     const pausado = await indiceAtivo(page, seletor);
     await page.waitForTimeout(3500);
     expect(await indiceAtivo(page, seletor)).toBe(pausado);
@@ -110,9 +125,13 @@ test.describe('com movimento reduzido', () => {
   });
 
   test('os números do hero já estão no valor final', async ({ page }) => {
+    await registrarContagem(page);
     await page.goto('/');
-    await expect(page.locator('[data-contar]').first()).toHaveText('~1.000');
-    await expect(page.locator('[data-contar]').nth(1)).toHaveText('1.400+');
+    await page.waitForLoadState('load');
+    // Dá tempo de sobra para uma contagem (atraso + 1,6 s) acontecer, se fosse acontecer.
+    await page.waitForTimeout(2500);
+    expect(await textosDaContagem(page)).toEqual(['~1.000']);
+    expect(await page.locator('[data-contar]').nth(1).textContent()).toBe('1.400+');
   });
 });
 
@@ -120,73 +139,80 @@ test.describe('com movimento permitido', () => {
   test.use({ reducedMotion: 'no-preference' });
 
   test('o carro percorre a rota inteira e todas as placas acendem', async ({ page }) => {
-    test.setTimeout(45_000);
+    test.setTimeout(60_000);
     await page.goto('/');
     const rota = page.locator('#projetos [data-rota][data-modo="loop"]');
     await rota.scrollIntoViewIfNeeded();
     await expect(rota).not.toHaveAttribute('data-estatico');
-    // Observa uma volta inteira (cerca de 13 s) dentro da página, a cada quadro.
+    // Observa a cada quadro, dentro da página, até ver o carro antes da entrada, depois da saída e todas as placas acesas.
     const visto = await rota.evaluate(
       (el) =>
-        new Promise<{ min: number; max: number; acesas: number[] }>((resolve) => {
+        new Promise<{ min: number; max: number; acesas: number; total: number }>((resolve) => {
           const r = el as HTMLElement;
           const placas = [...r.querySelectorAll('.placa')];
           let min = Infinity;
           let max = -Infinity;
           const acesas = new Set<number>();
-          const fim = performance.now() + 15_000;
+          const limite = performance.now() + 40_000;
           const olhar = () => {
             const pos = Number(r.style.getPropertyValue('--pos'));
             min = Math.min(min, pos);
             max = Math.max(max, pos);
             placas.forEach((p, i) => p.hasAttribute('data-ativa') && acesas.add(i));
-            if (performance.now() < fim) requestAnimationFrame(olhar);
-            else resolve({ min, max, acesas: [...acesas].sort() });
+            const completo = min < 0 && max > 1 && acesas.size === placas.length;
+            if (!completo && performance.now() < limite) requestAnimationFrame(olhar);
+            else resolve({ min, max, acesas: acesas.size, total: placas.length });
           };
           requestAnimationFrame(olhar);
         }),
     );
+    expect(visto.total).toBeGreaterThan(1);
     expect(visto.min).toBeLessThan(0);
     expect(visto.max).toBeGreaterThan(1);
-    expect(visto.acesas).toEqual([0, 1, 2, 3, 4]);
+    expect(visto.acesas).toBe(visto.total);
   });
 
-  test('o botão de pausa segura o carro e troca o texto', async ({ page }) => {
+  test('o botão de pausa para tudo e troca o texto', async ({ page }) => {
     await page.goto('/');
     const rota = page.locator('#projetos [data-rota][data-modo="loop"]');
     await rota.scrollIntoViewIfNeeded();
     const pos = () => rota.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--pos'));
-    const inicial = await pos();
-    await expect.poll(pos, { timeout: 8000 }).not.toBe(inicial);
+    const rodando = () =>
+      rota.evaluate((el) =>
+        el
+          .getAnimations({ subtree: true })
+          .filter((a) => a.playState === 'running')
+          .map((a) => (a as CSSAnimation).animationName ?? (a as CSSTransition).transitionProperty),
+      );
     const pausa = rota.locator('[data-rota-pausa]');
     await expect(pausa).toHaveText('Pausar');
+    // O caso difícil: pausar com o carro andando entre duas placas.
+    await expect(rota).toHaveAttribute('data-andando', '', { timeout: 10_000 });
     await pausa.click();
     await expect(pausa).toHaveText('Continuar');
-    await expect(pausa).toHaveAttribute('aria-pressed', 'true');
+    await expect(rota).not.toHaveAttribute('data-andando');
+    await expect.poll(rodando, { timeout: 3000 }).toEqual([]);
     const parado = await pos();
     await page.waitForTimeout(1500);
     expect(await pos()).toBe(parado);
+    expect(await rodando()).toEqual([]);
+    await expect(rota).not.toHaveAttribute('data-andando');
     await pausa.click();
     await expect(pausa).toHaveText('Pausar');
     await expect.poll(pos, { timeout: 5000 }).not.toBe(parado);
   });
 
   test('os números do hero contam até o valor final', async ({ page }) => {
-    await page.addInitScript(() => {
-      const w = window as unknown as { __contagem: string[] };
-      w.__contagem = [];
-      document.addEventListener('DOMContentLoaded', () => {
-        const el = document.querySelector('[data-contar]');
-        if (!el) return;
-        w.__contagem.push(el.textContent ?? '');
-        new MutationObserver(() => w.__contagem.push(el.textContent ?? '')).observe(el, { childList: true, characterData: true, subtree: true });
-      });
-    });
+    await registrarContagem(page);
     await page.goto('/');
-    await page.waitForTimeout(2800);
-    const textos = await page.evaluate(() => (window as unknown as { __contagem: string[] }).__contagem);
-    expect(new Set(textos).size).toBeGreaterThan(3);
-    expect(textos[textos.length - 1]).toBe('~1.000');
+    // Espera a contagem terminar: o último texto registrado é o final, depois de ter passado por outros.
+    await expect
+      .poll(async () => {
+        const textos = await textosDaContagem(page);
+        return textos.length > 1 && textos[textos.length - 1] === '~1.000';
+      }, { timeout: 8000 })
+      .toBe(true);
+    expect(new Set(await textosDaContagem(page)).size).toBeGreaterThan(3);
   });
 
   test('a estrada do hero anda', async ({ page }) => {
