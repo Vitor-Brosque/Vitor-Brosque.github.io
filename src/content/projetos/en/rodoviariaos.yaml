@@ -18,13 +18,13 @@ capa:
   alt: RodoviariaOS daily dashboard with summary, tasks, alerts, inventory and finance, using made-up data
 resumo:
   problema: >-
-    Hundreds of leads coming in through WhatsApp and ads. Salespeople got lost in the conversations,
+    Hundreds of leads coming in through WhatsApp and ads. The salesperson got lost in the conversations,
     and each partner worked out the numbers for their own cars by hand.
   construi: >-
     A system that recognizes each customer, builds the queue of who needs an answer and calculates
     the result of each car, with finance and an assistant ready to go live.
   orgulho: >-
-    The database itself enforces isolation between partners, WhatsApp ingestion is built not to lose or duplicate messages, and the AI classifies requests without ever seeing the store's data.
+    Each partner sees only the numbers for their own cars. The system is built not to lose or repeat customer messages. And the AI helps without having access to the store's data.
 problema: |-
   Before I wrote code, I worked the counter at Rodoviária Veículos, my family's car dealership. I took care of the ads, the inventory and customer service on WhatsApp.
 
@@ -54,10 +54,9 @@ rota:
         imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
         alt: Daily dashboard showing leads waiting for an answer and new unanswered leads
     - titulo: Negotiation
-      curto: The origin is required and frozen.
+      curto: The lead's origin is recorded and can't be changed later.
       texto: >-
-        Opening a negotiation requires an origin. From then on it is frozen and carries through to
-        the sale, even if the lead changes later.
+        To open a negotiation, the lead's origin must be on record. From then on it can't be changed, and it carries through to the sale.
       midia:
         video: /media/rodoviariaos/whatsapp-negociacao-celular.mp4
         imagem: ../../../assets/projetos/rodoviariaos/whatsapp-negociacao.png
