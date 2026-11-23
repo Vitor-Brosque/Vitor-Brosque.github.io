@@ -93,3 +93,37 @@ describe('checar-vazamento CLI', () => {
     expect(rodar(dir, lista(dir, TERMO), '--obrigatorio').status).toBe(0);
   });
 });
+
+describe('checar-vazamento CLI --repo', () => {
+  function repo(dir: string, arquivos: Record<string, string>, versionar: string[]) {
+    const git = (...a: string[]) => spawnSync('git', a, { cwd: dir, encoding: 'utf8' });
+    git('init', '-q');
+    for (const [nome, conteudo] of Object.entries(arquivos)) writeFileSync(join(dir, nome), conteudo);
+    if (versionar.length) git('add', '--', ...versionar);
+  }
+  it('termo em arquivo versionado falha com VAZAMENTO', () => {
+    const dir = novoDir();
+    repo(dir, { 'nota.md': `x ${TERMO} y` }, ['nota.md']);
+    const r = rodar(dir, lista(dir, TERMO), '--obrigatorio', '--repo');
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain('VAZAMENTO');
+  });
+  it('arquivo versionado limpo passa e relata o repositório', () => {
+    const dir = novoDir();
+    repo(dir, { 'nota.md': 'limpo' }, ['nota.md']);
+    const r = rodar(dir, lista(dir, TERMO), '--obrigatorio', '--repo');
+    expect(r.status).toBe(0);
+    expect(r.stdout).toContain('no repositório');
+    expect(r.stdout).toContain('1 arquivos lidos');
+  });
+  it('arquivo não versionado com o termo é ignorado', () => {
+    const dir = novoDir();
+    repo(dir, { 'nota.md': 'limpo', 'solto.md': TERMO }, ['nota.md']);
+    expect(rodar(dir, lista(dir, TERMO), '--obrigatorio', '--repo').status).toBe(0);
+  });
+  it('nenhum arquivo versionado falha', () => {
+    const dir = novoDir();
+    repo(dir, {}, []);
+    expect(rodar(dir, lista(dir, TERMO), '--obrigatorio', '--repo').status).toBe(1);
+  });
+});

@@ -15,8 +15,8 @@ describe('encontrarTermos', () => {
     expect(encontrarTermos('limpo', ['segredo'])).toEqual([]);
   });
   it('acha termo composto em texto decomposto e vice-versa', () => {
-    const composto = 'não simples';
-    const decomposto = 'nao simples'.replace('a', 'ã');
+    const composto = 'ação'.normalize('NFC');
+    const decomposto = 'ação'.normalize('NFD');
     expect(decomposto).not.toBe(composto);
     expect(encontrarTermos(`texto ${decomposto} aqui`, [composto])).toEqual([composto]);
     expect(encontrarTermos(`texto ${composto} aqui`, [decomposto])).toEqual([decomposto]);
