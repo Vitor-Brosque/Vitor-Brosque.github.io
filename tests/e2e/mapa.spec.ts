@@ -2,6 +2,10 @@ import { expect, test } from '@playwright/test';
 
 test('o mapa de arquitetura explica o componente escolhido', async ({ page }) => {
   await page.goto('/projetos/rodoviariaos/');
+  const bloco = page.locator('details.arquitetura');
+  await expect(bloco).not.toHaveAttribute('open', '');
+  await bloco.locator(':scope > summary').click();
+  await expect(bloco).toHaveAttribute('open', '');
   const no = page.getByRole('button', { name: /withTenant\(\)/ });
   await no.scrollIntoViewIfNeeded();
   await expect(page.locator('astro-island').filter({ has: page.locator('.mapa') })).not.toHaveAttribute('ssr');
