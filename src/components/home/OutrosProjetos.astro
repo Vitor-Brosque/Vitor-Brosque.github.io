@@ -8,7 +8,7 @@ interface Props { idioma: Idioma; projetos: Projeto[] }
 const { idioma, projetos } = Astro.props;
 ---
 <section class="secao wrap" aria-labelledby="outros-titulo">
-  <h2 id="outros-titulo">{textosHome[idioma].outros.titulo}</h2>
+  <h2 id="outros-titulo" class="revelar">{textosHome[idioma].outros.titulo}</h2>
   <div class="cards">
     {projetos.map((p, i) => <CardProjeto projeto={p} numero={i + 2} idioma={idioma} />)}
   </div>

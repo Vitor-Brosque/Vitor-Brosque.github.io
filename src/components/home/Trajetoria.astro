@@ -7,8 +7,8 @@ const { idioma } = Astro.props;
 const tr = textosHome[idioma].trajetoria;
 ---
 <section id="trajetoria" class="secao wrap" aria-labelledby="traj-titulo">
-  <h2 id="traj-titulo">{tr.titulo}</h2>
-  <p class="secao-intro">{tr.intro}</p>
+  <h2 id="traj-titulo" class="revelar">{tr.titulo}</h2>
+  <p class="secao-intro revelar">{tr.intro}</p>
   <div class="traj" data-trajetoria>
     <div class="traj-estrada" aria-hidden="true">
       <div class="traj-preenchida"></div>
@@ -16,7 +16,7 @@ const tr = textosHome[idioma].trajetoria;
     </div>
     <ol class="traj-marcos">
       {tr.marcos.map((m) => (
-        <li class="traj-marco">
+        <li class="traj-marco revelar">
           <p class="rotulo">{m.quando}</p>
           <h3>{m.titulo}</h3>
           <p class="traj-texto">{m.texto}</p>

@@ -30,24 +30,24 @@ const jsonLd = {
 <Base titulo={`${d.titulo} · Vitor Brosque`} descricao={d.seo.descricao} idioma={idioma} imagemOg={d.capa?.imagem} altOg={d.capa?.alt} jsonLd={jsonLd}>
   <main id="conteudo">
     <header class="wrap caso-topo">
-      <a class="voltar" href={urlDaHome(idioma, 'projetos')}>← {t(idioma, 'caso.voltar')}</a>
-      <p class="rotulo rotulo--sinal">{d.statusTexto}</p>
-      <h1 transition:name={`titulo-${slug}`}>{d.titulo}</h1>
-      <p class="caso-frase">{d.frase}</p>
-      <dl class="ficha">
+      <a class="voltar" data-entrada style="--ordem: 0" href={urlDaHome(idioma, 'projetos')}>← {t(idioma, 'caso.voltar')}</a>
+      <p class="rotulo rotulo--sinal" data-entrada style="--ordem: 0">{d.statusTexto}</p>
+      <h1 transition:name={`titulo-${slug}`} data-entrada style="--ordem: 1">{d.titulo}</h1>
+      <p class="caso-frase" data-entrada style="--ordem: 2">{d.frase}</p>
+      <dl class="ficha" data-entrada style="--ordem: 3">
         <div><dt class="rotulo">{t(idioma, 'caso.papel')}</dt><dd>{d.papel}</dd></div>
         <div><dt class="rotulo">{t(idioma, 'caso.periodo')}</dt><dd>{d.periodo}</dd></div>
         <div class="ficha-stack"><dt class="rotulo">{t(idioma, 'caso.stack')}</dt><dd><ul class="chips">{d.stack.map((s) => <li>{s}</li>)}</ul></dd></div>
       </dl>
-      <div class="acoes">
+      <div class="acoes" data-entrada style="--ordem: 4">
         {d.links.codigo && <a class="botao botao--sinal" href={d.links.codigo}>{t(idioma, 'caso.codigo')}</a>}
         {d.links.vitrine && <a class="botao" href={d.links.vitrine}>{t(idioma, 'caso.vitrine')}</a>}
       </div>
-      {d.links.vitrine && !d.links.codigo && <p class="vitrine-nota">{t(idioma, 'caso.vitrineNota')}</p>}
+      {d.links.vitrine && !d.links.codigo && <p class="vitrine-nota" data-entrada style="--ordem: 4">{t(idioma, 'caso.vitrineNota')}</p>}
     </header>
 
     <section class="wrap em-resumo-secao" aria-labelledby="em-resumo">
-      <div class="em-resumo">
+      <div class="em-resumo" data-entrada style="--ordem: 5">
         <h2 id="em-resumo" class="rotulo rotulo--sinal">{t(idioma, 'caso.emResumo')}</h2>
         <p class="em-resumo-texto" set:html={textoRico(d.emResumo)} />
         {d.numeros.length > 0 && (
@@ -59,23 +59,23 @@ const jsonLd = {
       </div>
     </section>
 
-    {capa && <div class="wrap caso-capa"><MolduraMidia midia={capa} idioma={idioma} prioridade sizes="(min-width: 1120px) 1040px, 92vw" /></div>}
+    {capa && <div class="wrap caso-capa revelar revelar--zoom"><MolduraMidia midia={capa} idioma={idioma} prioridade sizes="(min-width: 1120px) 1040px, 92vw" /></div>}
 
     <div class="caso-estrada"><Estrada /></div>
 
     <section class="secao wrap" aria-labelledby="problema">
-      <h2 id="problema">{t(idioma, 'caso.problema')}</h2>
-      <div class="texto caso-texto">{paragrafos(d.problema).map((p) => <p set:html={textoRico(p)} />)}</div>
+      <h2 id="problema" class="revelar">{t(idioma, 'caso.problema')}</h2>
+      <div class="texto caso-texto revelar">{paragrafos(d.problema).map((p) => <p set:html={textoRico(p)} />)}</div>
     </section>
 
     <section class="secao wrap" aria-labelledby="rota">
-      <h2 id="rota">{d.rota.titulo}</h2>
+      <h2 id="rota" class="revelar">{d.rota.titulo}</h2>
       <div class="caso-rota"><Rota titulo={d.rota.titulo} paradas={d.rota.paradas} modo="rolagem" idioma={idioma} /></div>
     </section>
 
     {d.funcionalidades.length > 0 && (
       <section class="secao wrap" aria-labelledby="faz">
-        <h2 id="faz">{t(idioma, 'caso.oQueFaz')}</h2>
+        <h2 id="faz" class="revelar">{t(idioma, 'caso.oQueFaz')}</h2>
         <ul class="funcs">
           {d.funcionalidades.map((f) => (
             <li class="revelar">
@@ -89,11 +89,11 @@ const jsonLd = {
     )}
 
     <section class="secao wrap" aria-labelledby="detalhes">
-      <h2 id="detalhes">{t(idioma, 'caso.detalhes')}</h2>
-      <p class="secao-intro">{t(idioma, 'caso.detalhesIntro')}</p>
+      <h2 id="detalhes" class="revelar">{t(idioma, 'caso.detalhes')}</h2>
+      <p class="secao-intro revelar">{t(idioma, 'caso.detalhesIntro')}</p>
 
       {d.arquitetura && (
-        <details class="arquitetura">
+        <details class="arquitetura revelar">
           <summary>
             <span class="resumo-titulo">{d.arquitetura.titulo}</span>
             <span class="resumo-texto" set:html={textoRico(d.arquitetura.texto)} />
@@ -112,18 +112,18 @@ const jsonLd = {
         </details>
       )}
 
-      <h3 class="decisoes-titulo">{t(idioma, 'caso.decisoes')}</h3>
+      <h3 class="decisoes-titulo revelar">{t(idioma, 'caso.decisoes')}</h3>
       <div class="decisoes">{d.decisoes.map((dec) => <Decisao decisao={dec} idioma={idioma} />)}</div>
     </section>
 
     {d.proximos.length > 0 && (
       <section class="secao wrap" aria-labelledby="proximos">
-        <h2 id="proximos">{t(idioma, 'caso.proximos')}</h2>
-        <ul class="proximos">{d.proximos.map((p) => <li set:html={textoRico(p)} />)}</ul>
+        <h2 id="proximos" class="revelar">{t(idioma, 'caso.proximos')}</h2>
+        <ul class="proximos revelar">{d.proximos.map((p) => <li set:html={textoRico(p)} />)}</ul>
       </section>
     )}
 
-    <nav class="secao wrap" aria-label={t(idioma, 'caso.proximoProjeto')}>
+    <nav class="secao wrap revelar" aria-label={t(idioma, 'caso.proximoProjeto')}>
       <a class="proximo" href={urlDoProjeto(idioma, slugDe(proximo.id))}>
         <span class="rotulo">{t(idioma, 'caso.proximoProjeto')} →</span>
         <strong>{proximo.data.titulo}</strong>

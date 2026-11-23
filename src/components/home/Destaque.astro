@@ -12,10 +12,10 @@ const d = projeto.data;
 const slug = slugDe(projeto.id);
 ---
 <section id="projetos" class="secao wrap destaque" aria-labelledby="destaque-titulo">
-  <p class="rotulo rotulo--sinal">01 · {d.statusTexto}</p>
+  <p class="rotulo rotulo--sinal revelar">01 · {d.statusTexto}</p>
   <h2 id="destaque-titulo" transition:name={`titulo-${slug}`}>{d.titulo}</h2>
-  <p class="destaque-frase">{d.frase}</p>
-  {d.statusDetalhe && <p class="destaque-nota">{d.statusDetalhe}</p>}
+  <p class="destaque-frase revelar">{d.frase}</p>
+  {d.statusDetalhe && <p class="destaque-nota revelar">{d.statusDetalhe}</p>}
   <div class="resumo">
     <div class="revelar"><p class="rotulo">{t(idioma, 'destaque.problema')}</p><p>{d.resumo.problema}</p></div>
     <div class="revelar resumo--sinal"><p class="rotulo">{t(idioma, 'destaque.construi')}</p><p>{d.resumo.construi}</p></div>

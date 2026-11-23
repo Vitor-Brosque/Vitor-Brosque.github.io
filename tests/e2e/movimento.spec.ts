@@ -1,4 +1,16 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
+
+async function rolarAteOFim(page: Page, passo = 500, aCada?: () => Promise<void>) {
+  for (;;) {
+    const fim = await page.evaluate((d) => {
+      window.scrollBy(0, d);
+      return window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+    }, passo);
+    await page.waitForTimeout(120);
+    if (aCada) await aCada();
+    if (fim) break;
+  }
+}
 
 test.describe('com movimento reduzido', () => {
   test.use({ reducedMotion: 'reduce' });
@@ -18,11 +30,17 @@ test.describe('com movimento reduzido', () => {
     expect(tocando).toBe(0);
   });
 
-  test('com movimento reduzido nada fica escondido pela revelação', async ({ page }) => {
+  test('o conteúdo entra com fade ao rolar e nada fica escondido', async ({ page }) => {
     await page.goto('/');
-    expect(await page.locator('.revelar').count()).toBeGreaterThan(0);
-    const escondidos = await page.$$eval('.revelar', (els) => els.filter((e) => getComputedStyle(e).opacity !== '1').length);
-    expect(escondidos).toBe(0);
+    const alvo = page.locator('#ferr-titulo');
+    const estilo = () => alvo.evaluate((el) => ({ opacity: getComputedStyle(el).opacity, translate: getComputedStyle(el).translate }));
+    expect(await estilo()).toEqual({ opacity: '0', translate: 'none' });
+    await alvo.scrollIntoViewIfNeeded();
+    await expect.poll(async () => (await estilo()).opacity).toBe('1');
+    await rolarAteOFim(page);
+    await expect
+      .poll(() => page.$$eval('.revelar', (els) => els.filter((e) => getComputedStyle(e).opacity !== '1').length))
+      .toBe(0);
   });
 });
 
