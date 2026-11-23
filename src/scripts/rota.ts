@@ -89,11 +89,13 @@ function aoAparecer(raiz: HTMLElement, mudou: (visivel: boolean) => void): () =>
   return () => obs.disconnect();
 }
 
+/** Estado de pausa compartilhado pelas rotas em loop da página; avisa quem precisa reagir à troca. */
 interface Pausa {
   pausado: boolean;
+  ouvintes: Set<() => void>;
 }
 
-/** Loop com movimento: o carro entra, para em cada placa e sai. O tempo só corre visível e sem pausa. */
+/** Loop com movimento: o carro entra, para em cada placa e sai. O tempo e o quadro só correm visível e sem pausa. */
 function loopAndando(rota: Rota, pausa: Pausa): () => void {
   const n = rota.placas.length;
   const duracao = unidadesDoLoop(n) * UNIDADE_MS;
@@ -102,23 +104,31 @@ function loopAndando(rota: Rota, pausa: Pausa): () => void {
   let visivel = false;
   let raf = 0;
   const passo = (agora: number) => {
-    if (!pausa.pausado) decorrido = (decorrido + Math.min(agora - anterior, 64)) % duracao;
+    decorrido = (decorrido + Math.min(agora - anterior, 64)) % duracao;
     anterior = agora;
     rota.aplicar(estadoDoLoop(decorrido / duracao, n));
     raf = requestAnimationFrame(passo);
   };
-  const pararObs = aoAparecer(rota.raiz, (v) => {
-    visivel = v;
-    if (visivel && !raf) {
+  /** Liga o quadro a quadro só quando a rota está visível e sem pausa; parada, ela não fica "andando". */
+  const sincronizar = () => {
+    const rodar = visivel && !pausa.pausado;
+    if (rodar && !raf) {
       anterior = performance.now();
       raf = requestAnimationFrame(passo);
-    } else if (!visivel && raf) {
+    } else if (!rodar) {
       cancelAnimationFrame(raf);
       raf = 0;
+      rota.raiz.removeAttribute('data-andando');
     }
+  };
+  pausa.ouvintes.add(sincronizar);
+  const pararObs = aoAparecer(rota.raiz, (v) => {
+    visivel = v;
+    sincronizar();
   });
   rota.aplicar(estadoDoLoop(0, n));
   return () => {
+    pausa.ouvintes.delete(sincronizar);
     pararObs();
     cancelAnimationFrame(raf);
   };
@@ -208,17 +218,16 @@ aoCarregarPagina(() => {
   const raizes = [...document.querySelectorAll<HTMLElement>('[data-rota]')];
   if (raizes.length === 0) return;
   const reduzido = movimentoReduzido();
-  const pausa: Pausa = { pausado: false };
+  const pausa: Pausa = { pausado: false, ouvintes: new Set() };
   const limpezas: Array<() => void> = [];
 
   const botoes = [...document.querySelectorAll<HTMLButtonElement>('[data-rota-pausa]')];
   const alternar = () => {
     pausa.pausado = !pausa.pausado;
-    for (const b of botoes) {
-      b.setAttribute('aria-pressed', String(pausa.pausado));
-      b.textContent = (pausa.pausado ? b.dataset.continuar : b.dataset.pausar) ?? b.textContent;
-    }
+    // Só o texto troca (Pausar/Continuar): com aria-pressed junto, o leitor de tela diria "Continuar, pressionado".
+    for (const b of botoes) b.textContent = (pausa.pausado ? b.dataset.continuar : b.dataset.pausar) ?? b.textContent;
     raizes.forEach((r) => r.dataset.modo === 'loop' && r.toggleAttribute('data-pausada', pausa.pausado));
+    pausa.ouvintes.forEach((f) => f());
   };
   botoes.forEach((b) => b.addEventListener('click', alternar));
   limpezas.push(() => botoes.forEach((b) => b.removeEventListener('click', alternar)));

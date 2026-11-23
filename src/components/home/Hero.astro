@@ -56,7 +56,9 @@ const formato = new Intl.NumberFormat(locale);
   .numero { display: block; font-size: clamp(1.8rem, 2.5vw, 2.3rem); white-space: nowrap; font-weight: 850; font-stretch: 125%; line-height: 1.05; color: var(--signal); font-variant-numeric: tabular-nums; }
   .rotulo-numero { display: block; margin-top: 6px; color: var(--mute); font-size: 0.9rem; line-height: 1.35; }
   .hero-acoes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
-  .hero-visual { position: relative; isolation: isolate; }
+  /* Entrada do print (com o halo) por CSS, no invólucro: o print usa rotate (repouso), translate (flutuar) e transform (inclinação por GSAP). */
+  .hero-visual { position: relative; isolation: isolate; animation: print-surgir 0.9s var(--ease) 0.15s both; }
+  @keyframes print-surgir { from { opacity: 0; } }
   /* Halo amarelo difuso atrás do print: parado com movimento reduzido, respirando com movimento. */
   .hero-halo { position: absolute; z-index: -1; inset: -28% -22%; background: radial-gradient(closest-side, rgb(245 184 0 / 0.3), rgb(245 184 0 / 0.12) 50%, transparent); filter: blur(20px); pointer-events: none; }
   .hero-print { position: relative; margin: 0; rotate: 2.5deg; border: 1px solid #2e3833; border-radius: var(--raio); overflow: hidden; background: #fff; box-shadow: 0 34px 70px -24px #000, 0 0 0 7px var(--estrada); }
@@ -65,6 +67,8 @@ const formato = new Intl.NumberFormat(locale);
   .hero-print :global(img) { width: 100%; height: clamp(260px, 32vw, 400px); object-fit: cover; object-position: top; }
   .hero-print figcaption { position: absolute; left: 14px; bottom: 14px; padding: 7px 11px; background: var(--ink); color: var(--bg); font-weight: 700; font-size: 0.8rem; font-stretch: 110%; }
   @media (prefers-reduced-motion: no-preference) {
+    .hero-visual { animation-name: print-chegar; animation-duration: 1.2s; }
+    @keyframes print-chegar { from { opacity: 0; translate: 0 60px; rotate: 8deg; scale: 0.94; } }
     .hero-print { animation: flutuar 7s ease-in-out infinite; }
     .hero-halo { animation: respirar 6s ease-in-out infinite; }
   }

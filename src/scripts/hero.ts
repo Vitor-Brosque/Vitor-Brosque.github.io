@@ -11,8 +11,14 @@ const CONTAGEM_MS = 1600;
 const CONTAGEM_ATRASO_MS = 450;
 const INCLINACAO_MAX = 6;
 
-/** Cada número do hero conta de 0 até o valor final. O leitor de tela lê só o valor final (span.sr-only). */
+/**
+ * Cada número do hero conta de 0 até o valor final. O leitor de tela lê só o valor final (span.sr-only).
+ * O servidor já entrega o valor final: se o script roda tarde e os números já estão à vista, não conta
+ * (senão a pessoa veria valor final, 0 e a contagem).
+ */
 function contarNumeros(): () => void {
+  const item = document.querySelector<HTMLElement>('[data-hero-prova]');
+  if (item && Number(getComputedStyle(item).opacity) >= 0.5) return () => {};
   const alvos = [...document.querySelectorAll<HTMLElement>('[data-contar]')].map((el) => ({
     el,
     alvo: Number(el.dataset.contar),
@@ -92,10 +98,8 @@ aoCarregarPagina(() => {
           return gsap.from(s.lines, { yPercent: 110, duration: 1, ease: 'power4.out', stagger: 0.1 });
         },
       });
-      if (print) {
-        gsap.from(print, { opacity: 0, y: 60, rotate: 8, scale: 0.94, duration: 1.2, ease: 'power3.out', delay: 0.15 });
-        if (hero) limpezas.push(inclinarPrint(hero, print));
-      }
+      // A entrada do print é CSS (Hero.astro); aqui fica só a inclinação pelo ponteiro.
+      if (print && hero) limpezas.push(inclinarPrint(hero, print));
     });
     limpezas.push(() => ctx.revert());
   } catch {
