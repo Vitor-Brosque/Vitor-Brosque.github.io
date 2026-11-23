@@ -96,17 +96,6 @@ const jsonLd = {
       <div class="decisoes">{d.decisoes.map((dec) => <Decisao decisao={dec} idioma={idioma} />)}</div>
     </section>
 
-    {d.desafios.length > 0 && (
-      <section class="secao wrap" aria-labelledby="desafios">
-        <h2 id="desafios">{t(idioma, 'caso.desafios')}</h2>
-        <ol class="desafios">
-          {d.desafios.map((x) => (
-            <li class="revelar"><h3>{x.titulo}</h3><p set:html={textoRico(x.texto)} /></li>
-          ))}
-        </ol>
-      </section>
-    )}
-
     {d.numeros.length > 0 && (
       <section class="secao wrap" aria-labelledby="numeros">
         <h2 id="numeros">{t(idioma, 'caso.numeros')}</h2>
@@ -153,10 +142,6 @@ const jsonLd = {
   .funcs h3 { margin-top: 14px; font-size: 1.15rem; }
   .funcs p { margin-top: 6px; color: var(--ink-2); font-size: 0.95rem; }
   .decisoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 18px; margin-top: 26px; }
-  .desafios { display: grid; gap: 22px; margin: 24px 0 0; padding: 0; list-style: none; counter-reset: desafio; }
-  .desafios li { position: relative; padding-left: 56px; max-width: 78ch; counter-increment: desafio; }
-  .desafios li::before { content: counter(desafio, decimal-leading-zero); position: absolute; left: 0; top: 0; font-family: var(--fonte-mono); color: var(--signal); }
-  .desafios p { margin-top: 6px; color: var(--ink-2); }
   .numeros { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 18px; margin: 24px 0 0; }
   .numeros dt { font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 850; font-stretch: 125%; color: var(--signal); }
   .numeros dd { margin: 4px 0 0; color: var(--ink-2); }
