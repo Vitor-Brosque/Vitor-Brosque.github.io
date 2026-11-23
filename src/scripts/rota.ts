@@ -71,13 +71,14 @@ function iniciarRolagem(raiz: HTMLElement, placas: HTMLElement[]): () => void {
       scrub: 0.4,
       onUpdate: (st) => aplicar(raiz, placas, estadoDaRota(st.progress, n)),
     });
+    aplicar(raiz, placas, estadoDaRota(0, n));
   });
   mm.add('(max-width: 899px)', () => {
     const atualizar = (st: ScrollTrigger) => {
       const e = estadoDaRota(st.progress, n);
       aplicar(raiz, placas, { ...e, posicao: posicaoReal(raiz, placas, e.posicao) });
     };
-    ScrollTrigger.create({
+    const gatilho = ScrollTrigger.create({
       trigger: raiz,
       start: 'top 60%',
       end: 'bottom 60%',
@@ -85,8 +86,8 @@ function iniciarRolagem(raiz: HTMLElement, placas: HTMLElement[]): () => void {
       onUpdate: atualizar,
       onRefresh: atualizar,
     });
+    atualizar(gatilho);
   });
-  aplicar(raiz, placas, estadoDaRota(0, n));
   return () => mm.revert();
 }
 

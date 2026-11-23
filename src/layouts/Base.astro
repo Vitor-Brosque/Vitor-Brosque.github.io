@@ -21,8 +21,9 @@ interface Props {
   imagemOg?: ImageMetadata;
   jsonLd?: Record<string, unknown>;
   indexar?: boolean;
+  altOg?: string;
 }
-const { titulo, descricao, idioma, imagemOg = capaPadrao, jsonLd, indexar = true } = Astro.props;
+const { titulo, descricao, idioma, imagemOg = capaPadrao, jsonLd, indexar = true, altOg = titulo } = Astro.props;
 const site = Astro.site ?? new URL('https://vitor-brosque.github.io');
 const canonica = new URL(Astro.url.pathname, site).href;
 const urlPt = new URL(urlEquivalente(Astro.url.pathname, 'pt'), site).href;
@@ -38,10 +39,10 @@ const ogUrl = new URL(og.src, site).href;
     <title>{titulo}</title>
     <meta name="description" content={descricao} />
     {!indexar && <meta name="robots" content="noindex" />}
-    <link rel="canonical" href={canonica} />
-    <link rel="alternate" hreflang="pt-BR" href={urlPt} />
-    <link rel="alternate" hreflang="en" href={urlEn} />
-    <link rel="alternate" hreflang="x-default" href={urlPt} />
+    {indexar && <link rel="canonical" href={canonica} />}
+    {indexar && <link rel="alternate" hreflang="pt-BR" href={urlPt} />}
+    {indexar && <link rel="alternate" hreflang="en" href={urlEn} />}
+    {indexar && <link rel="alternate" hreflang="x-default" href={urlPt} />}
     <link rel="preload" href={archivoLatin} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
@@ -54,6 +55,7 @@ const ogUrl = new URL(og.src, site).href;
     <meta property="og:image" content={ogUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={altOg} />
     <meta property="og:locale" content={idioma === 'pt' ? 'pt_BR' : 'en_US'} />
     <meta name="twitter:card" content="summary_large_image" />
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}

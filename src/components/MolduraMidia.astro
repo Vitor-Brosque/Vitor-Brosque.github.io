@@ -27,7 +27,7 @@ const poster = midia.video && midia.imagem ? await getImage({ src: midia.imagem,
     <div class="moldura-midia" style={`aspect-ratio: ${proporcao}`}>
       {midia.video ? (
         <>
-          <video data-video muted loop playsinline preload={poster ? 'none' : 'metadata'} poster={poster?.src} aria-label={midia.alt}>
+          <video data-video controls muted loop playsinline preload={poster ? 'none' : 'metadata'} poster={poster?.src} aria-label={midia.alt}>
             <source src={midia.video} type="video/mp4" />
             <track kind="captions" src={`/media/sem-audio-${idioma}.vtt`} srclang={idioma === 'pt' ? 'pt-BR' : 'en'} label={idioma === 'pt' ? 'Português' : 'English'} />
           </video>

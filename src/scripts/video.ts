@@ -41,6 +41,9 @@ aoCarregarPagina(() => {
 
   const ouvintes: Array<() => void> = [];
   for (const v of videos) {
+    // Sem JavaScript o vídeo usa os controles nativos; aqui o botão próprio assume.
+    const tinhaControles = v.hasAttribute('controls');
+    v.removeAttribute('controls');
     estados.set(v, { visivel: false, movimentoReduzido: reduzido, escolhaDoUsuario: null });
     obs.observe(v);
     const aoMudar = () => atualizarBotao(v);
@@ -58,6 +61,7 @@ aoCarregarPagina(() => {
       v.removeEventListener('play', aoMudar);
       v.removeEventListener('pause', aoMudar);
       botao?.removeEventListener('click', aoClicar);
+      if (tinhaControles) v.setAttribute('controls', '');
     });
     atualizarBotao(v);
   }
