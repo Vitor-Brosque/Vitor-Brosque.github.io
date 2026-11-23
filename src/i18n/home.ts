@@ -35,7 +35,7 @@ export const textosHome: Record<Idioma, TextosHome> = {
       tituloDestaque: 'ao sistema',
       tituloDepois: ' que roda nela.',
       apresentacao:
-        'Sou o Vitor, estudante de Sistemas de Informação na UNESP, em Bauru. Comecei atendendo cliente na loja de carros da minha família e hoje construo o software que organiza ela.',
+        'Sou o Vitor, estudante de Sistemas de Informação na UNESP, em Bauru. Comecei atendendo clientes na loja de carros da minha família e hoje construo o software que organiza a loja.',
       provas: [
         { texto: 'Em uso todo dia numa revenda de carros', detalhe: 'RodoviariaOS' },
         { texto: 'Código aberto, com testes', detalhe: 'Life RPG' },
@@ -96,7 +96,7 @@ export const textosHome: Record<Idioma, TextosHome> = {
       tituloDestaque: 'to the system',
       tituloDepois: ' that runs it.',
       apresentacao:
-        "I'm Vitor, an Information Systems student at UNESP, in Brazil. I started out serving customers at my family's car dealership, and now I build the software that runs it.",
+        "I'm Vitor, an Information Systems student at UNESP, in Brazil. I started out serving customers at my family's car dealership, and now I build the software that keeps the dealership organized.",
       provas: [
         { texto: 'Used every day at a car dealership', detalhe: 'RodoviariaOS' },
         { texto: 'Open source, with tests', detalhe: 'Life RPG' },

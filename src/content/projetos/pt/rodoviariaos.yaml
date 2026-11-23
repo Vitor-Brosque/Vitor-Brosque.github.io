@@ -24,7 +24,7 @@ resumo:
     Um sistema que reconhece cada cliente, monta a fila de quem precisa de resposta e calcula o
     resultado de cada carro, com o financeiro e um assistente prontos para entrar em uso.
   orgulho: >-
-    O isolamento entre sócios é garantido pelo próprio banco de dados, a ingestão do WhatsApp é feita para não perder nem duplicar mensagens, e a IA classifica pedidos sem nunca ver os dados da loja.
+    Cada sócio vê só os números dos próprios carros. O sistema foi feito para não perder nem repetir mensagens de clientes. E a IA ajuda sem ter acesso aos dados da loja.
 problema: |-
   Antes de programar, eu trabalhava no balcão da Rodoviária Veículos, a revenda da minha família. Cuidava dos anúncios, do estoque e do atendimento pelo WhatsApp.
 
@@ -54,10 +54,9 @@ rota:
         imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
         alt: Painel do dia mostrando leads esperando resposta e leads novos sem resposta
     - titulo: Negociação
-      curto: A origem é obrigatória e congelada.
+      curto: A origem do lead é registrada e não pode ser alterada depois.
       texto: >-
-        Para abrir uma negociação, a origem é obrigatória. A partir daí ela fica congelada e segue
-        até a venda, mesmo que o lead mude depois.
+        Para abrir uma negociação, a origem do lead precisa estar registrada. A partir daí ela não pode mais ser alterada e segue até a venda.
       midia:
         video: /media/rodoviariaos/whatsapp-negociacao-celular.mp4
         imagem: ../../../assets/projetos/rodoviariaos/whatsapp-negociacao.png
