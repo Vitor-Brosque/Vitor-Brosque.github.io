@@ -92,13 +92,6 @@ funcionalidades:
     midia:
       imagem: ../../../assets/projetos/rodoviariaos/resultado-por-carro.png
       alt: Tela de resultado por carro com venda, aquisição, despesas e resultado, com dados inventados
-  - titulo: Radar de compra
-    texto: >-
-      Anúncios de carros parecidos comparados com a mediana do mercado, corrigida pela
-      quilometragem. Desconto grande demais vira "conferir" e nunca some.
-    midia:
-      imagem: ../../../assets/projetos/rodoviariaos/radar-de-compra.png
-      alt: Lista de anúncios com selos de oportunidade e de conferir, com dados inventados
   - titulo: Assistente
     texto: >-
       Responde perguntas sobre estoque, leads e financeiro, e só registra algo depois de um
@@ -107,6 +100,13 @@ funcionalidades:
       video: /media/rodoviariaos/assistente.mp4
       proporcao: 4/5
       alt: Assistente do RodoviariaOS respondendo uma consulta e pedindo confirmação, com dados inventados
+  - titulo: Radar de compra
+    texto: >-
+      Anúncios de carros parecidos comparados com a mediana do mercado, corrigida pela
+      quilometragem. Desconto grande demais vira "conferir" e nunca some.
+    midia:
+      imagem: ../../../assets/projetos/rodoviariaos/radar-de-compra.png
+      alt: Lista de anúncios com selos de oportunidade e de conferir, com dados inventados
   - titulo: Ocultar valores
     texto: Um clique esconde todos os valores da tela, para quando tem cliente no balcão.
     midia:
