@@ -1,6 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import Estrada from './Estrada.astro';
 import Hero from './home/Hero.astro';
 import Destaque from './home/Destaque.astro';
 import OutrosProjetos from './home/OutrosProjetos.astro';
@@ -33,7 +32,6 @@ const jsonLd = {
 <Base titulo={h.meta.titulo} descricao={h.meta.descricao} idioma={idioma} imagemOg={destaque.data.capa?.imagem} altOg={destaque.data.capa?.alt} jsonLd={jsonLd}>
   <main id="conteudo">
     <Hero idioma={idioma} destaque={destaque} />
-    <Estrada carro />
     <Destaque idioma={idioma} projeto={destaque} />
     <OutrosProjetos idioma={idioma} projetos={outros} />
     <Trajetoria idioma={idioma} />
