@@ -46,6 +46,23 @@ async function registrarContagem(page: Page) {
 }
 const textosDaContagem = (page: Page) => page.evaluate(() => (window as unknown as { __contagem: string[] }).__contagem);
 
+/** Fixa a entrada dos números: 'escondidos' segura o início do fade (opacidade 0), 'visiveis' tira a entrada. */
+async function entradaDosNumeros(page: Page, estado: 'escondidos' | 'visiveis') {
+  // Antes de qualquer script da página: o estilo entra no <html> assim que ele existe.
+  await page.addInitScript((e) => {
+    const estilo = document.createElement('style');
+    estilo.textContent = `[data-hero-prova] { ${e === 'escondidos' ? 'animation-play-state: paused' : 'animation: none'} !important; }`;
+    const por = () => document.documentElement.append(estilo);
+    if (document.documentElement) por();
+    else
+      new MutationObserver((_, obs) => {
+        if (!document.documentElement) return;
+        obs.disconnect();
+        por();
+      }).observe(document, { childList: true });
+  }, estado);
+}
+
 const indiceAtivo = (page: Page, seletor: string) =>
   page.locator(seletor).first().locator('.placa').evaluateAll((ps) => ps.findIndex((p) => p.hasAttribute('data-ativa')));
 
@@ -74,14 +91,42 @@ test.describe('com movimento reduzido', () => {
     });
   }
 
-  test('a estrada fica parada', async ({ page }) => {
+  // Exceção escolhida à regra dos dois modos: a rua corre devagar (as duas variantes), sem o carro sair do lugar.
+  for (const caminho of ['/', '/projetos/rodoviariaos/']) {
+    test(`${caminho}: a rua da estrada corre devagar`, async ({ page }) => {
+      await page.goto(caminho);
+      const estrada = page.locator('[data-estrada]').first();
+      await estrada.scrollIntoViewIfNeeded();
+      const desloc = () => estrada.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--desloc'));
+      await expect.poll(desloc).not.toBe('');
+      const antes = await desloc();
+      await expect.poll(desloc, { timeout: 3000 }).not.toBe(antes);
+    });
+  }
+
+  test('o carro da rota grande anda de placa em placa', async ({ page }) => {
     await page.goto('/');
-    const estrada = page.locator('[data-estrada]').first();
-    await estrada.scrollIntoViewIfNeeded();
-    const desloc = () => estrada.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--desloc'));
-    const antes = await desloc();
-    await page.waitForTimeout(1000);
-    expect(await desloc()).toBe(antes);
+    const rota = page.locator('#projetos [data-rota][data-modo="loop"]');
+    await rota.scrollIntoViewIfNeeded();
+    // Observa a cada quadro, dentro da página, até ver o carro andando e em três posições diferentes.
+    const visto = await rota.evaluate(
+      (el) =>
+        new Promise<{ andou: boolean; posicoes: number }>((resolve) => {
+          const r = el as HTMLElement;
+          const posicoes = new Set<string>();
+          let andou = false;
+          const limite = performance.now() + 12_000;
+          const olhar = () => {
+            posicoes.add(r.style.getPropertyValue('--pos'));
+            andou ||= r.hasAttribute('data-andando');
+            if (!(andou && posicoes.size >= 3) && performance.now() < limite) requestAnimationFrame(olhar);
+            else resolve({ andou, posicoes: posicoes.size });
+          };
+          requestAnimationFrame(olhar);
+        }),
+    );
+    expect(visto.andou).toBe(true);
+    expect(visto.posicoes).toBeGreaterThanOrEqual(3);
   });
 
   test('o conteúdo entra com fade ao rolar e nada fica escondido', async ({ page }) => {
@@ -165,14 +210,27 @@ test.describe('com movimento reduzido', () => {
     expect(tocando).toBe(0);
   });
 
-  test('os números do hero já estão no valor final', async ({ page }) => {
+  test('os números do hero contam até o valor final', async ({ page }) => {
+    await entradaDosNumeros(page, 'escondidos');
+    await registrarContagem(page);
+    await page.goto('/');
+    await expect
+      .poll(async () => {
+        const textos = await textosDaContagem(page);
+        return textos.length > 1 && textos[textos.length - 1] === '~1.000';
+      }, { timeout: 8000 })
+      .toBe(true);
+    expect(new Set(await textosDaContagem(page)).size).toBeGreaterThan(3);
+    expect(await page.locator('[data-contar]').nth(1).textContent()).toBe('~11.000');
+  });
+
+  test('os números do hero não contam se já estão à vista quando o script começa', async ({ page }) => {
+    await entradaDosNumeros(page, 'visiveis');
     await registrarContagem(page);
     await page.goto('/');
     await page.waitForLoadState('load');
-    // Dá tempo de sobra para uma contagem (atraso + 1,6 s) acontecer, se fosse acontecer.
     await page.waitForTimeout(2500);
     expect(await textosDaContagem(page)).toEqual(['~1.000']);
-    expect(await page.locator('[data-contar]').nth(1).textContent()).toBe('~11.000');
   });
 });
 
@@ -377,23 +435,6 @@ test.describe('com movimento permitido', () => {
       await expect(page.locator(`${seletor} .rota-dica`)).toHaveText('Escolha uma parada');
     });
   });
-
-  /** Fixa a entrada dos números: 'escondidos' segura o início do fade (opacidade 0), 'visiveis' tira a entrada. */
-  async function entradaDosNumeros(page: Page, estado: 'escondidos' | 'visiveis') {
-    // Antes de qualquer script da página: o estilo entra no <html> assim que ele existe.
-    await page.addInitScript((e) => {
-      const estilo = document.createElement('style');
-      estilo.textContent = `[data-hero-prova] { ${e === 'escondidos' ? 'animation-play-state: paused' : 'animation: none'} !important; }`;
-      const por = () => document.documentElement.append(estilo);
-      if (document.documentElement) por();
-      else
-        new MutationObserver((_, obs) => {
-          if (!document.documentElement) return;
-          obs.disconnect();
-          por();
-        }).observe(document, { childList: true });
-    }, estado);
-  }
 
   test('os números do hero contam até o valor final', async ({ page }) => {
     // O caso normal: o script começa antes de os números aparecerem. Sob carga, o script pode chegar depois

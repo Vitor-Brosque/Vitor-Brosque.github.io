@@ -20,10 +20,6 @@ const UNIDADE_MS = 1500;
 /** Na rota grande (com a vitrine), cada parada fica bem mais tempo: é o tempo de olhar a tela. */
 const PARADA_GRANDE_MS = 7000;
 const TEMPOS_GRANDE: TemposDoLoop = { ...LOOP, parada: PARADA_GRANDE_MS / UNIDADE_MS };
-/** Com movimento reduzido, a placa acesa avança a cada tanto, sem o carro andar. */
-const TROCA_MS = 2600;
-const TICK_MS = 250;
-const FADE_CARRO_MS = 220;
 /** Ao clicar numa placa, o carro anda até ela nesse tempo. */
 const IDA_MS = 600;
 
@@ -149,7 +145,7 @@ interface Loop {
 
 const suavizar = (t: number) => 1 - (1 - t) ** 3;
 
-/** Loop com movimento: o carro entra, para em cada placa e sai. O tempo e o quadro só correm visível e sem pausa. */
+/** Loop (nos dois modos): o carro entra, para em cada placa e sai. O tempo e o quadro só correm visível e sem pausa. */
 function loopAndando(rota: Rota, pausa: Pausa, tempos: TemposDoLoop): Loop {
   const n = rota.placas.length;
   const duracao = unidadesDoLoop(n, tempos) * UNIDADE_MS;
@@ -218,49 +214,6 @@ function loopAndando(rota: Rota, pausa: Pausa, tempos: TemposDoLoop): Loop {
       pararObs();
       cancelAnimationFrame(raf);
       cancelAnimationFrame(ida);
-    },
-  };
-}
-
-/** Loop com movimento reduzido: o carro não anda; a placa acesa avança e o carro troca de lugar com fade. */
-function loopTrocando(rota: Rota, pausa: Pausa, trocaMs: number): Loop {
-  const n = rota.placas.length;
-  let ativa = 0;
-  let visivel = false;
-  let acumulado = 0;
-  let fade = 0;
-  rota.aplicar({ ativa, u: ativa, andando: false });
-  const pararObs = aoAparecer(rota.raiz, (v) => {
-    visivel = v;
-  });
-  const irPara = (i: number) => {
-    ativa = i;
-    acumulado = 0;
-    rota.acender(ativa);
-    rota.raiz.setAttribute('data-trocando', '');
-    window.clearTimeout(fade);
-    fade = window.setTimeout(() => {
-      rota.aplicar({ ativa, u: ativa, andando: false });
-      rota.raiz.removeAttribute('data-trocando');
-    }, FADE_CARRO_MS);
-  };
-  // Conta só o tempo em que a troca pode acontecer: visível, sem pausa e sem ninguém segurando.
-  const relogio = window.setInterval(() => {
-    if (!visivel || pausa.pausado || rota.segurando || n < 2) return;
-    acumulado += TICK_MS;
-    if (acumulado >= trocaMs) irPara((ativa + 1) % n);
-  }, TICK_MS);
-  const aoPausar = () => {
-    if (!pausa.pausado) acumulado = 0;
-  };
-  pausa.ouvintes.add(aoPausar);
-  return {
-    irPara,
-    limpar: () => {
-      pausa.ouvintes.delete(aoPausar);
-      pararObs();
-      window.clearInterval(relogio);
-      window.clearTimeout(fade);
     },
   };
 }
@@ -454,9 +407,8 @@ aoCarregarPagina(() => {
     limpezas.push(() => rota.desligar());
     if (raiz.dataset.modo === 'loop') {
       const grande = rota.paineis.length > 0;
-      const loop = reduzido
-        ? loopTrocando(rota, pausa, grande ? PARADA_GRANDE_MS : TROCA_MS)
-        : loopAndando(rota, pausa, grande ? TEMPOS_GRANDE : LOOP);
+      // O carro anda nos dois modos (exceção escolhida à regra dos dois modos); quique, tracejado correndo e placa subindo ficam no CSS só com movimento.
+      const loop = loopAndando(rota, pausa, grande ? TEMPOS_GRANDE : LOOP);
       limpezas.push(() => loop.limpar());
       if (grande) limpezas.push(vitrineViva(rota, loop, () => definirPausa(true), reduzido));
     } else limpezas.push(reduzido ? rolagemEstatica(rota) : rolagemAndando(rota));

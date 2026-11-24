@@ -4,7 +4,9 @@ import { proximoDeslocamento } from './estrada-calculo';
 
 aoCarregarPagina(() => {
   const estradas = [...document.querySelectorAll<HTMLElement>('[data-estrada]')];
-  if (estradas.length === 0 || movimentoReduzido()) return;
+  if (estradas.length === 0) return;
+  // Exceção escolhida à regra dos dois modos: com movimento reduzido a rua também corre, devagar e sem acelerar com a rolagem.
+  const reduzido = movimentoReduzido();
 
   const visiveis = new Set<HTMLElement>();
   let desloc = 0;
@@ -17,7 +19,7 @@ aoCarregarPagina(() => {
     const dy = window.scrollY - ultimoScroll;
     ultimoTempo = agora;
     ultimoScroll = window.scrollY;
-    desloc = proximoDeslocamento(desloc, dt, dy);
+    desloc = proximoDeslocamento(desloc, dt, dy, reduzido);
     // Só a rua corre (tracejado e tachões); o carro fica no lugar.
     for (const e of visiveis) e.style.setProperty('--desloc', `${desloc.toFixed(2)}px`);
     raf = visiveis.size ? requestAnimationFrame(passo) : 0;
