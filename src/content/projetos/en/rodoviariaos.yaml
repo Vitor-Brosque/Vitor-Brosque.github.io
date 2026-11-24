@@ -65,7 +65,8 @@ rota:
         If the customer stops answering, the system schedules the next attempt and suggests the message. The salesperson reviews and sends it: nothing goes out by itself. Only attempts that were actually made count.
       midia:
         imagem: ../../../assets/projetos/rodoviariaos/mensagem-sugerida.png
-        alt: The day's attempts queue with the ready-made message for the fourth attempt for the salesperson to review, with made-up data
+        moldura: nenhuma
+        alt: Follow-up message suggested by the system for the salesperson to review before sending, with made-up data
     - titulo: Rescue
       curto: By time or by the car of interest.
       texto: >-
