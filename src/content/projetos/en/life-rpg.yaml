@@ -3,10 +3,10 @@ ordem: 2
 frase: A pixel-art study and routine app, offline-first, that shows one quest at a time.
 status: aberto
 statusTexto: Open source (MIT) · in use on the PC
-statusDetalhe: "In use on the PC since November 2026. The public version dates from 11/23/2026. Still missing: turning on iPhone access (HTTPS on the private network), testing on the iPhone, testing the AI with a real key, and setting up CI."
+statusDetalhe: In use on the PC since November 2026. Still to come are iPhone access, the AI with a real key, and CI.
 papel: Personal project, from design to infrastructure
 periodo: "2026"
-stack: [TypeScript, React 19, Vite, Dexie (IndexedDB), Zustand, Fastify 5, "SQLite (node:sqlite)", Zod 4, ts-fsrs, Vitest, "Docker (ready-made recipe, runs directly on the PC today)"]
+stack: [TypeScript, React 19, Vite, Dexie (IndexedDB), Zustand, Fastify 5, "SQLite (node:sqlite)", Zod 4, ts-fsrs, Vitest]
 links:
   codigo: https://github.com/Vitor-Brosque/life-rpg
 cartao: capa
@@ -31,7 +31,7 @@ problema: |-
 
   Life RPG tries to close the gap between knowing and doing. It shows one quest at a time, with a small first step, and adapts to the kind of day: normal, low energy, recovery or free. Nothing resets, nothing decays and nothing turns red: a slow day doesn't erase progress.
 
-  I have used it on my PC since November 2026. The phone is the next step, and the app was built for both from the start: that's why it had to work offline and keep both devices in sync. Sync has been tested with automated tests and with two profiles on the same machine, not yet between two real devices.
+  I have used it on my PC since November 2026. The app was built for phone and PC from the start, which is why it had to work offline and keep both in sync. The phone is the next step.
 rota:
   titulo: The route of a change
   paradas:
@@ -85,12 +85,12 @@ funcionalidades:
       imagem: ../../../assets/projetos/life-rpg/personagem.png
       moldura: celular
       alt: Character sheet for the fictional character Lia, with level, XP, a shortcut to the world map and attributes by area of life
-  - titulo: Week
-    texto: Planning in blocks, recurring items, weekly and long-term goals, 6 to 8 week seasons and strategies being tested.
+  - titulo: Journeys
+    texto: A project becomes a journey of quests in order. Only the next one shows up on the Now screen, so the project never turns into a to-do list.
     midia:
-      imagem: ../../../assets/projetos/life-rpg/semana.png
+      imagem: ../../../assets/projetos/life-rpg/jornada.png
       moldura: celular
-      alt: Plan screen on the Goals tab, with a project journey in progress and 2 of 5 quests done
+      alt: An open journey with its quests in order, two done and three to go, with made-up data
 arquitetura:
   titulo: Architecture
   texto: >-

@@ -3,10 +3,10 @@ ordem: 2
 frase: App de estudo e rotina em pixel art, offline-first, que mostra uma missão por vez.
 status: aberto
 statusTexto: Código aberto (MIT) · em uso no PC
-statusDetalhe: "Em uso no PC desde novembro de 2026. A versão pública é de 23/11/2026. Faltam: ligar o acesso pelo iPhone (HTTPS na rede privada), testar no iPhone, testar a IA com chave real e configurar CI."
+statusDetalhe: Em uso no PC desde novembro de 2026. Faltam o acesso pelo iPhone, a IA com chave real e o CI.
 papel: Projeto pessoal, do design à infraestrutura
 periodo: "2026"
-stack: [TypeScript, React 19, Vite, Dexie (IndexedDB), Zustand, Fastify 5, "SQLite (node:sqlite)", Zod 4, ts-fsrs, Vitest, "Docker (receita pronta, hoje roda direto no PC)"]
+stack: [TypeScript, React 19, Vite, Dexie (IndexedDB), Zustand, Fastify 5, "SQLite (node:sqlite)", Zod 4, ts-fsrs, Vitest]
 links:
   codigo: https://github.com/Vitor-Brosque/life-rpg
 cartao: capa
@@ -31,7 +31,7 @@ problema: |-
 
   O Life RPG tenta diminuir a distância entre saber e fazer. Ele mostra uma missão por vez, com um primeiro passo pequeno, e se adapta ao tipo do dia: normal, baixa energia, recuperação ou livre. Nada zera, nada decai e nada fica vermelho: um dia parado não apaga o progresso.
 
-  Uso no PC desde novembro de 2026. O celular é o próximo passo, e o app foi feito para os dois desde o começo: por isso ele precisava funcionar sem internet e manter os dois aparelhos em sincronia. A sincronização foi testada com testes automáticos e com dois perfis na mesma máquina, ainda não entre dois aparelhos reais.
+  Uso no PC desde novembro de 2026. O app foi feito para celular e PC desde o começo, por isso precisava funcionar sem internet e manter os dois em sincronia. O celular é o próximo passo.
 rota:
   titulo: A rota de uma mudança
   paradas:
@@ -87,12 +87,12 @@ funcionalidades:
       imagem: ../../../assets/projetos/life-rpg/personagem.png
       moldura: celular
       alt: Ficha da personagem fictícia Lia, com nível, XP, o atalho para o mapa do mundo e atributos por área da vida
-  - titulo: Semana
-    texto: Planejamento em blocos, itens recorrentes, objetivos da semana e de longo prazo, temporadas de 6 a 8 semanas e estratégias em teste.
+  - titulo: Jornadas
+    texto: Um projeto vira uma jornada de missões em ordem. Só a próxima aparece no Agora, para o projeto não virar uma lista de tarefas.
     midia:
-      imagem: ../../../assets/projetos/life-rpg/semana.png
+      imagem: ../../../assets/projetos/life-rpg/jornada.png
       moldura: celular
-      alt: Tela Planejar na aba Objetivos, com uma jornada de projeto em andamento e o progresso de 2 de 5 missões
+      alt: Jornada aberta com as missões em ordem, duas feitas e três por fazer, com dados inventados
 arquitetura:
   titulo: Arquitetura
   texto: >-
