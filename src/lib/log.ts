@@ -1,3 +1,6 @@
+/** Nome do arquivo de log do TechNews (a barra de título das janelas de terminal). */
+export const ARQUIVO_DO_LOG = 'technews.log';
+
 /** Níveis que o log do TechNews usa (`logging` do Python, formato `%(asctime)s | %(levelname)s | %(message)s`). */
 export type NivelDoLog = 'INFO' | 'WARNING' | 'ERROR';
 

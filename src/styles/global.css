@@ -63,6 +63,10 @@ html[data-pausado] *::after { animation-play-state: paused !important; }
   @keyframes hero-titulo-seguranca { to { visibility: visible; } }
 }
 
+/* Piscar do cursor de bloco (tema terminal: o do log do topo e o da rota). Fica aqui porque a rota compacta do cartão
+   da home também o usa, fora da página do tema. */
+@keyframes cursor-piscar { 50% { opacity: 0; } }
+
 /* Revelação ao rolar: fade nos dois modos; deslocamento só com movimento permitido. */
 .revelar { transition: opacity 0.6s var(--ease); transition-delay: calc(var(--ordem, 0) * 70ms); }
 .js .revelar:not(.visivel) { opacity: 0; }

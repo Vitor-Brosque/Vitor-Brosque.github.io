@@ -8,6 +8,7 @@ import MapaArquitetura from '../components/MapaArquitetura.tsx';
 import CenaRpg from '../components/rpg/CenaRpg.astro';
 import Estagios from '../components/rpg/Estagios.astro';
 import LogTerminal from '../components/terminal/LogTerminal.astro';
+import { ARQUIVO_DO_LOG } from '../lib/log';
 import type { Projeto } from '../lib/projetos';
 import { slugDe } from '../lib/projetos-puro';
 import { paragrafos, textoRico } from '../lib/texto';
@@ -92,7 +93,7 @@ const jsonLd = {
 
     <section class="secao wrap" aria-labelledby="rota">
       <h2 id="rota" class="revelar">{d.rota.titulo}</h2>
-      <div class="caso-rota"><Rota titulo={d.rota.titulo} paradas={d.rota.paradas} modo="rolagem" idioma={idioma} tema={tema} /></div>
+      <div class="caso-rota"><Rota titulo={d.rota.titulo} paradas={d.rota.paradas} modo="rolagem" idioma={idioma} tema={tema} execucao={terminal && d.logDoTopo?.[0] ? { arquivo: ARQUIVO_DO_LOG, comando: d.logDoTopo[0] } : undefined} /></div>
     </section>
 
     {d.funcionalidades.length > 0 && (

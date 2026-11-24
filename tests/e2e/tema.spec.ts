@@ -236,10 +236,21 @@ for (const js of [true, false]) {
         await expect(janela).toHaveAttribute('aria-label', /technews\.log/);
         await expect(janela.locator('.log-linha')).toHaveText(logDoTopo);
         await expect(janela.locator('.log-nivel')).toHaveText(['WARNING', 'INFO', 'WARNING', 'INFO']);
+        // WARNING no âmbar do tema e INFO no verde do tema (valores computados).
         const cores = await janela.locator('.log-nivel').evaluateAll((ns) => ns.map((n) => getComputedStyle(n).color));
-        expect(cores[0]).toBe(cores[2]);
-        expect(cores[1]).toBe(cores[3]);
-        expect(cores[0]).not.toBe(cores[1]);
+        const [verde, ambar] = await page.evaluate(() =>
+          ['--verde', '--ambar'].map((v) => {
+            const t = document.createElement('span');
+            t.style.color = `var(${v})`;
+            document.querySelector('main')!.append(t);
+            const cor = getComputedStyle(t).color;
+            t.remove();
+            return cor;
+          }),
+        );
+        expect(verde).toBe('rgb(126, 231, 135)');
+        expect(ambar).toBe('rgb(227, 179, 65)');
+        expect(cores).toEqual([ambar, verde, ambar, verde]);
         await expect(janela.locator('figcaption')).toHaveText(legenda);
         // Nada de rolagem horizontal: as linhas quebram dentro da janela.
         expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
@@ -247,6 +258,44 @@ for (const js of [true, false]) {
     }
   });
 }
+// Com movimento permitido as linhas entram uma a uma: todas precisam chegar à vista (com e sem JS).
+const linhasVisiveis = (page: Page) =>
+  page.locator('.log-janela .log-linha').evaluateAll((ls) => ls.filter((l) => getComputedStyle(l).visibility === 'visible').length);
+for (const js of [true, false]) {
+  test.describe(`log do topo com movimento, ${js ? 'com' : 'sem'} JavaScript`, () => {
+    test.use({ javaScriptEnabled: js, reducedMotion: 'no-preference' });
+    test('as seis linhas aparecem todas', async ({ page }) => {
+      await page.goto('/projetos/technews/');
+      await expect.poll(() => linhasVisiveis(page), { timeout: 3500 }).toBe(6);
+    });
+  });
+}
+test.describe('log do topo, pausa cedo', () => {
+  test.use({ reducedMotion: 'no-preference' });
+  test('pausar no meio da entrada mostra o log inteiro, e continuar não esconde as linhas de novo', async ({ page }) => {
+    await page.goto('/projetos/technews/', { waitUntil: 'domcontentloaded' });
+    // Pausa assim que o botão responde, anotando antes do clique se a última linha ainda esperava a vez (prova de que foi cedo).
+    const pausar = () =>
+      page.evaluate(() => {
+        const w = window as unknown as { __pendente?: boolean };
+        const a = [...document.querySelectorAll('.log-janela .log-linha')].at(-1)?.getAnimations()[0];
+        w.__pendente = Boolean(a) && Number(a!.currentTime ?? 0) < Number(a!.effect?.getTiming().delay ?? 0);
+        (document.querySelector('[data-estrada-pausa]') as HTMLButtonElement | null)?.click();
+        return document.documentElement.hasAttribute('data-pausado');
+      });
+    await expect.poll(pausar, { intervals: [20] }).toBe(true);
+    const ultimaPendente = await page.evaluate(() => (window as unknown as { __pendente?: boolean }).__pendente);
+    expect(ultimaPendente).toBe(true);
+    expect(await linhasVisiveis(page)).toBe(6);
+    await page.evaluate(() => (document.querySelector('[data-estrada-pausa]') as HTMLButtonElement).click());
+    await expect(page.locator('html')).not.toHaveAttribute('data-pausado');
+    for (let i = 0; i < 15; i++) {
+      expect(await linhasVisiveis(page)).toBe(6);
+      await page.waitForTimeout(150);
+    }
+  });
+});
+
 test('as outras páginas não têm o log do topo', async ({ page }) => {
   await page.goto('/projetos/rodoviariaos/');
   await expect(page.locator('.log-janela')).toHaveCount(0);
@@ -289,12 +338,23 @@ for (const modo of ['reduce', 'no-preference'] as const) {
       await page.waitForTimeout(800);
       expect(await desloc()).toBe(parada);
       expect(await piscando()).toBe(0);
-      expect(await cursoresApagados()).toBe(0);
+      // Aceso em todas as amostras, qualquer que seja a fase em que o piscar congelou.
+      for (let i = 0; i < 10; i++) {
+        expect(await cursoresApagados()).toBe(0);
+        await page.waitForTimeout(120);
+      }
       await botao.click();
       await expect.poll(desloc, { timeout: 3000 }).not.toBe(parada);
     });
   });
 }
+
+const linhasDasEtapas = [
+  'WARNING | SEM_URL_OU_TITULO | ID = 46012907',
+  'INFO | EXTRACAO_OK | ID = 46013377',
+  'INFO | POSTGRES_CONECTADO | DB = …',
+  'INFO | RESUMO_INGESTAO | INSERIDAS=… | DUPLICADAS=… | REJEITADAS=…',
+];
 
 test('na rota do TechNews as três primeiras etapas trazem a contagem da execução de teste; as do banco não', async ({ page }) => {
   for (const [caminho, contagens] of [
@@ -307,14 +367,53 @@ test('na rota do TechNews as três primeiras etapas trazem a contagem da execuç
     for (let i = 0; i < 3; i++) await expect(placas.nth(i).locator('.placa-contagem')).toHaveText(contagens[i]);
     for (const i of [3, 4]) await expect(placas.nth(i).locator('.placa-contagem')).toHaveCount(0);
     // A linha de log de cada etapa, no formato real (Coleta não tem).
-    await expect(placas.locator('.saida')).toHaveText([
-      'WARNING | SEM_URL_OU_TITULO | ID = 46012907',
-      'INFO | EXTRACAO_OK | ID = 46013377',
-      'INFO | POSTGRES_CONECTADO | DB = …',
-      'INFO | RESUMO_INGESTAO | INSERIDAS=… | DUPLICADAS=… | REJEITADAS=…',
-    ]);
+    await expect(placas.locator('.saida')).toHaveText(linhasDasEtapas);
+    // À vista de fato: no desktop as placas da rota presa; no celular cada item, rolando até ele.
+    for (let i = 0; i < 3; i++) {
+      await placas.nth(i).locator('.placa-corpo').scrollIntoViewIfNeeded();
+      await expect(placas.nth(i).locator('.placa-contagem')).toBeVisible();
+    }
   }
 });
+
+for (const modo of ['reduce', 'no-preference'] as const) {
+  test.describe(`execução da rota do TechNews (${modo === 'reduce' ? 'movimento reduzido' : 'movimento permitido'})`, () => {
+    test.use({ reducedMotion: modo });
+    test('na rota presa a janela mostra a execução até a etapa; no celular cada item mostra só a própria linha', async ({ page }) => {
+      await page.goto('/projetos/technews/');
+      const rota = page.locator('[data-rota][data-modo="rolagem"]');
+      const placas = rota.locator('.placa');
+      const largo = (page.viewportSize()?.width ?? 0) >= 900;
+      if (largo) {
+        await expect(rota).toHaveAttribute('data-presa', '');
+        const topo = await rota.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+        await page.evaluate((y) => window.scrollTo(0, y - 80), topo);
+        // Rola dentro da rota presa até a etapa 3 acender.
+        for (let k = 0; k < 80 && (await placas.nth(2).getAttribute('data-ativa')) === null; k++) {
+          await page.evaluate(() => window.scrollBy(0, 50));
+          await page.waitForTimeout(60);
+        }
+        await expect(placas.nth(2)).toHaveAttribute('data-ativa', '');
+        const janela = placas.nth(2).locator('.execucao');
+        await expect(janela).toBeVisible();
+        await expect(janela.locator('.execucao-linha')).toHaveText(['$ python scr/main.py', linhasDasEtapas[0], linhasDasEtapas[1]]);
+        await expect(janela.locator('.execucao-linha--atual')).toHaveText(linhasDasEtapas[1]);
+        await expect(janela).not.toContainText('POSTGRES_CONECTADO');
+        await expect(janela).not.toContainText('RESUMO_INGESTAO');
+        // A saída solta não aparece na rota presa (a linha da etapa está na janela).
+        await expect(placas.nth(2).locator('.saida')).toBeHidden();
+      } else {
+        for (let i = 1; i < 5; i++) {
+          const saida = placas.nth(i).locator('.saida');
+          await saida.scrollIntoViewIfNeeded();
+          await expect(saida).toBeVisible();
+          await expect(saida).toHaveText(linhasDasEtapas[i - 1]);
+          await expect(placas.nth(i).locator('.execucao')).toBeHidden();
+        }
+      }
+    });
+  });
+}
 
 test('na home só o cartão do TechNews tem a moldura do terminal, com o cursor e "Etapa n" na rota compacta', async ({ page }) => {
   await page.goto('/');

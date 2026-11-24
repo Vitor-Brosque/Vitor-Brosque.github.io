@@ -1,5 +1,6 @@
 ---
 import LinhaDeLog from './LinhaDeLog.astro';
+import { ARQUIVO_DO_LOG } from '../../lib/log';
 import { t, type Idioma } from '../../i18n/ui';
 
 /**
@@ -9,7 +10,7 @@ import { t, type Idioma } from '../../i18n/ui';
  * pisca no fim; com movimento reduzido e na pausa o log aparece inteiro e o cursor fica aceso.
  */
 interface Props { idioma: Idioma; linhas: string[]; arquivo?: string }
-const { idioma, linhas, arquivo = 'technews.log' } = Astro.props;
+const { idioma, linhas, arquivo = ARQUIVO_DO_LOG } = Astro.props;
 ---
 <figure class="log-janela" aria-label={t(idioma, 'terminal.logRotulo')} style={`--n: ${linhas.length}`}>
   <div class="janela-barra" aria-hidden="true"><i></i><i></i><i></i><span>{arquivo}</span></div>
@@ -31,9 +32,10 @@ const { idioma, linhas, arquivo = 'technews.log' } = Astro.props;
     .log-linha { animation: log-linha 0s steps(1) both; animation-delay: calc(0.35s + var(--i) * 0.38s); }
     .cursor-bloco { animation: cursor-piscar 1.06s steps(1) calc(0.35s + var(--n) * 0.38s) infinite; }
     @keyframes log-linha { from { visibility: hidden; } }
-    @keyframes cursor-piscar { 50% { opacity: 0; } }
-    /* Na pausa da página o log fica inteiro e o cursor aceso (a regra geral só congelaria onde estavam). */
-    :global(html[data-pausado]) .log-linha,
-    :global(html[data-pausado]) .cursor-bloco { animation: none; }
+    /* Na pausa da página o log fica inteiro e o cursor aceso. A animação continua lá (a regra geral congela a linha do
+       tempo), então ao continuar ela retoma de onde parou em vez de recomeçar e esconder as linhas de novo. */
+    :global(html[data-pausado]) .log-linha { visibility: visible !important; }
+    :global(html[data-pausado]) .cursor-bloco { opacity: 1 !important; }
   }
 </style>
+<script>import '../../scripts/log-terminal';</script>

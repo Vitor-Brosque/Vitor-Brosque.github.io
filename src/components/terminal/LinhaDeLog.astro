@@ -8,7 +8,7 @@ const p = partesDoLog(Astro.props.linha);
 {p.tipo === 'comando' ? <><span class="log-prompt" aria-hidden="true">$ </span>{p.comando}</>
   : p.tipo === 'log' ? <>{p.data && <span class="log-data">{p.data} | </span>}<span class:list={['log-nivel', `log-nivel--${p.nivel.toLowerCase()}`]}>{p.nivel}</span> | {p.mensagem}</>
   : p.texto}
-<style is:global>
+<style>
   .log-prompt { color: var(--verde); }
   .log-data { color: var(--mute); }
   .log-nivel--info { color: var(--verde); }
