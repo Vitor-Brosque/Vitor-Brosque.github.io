@@ -84,7 +84,8 @@ const jsonLd = {
 
     {capa && <div class="wrap caso-capa revelar revelar--zoom"><MolduraMidia midia={capa} idioma={idioma} sizes="(min-width: 1120px) 1040px, 92vw" /></div>}
 
-    <div class="caso-estrada"><Estrada tema={tema} idioma={idioma} /></div>
+    {/* Cada tema põe o seu veículo sobre a faixa: o carrinho na rodovia, a lanterna na trilha do rpg (o duto do terminal leva só os pacotes). */}
+    <div class="caso-estrada"><Estrada tema={tema} idioma={idioma} carro={tema === 'rodovia'} /></div>
 
     <section class="secao wrap" aria-labelledby="problema">
       <h2 id="problema" class="revelar">{t(idioma, 'caso.problema')}</h2>

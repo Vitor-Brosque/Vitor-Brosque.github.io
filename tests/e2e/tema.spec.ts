@@ -233,6 +233,29 @@ test.describe('rota com movimento reduzido', () => {
     expect(await lanterna.evaluate((l) => l.getAnimations({ subtree: true }).length)).toBe(0);
   });
 
+  test('no RodoviariaOS o carrinho fica sobre a faixa, no lugar, com a rua correndo; nas outras páginas não há carrinho na faixa', async ({ page }) => {
+    await page.goto('/projetos/rodoviariaos/');
+    const faixa = page.locator('main [data-estrada]');
+    await faixa.scrollIntoViewIfNeeded();
+    const carro = faixa.locator('.estrada-carro .carrinho');
+    await expect(carro).toBeVisible();
+    const caixa = (await carro.boundingBox())!;
+    const pista = (await faixa.boundingBox())!;
+    expect(caixa.y).toBeGreaterThanOrEqual(pista.y - 1);
+    expect(caixa.y + caixa.height).toBeLessThanOrEqual(pista.y + pista.height + 1);
+    // A rua corre (a exceção escolhida vale também com movimento reduzido) e o carro não sai do lugar.
+    const desloc = () => faixa.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--desloc'));
+    await expect.poll(desloc).not.toBe('');
+    const antes = await desloc();
+    await expect.poll(desloc, { timeout: 3000 }).not.toBe(antes);
+    expect((await carro.boundingBox())!.x).toBeCloseTo(caixa.x, 0);
+    await expect(page.locator('main [data-estrada-pausa]')).toBeVisible();
+    for (const caminho of ['/projetos/life-rpg/', '/projetos/technews/']) {
+      await page.goto(caminho);
+      await expect(page.locator('main [data-estrada] .carrinho')).toHaveCount(0);
+    }
+  });
+
 });
 
 // Tema terminal: o log do pipeline no cabeçalho, no formato real do TechNews.
