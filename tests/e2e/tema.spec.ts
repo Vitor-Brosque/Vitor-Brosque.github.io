@@ -344,3 +344,16 @@ test('no TechNews as decisões são blocos de terminal e os próximos passos, ca
   await page.goto('/projetos/rodoviariaos/');
   await expect(page.locator('details.decisao--terminal')).toHaveCount(0);
 });
+
+test('o TechNews mostra em que pé está sob o título; o Life RPG continua sem essa linha', async ({ page }) => {
+  await page.goto('/projetos/technews/');
+  await expect(page.locator('.caso-status')).toHaveText(
+    'Hoje ele coleta do Hacker News e grava no PostgreSQL. Estou escolhendo as próximas fontes e criando os coletores e os fallbacks.',
+  );
+  await page.goto('/en/projects/technews/');
+  await expect(page.locator('.caso-status')).toHaveText(
+    "Today it collects from Hacker News and writes to PostgreSQL. I'm choosing the next sources and building the collectors and their fallbacks.",
+  );
+  await page.goto('/projetos/life-rpg/');
+  await expect(page.locator('.caso-status')).toHaveCount(0);
+});

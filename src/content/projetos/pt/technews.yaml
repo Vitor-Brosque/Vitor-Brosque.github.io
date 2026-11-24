@@ -1,9 +1,10 @@
 titulo: TechNews
 ordem: 3
-frase: Pipeline de dados em Python que coleta, valida e guarda notícias de tecnologia no PostgreSQL.
+frase: Pipeline em Python que reúne as notícias de tecnologia dos temas que eu acompanho, para eu ler o que importa toda manhã.
 status: desenvolvimento
 statusTexto: Em desenvolvimento · código aberto
-papel: Projeto de estudo, sozinho
+statusDetalhe: Hoje ele coleta do Hacker News e grava no PostgreSQL. Estou escolhendo as próximas fontes e criando os coletores e os fallbacks.
+papel: Projeto pessoal e de estudo, sozinho
 periodo: "2026"
 stack: [Python, PostgreSQL, psycopg 3, httpx, trafilatura, API do Hacker News]
 links:
@@ -18,25 +19,30 @@ logDoTopo:
   - "2026-11-23 10:12:11,870 | WARNING | FALHA_DOWNLOAD | ID=46013412 | URL=https://…"
   - "2026-11-23 10:13:40,002 | INFO | RESUMO_INGESTAO | INSERIDAS=… | DUPLICADAS=… | REJEITADAS=…"
 emResumo: >-
-  Pipeline em Python que busca no Hacker News as notícias do dia anterior, descarta o que vem
-  incompleto ou repetido, extrai o texto da página original e grava no PostgreSQL sem duplicar.
-  Numa execução de teste em 23/11/2026, coletou 81 notícias e extraiu o texto de 70 delas (86%).
-  As outras 11 falharam no download (sites que bloqueiam robôs ou exigem login) ou na extração,
-  e ficaram registradas no log.
+  Tem portal e notícia demais, e eu me perdia nas novidades de tecnologia. O TechNews é o que estou
+  construindo para resolver isso: reunir as notícias dos temas que eu acompanho e me entregar um
+  resumo toda manhã. A primeira parte já funciona: ele busca no Hacker News as notícias do dia
+  anterior, descarta o que vem incompleto ou repetido, extrai o texto da página original e grava no
+  PostgreSQL sem duplicar. Numa execução de teste em 23/11/2026, coletou 81 notícias e extraiu o
+  texto de 70 delas (86%).
 resumo:
   problema: >-
-    Eu queria entender, na prática, como um dado sai de uma API, passa por validação e chega limpo
-    num banco.
+    Tem portal e notícia demais. Eu me perdia nas novidades de tecnologia e queria ler só o que
+    importa, toda manhã.
   construi: >-
-    Um pipeline que busca no Hacker News as notícias do dia anterior sobre 10 temas, descarta o que
-    vem incompleto, extrai o texto da página e grava no PostgreSQL.
+    A primeira parte do pipeline: busca no Hacker News as notícias do dia anterior sobre 10 temas,
+    descarta o que vem incompleto, extrai o texto da página e grava no PostgreSQL.
   orgulho: >-
     Rodar de novo não duplica nada, uma notícia com problema não derruba as outras, e cada etapa deixa
     um log com nome de evento.
 problema: |-
-  O TechNews é o meu laboratório de engenharia de dados. Comecei por ele para entender, na prática, cada etapa de um pipeline: de onde vem o dado, o que fazer quando ele chega quebrado e como garantir que rodar de novo não estraga nada.
+  Acompanhar tecnologia virou um problema de volume. São vários portais e muita notícia por dia, e eu ficava perdido, sem saber o que valia a leitura.
 
-  O código é pequeno de propósito. Cada etapa foi construída para eu entender o porquê de cada decisão.
+  O TechNews é a minha resposta. A ideia é buscar as notícias dos temas que eu acompanho, guardar no banco, passar por uma IA que filtra, classifica e resume, e me mostrar o resultado numa tela, para eu ler toda manhã. O que eu gostar, eu salvo. O que eu não salvar tem prazo para ser apagado quando chegarem as novas.
+
+  O projeto está no começo. Hoje existe a primeira parte: a coleta no Hacker News, a validação, a extração do texto e a gravação no PostgreSQL. Agora estou decidindo as próximas fontes e criando os coletores que alimentam o banco, com fallback para quando uma fonte falhar.
+
+  Ele também é o meu laboratório de engenharia de dados. O código é pequeno de propósito: cada etapa foi construída para eu entender o porquê de cada decisão.
 rota:
   titulo: Da API ao banco
   paradas:
@@ -117,12 +123,13 @@ numerosFonte: >-
   Execução das etapas de coleta, validação e extração em 23/11/2026, com as notícias de 22/11/2026,
   sem gravar no banco.
 proximos:
-  - Escrever testes para cada etapa, com respostas da API gravadas.
+  - Adicionar as próximas fontes, com fallback para quando uma falhar.
+  - Passar as notícias por uma IA que filtra, classifica e resume.
+  - Mostrar o resultado numa tela para ler toda manhã, salvar o que eu gostar e apagar o resto depois de um prazo.
   - Agendar a execução diária.
+  - Escrever testes para cada etapa, com respostas da API gravadas.
   - Baixar as páginas em paralelo, com limite de concorrência.
-  - Adicionar fontes além do Hacker News.
-  - Gerar um resumo com IA e uma interface de consulta.
 seo:
   descricao: >-
-    Estudo de caso do TechNews: pipeline de ingestão em Python e PostgreSQL, com idempotência, commit
-    por linha e logs com nome de evento.
+    Estudo de caso do TechNews: pipeline em Python e PostgreSQL para acompanhar notícias de tecnologia,
+    com idempotência, commit por linha e log com nome de evento.

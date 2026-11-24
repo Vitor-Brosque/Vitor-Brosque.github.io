@@ -1,9 +1,10 @@
 titulo: TechNews
 ordem: 3
-frase: A Python data pipeline that collects, validates and stores tech news in PostgreSQL.
+frase: A Python pipeline that gathers tech news on the topics I follow, so I can read what matters every morning.
 status: desenvolvimento
 statusTexto: In development · open source
-papel: Study project, on my own
+statusDetalhe: Today it collects from Hacker News and writes to PostgreSQL. I'm choosing the next sources and building the collectors and their fallbacks.
+papel: Personal and study project, on my own
 periodo: "2026"
 stack: [Python, PostgreSQL, psycopg 3, httpx, trafilatura, Hacker News API]
 links:
@@ -18,23 +19,30 @@ logDoTopo:
   - "2026-11-23 10:12:11,870 | WARNING | FALHA_DOWNLOAD | ID=46013412 | URL=https://…"
   - "2026-11-23 10:13:40,002 | INFO | RESUMO_INGESTAO | INSERIDAS=… | DUPLICADAS=… | REJEITADAS=…"
 emResumo: >-
-  A Python pipeline that fetches the previous day's stories from Hacker News, drops anything
-  incomplete or repeated, extracts the text of the original page and stores it in PostgreSQL
-  without duplicates. In a test run on Nov 23, 2026, it collected 81 stories and extracted the
-  text of 70 of them (86%). The other 11 failed to download (sites that block bots or require a
-  login) or to extract, and were logged.
+  There are too many sites and too much news, and I kept getting lost in what's new in tech.
+  TechNews is what I'm building to fix that: gather the news on the topics I follow and hand me a
+  summary every morning. The first part already works: it fetches the previous day's stories from
+  Hacker News, drops anything incomplete or repeated, extracts the text of the original page and
+  stores it in PostgreSQL without duplicates. In a test run on Nov 23, 2026, it collected 81
+  stories and extracted the text of 70 of them (86%).
 resumo:
-  problema: I wanted to understand, hands-on, how data leaves an API, gets validated and lands clean in a database.
+  problema: >-
+    There are too many sites and too much news. I kept getting lost in what's new in tech and wanted
+    to read only what matters, every morning.
   construi: >-
-    A pipeline that fetches the previous day's Hacker News stories on 10 topics, drops incomplete ones,
-    extracts the page text and stores it in PostgreSQL.
+    The first part of the pipeline: it fetches the previous day's Hacker News stories on 10 topics,
+    drops incomplete ones, extracts the page text and stores it in PostgreSQL.
   orgulho: >-
     Running it again duplicates nothing, one bad story doesn't take the others down, and every step
     leaves a log with a named event.
 problema: |-
-  TechNews is my data engineering lab. I started it to understand, hands-on, every step of a pipeline: where the data comes from, what to do when it arrives broken, and how to make sure running it again doesn't break anything.
+  Keeping up with tech became a volume problem. There are many sites and a lot of news every day, and I kept getting lost, not knowing what was worth reading.
 
-  The code is small on purpose. Each step was built so I'd understand the reason behind every decision.
+  TechNews is my answer. The idea is to fetch the news on the topics I follow, store it in the database, run it through an AI that filters, classifies and summarizes, and show me the result on a screen, so I can read it every morning. What I like, I save. What I don't save gets deleted after a set time, once newer stories arrive.
+
+  The project is at the beginning. Today the first part exists: collecting from Hacker News, validating, extracting the text and writing to PostgreSQL. Right now I'm deciding the next sources and building the collectors that feed the database, with a fallback for when a source fails.
+
+  It is also my data engineering lab. The code is small on purpose: each step was built so I'd understand the reason behind every decision.
 rota:
   titulo: From the API to the database
   paradas:
@@ -102,12 +110,13 @@ numerosFonte: >-
   Collection, validation and extraction steps run on Nov 23, 2026, with the stories from Nov 22, 2026,
   without writing to the database.
 proximos:
-  - Write tests for every step, with recorded API responses.
+  - Add the next sources, with a fallback for when one fails.
+  - Run the stories through an AI that filters, classifies and summarizes.
+  - Show the result on a screen to read every morning, save what I like and delete the rest after a set time.
   - Schedule the daily run.
+  - Write tests for each step, with recorded API responses.
   - Download pages in parallel, with a concurrency limit.
-  - Add sources beyond Hacker News.
-  - Generate an AI summary and a search interface.
 seo:
   descricao: >-
-    TechNews case study: a Python and PostgreSQL ingestion pipeline with idempotency, per-row commits
-    and named log events.
+    TechNews case study: a Python and PostgreSQL pipeline for keeping up with tech news, with
+    idempotency, per-row commits and logs with named events.
