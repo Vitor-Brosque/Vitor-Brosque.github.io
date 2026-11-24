@@ -14,4 +14,12 @@ describe('proximoDeslocamento', () => {
     expect(r).toBeCloseTo(-9.74);
     expect(r).toBeGreaterThan(-PERIODO);
   });
+  it('com movimento reduzido anda devagar (0.05 px/ms) e não acelera com a rolagem', () => {
+    expect(proximoDeslocamento(0, 16, 0, true)).toBeCloseTo(-0.8);
+    expect(proximoDeslocamento(0, 16, 300, true)).toBeCloseTo(-0.8);
+    expect(proximoDeslocamento(-67.5, 16, 0, true)).toBeCloseTo(-0.3);
+  });
+  it('sem o parâmetro, vale o modo com movimento', () => {
+    expect(proximoDeslocamento(0, 16, 0, false)).toBeCloseTo(proximoDeslocamento(0, 16, 0));
+  });
 });

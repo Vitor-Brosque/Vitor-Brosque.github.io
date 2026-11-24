@@ -78,9 +78,10 @@ aoCarregarPagina(() => {
     titulo.style.visibility = 'visible';
   };
   // Com movimento reduzido os blocos entram só com fade (CSS, [data-entrada]) e o título aparece direto.
+  // A contagem dos números é uma exceção escolhida à regra dos dois modos: roda nos dois.
   if (movimentoReduzido()) {
     mostrar();
-    return;
+    return contarNumeros();
   }
   // Rede de segurança: se a divisão do texto demorar ou falhar, o título aparece mesmo assim.
   const seguranca = window.setTimeout(mostrar, 1500);
