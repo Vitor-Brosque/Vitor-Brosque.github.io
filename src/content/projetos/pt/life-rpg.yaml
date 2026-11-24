@@ -1,6 +1,6 @@
 titulo: Life RPG
 ordem: 2
-frase: App de estudo e rotina em pixel art, offline-first, que mostra uma missão por vez.
+frase: App em pixel art que transforma rotina e estudo num jogo, feito para ajudar nos dias difíceis.
 status: aberto
 statusTexto: Código aberto (MIT) · em uso no PC
 statusDetalhe: Em uso no PC desde novembro de 2026. Faltam o acesso pelo iPhone, a IA com chave real e o CI.
@@ -16,11 +16,15 @@ capa:
   moldura: celular
   alt: Mapa do mundo do Life RPG em pixel art, com seis territórios (vila, aldeia, acampamentos e ruínas) ligados por trilhas e um personagem no centro
 emResumo: >-
-  App que uso no PC desde novembro de 2026 para estudar e organizar a rotina. Foi feito para funcionar sem internet no celular e sincronizar com o PC quase em tempo real. O código é aberto, com testes, e as regras do app foram comparadas com uma base de pesquisa de 63 fontes sobre hábitos e aprendizagem.
+  Comecei o Life RPG para me organizar e ele cresceu: hoje, na terceira versão, junta rotina, estudo e
+  hábitos num jogo em pixel art, pensado para os dias difíceis, quando falta energia e não dá para
+  sentir progresso. Uso no PC desde novembro de 2026. Foi feito para funcionar sem internet no celular
+  e sincronizar com o PC quase em tempo real. O código é aberto, com testes, e as regras do app foram
+  comparadas com uma base de pesquisa de 63 fontes sobre hábitos e aprendizagem.
 resumo:
   problema: >-
-    Eu sei o que preciso fazer, mas travo na hora de começar. Lista longa me sobrecarrega e plano
-    rígido vira culpa.
+    Em dia bom tudo é fácil. O difícil são os dias ruins: travar na hora de começar, não sentir
+    progresso e desistir.
   construi: >-
     Um app que mostra uma missão por vez, se adapta ao tipo do dia e foi feito para funcionar sem
     internet e sincronizar celular e PC.
@@ -28,9 +32,11 @@ resumo:
     Sincronização por cursor com atualização quase em tempo real, regras de domínio puras e decisões
     revisadas com uma base de pesquisa de 63 fontes.
 problema: |-
-  Muitas vezes eu sei o que preciso fazer, mas travo na hora de começar. Lista longa me sobrecarrega, plano rígido vira culpa quando falha, e os apps de tarefas registram o que fazer sem ajudar a fazer.
+  Venho tentando construir este app desde o fim de 2025, e esta já é a terceira versão. Comecei para me organizar. Depois vi que dava para juntar os estudos no mesmo lugar, e aos poucos entraram outras coisas, como os hábitos de sono. No caminho fui lendo sobre neurociência e sobre como hábitos se formam, e tentando trazer o que aprendia para o meu dia a dia.
 
-  O Life RPG tenta diminuir a distância entre saber e fazer. Ele mostra uma missão por vez, com um primeiro passo pequeno, e se adapta ao tipo do dia: normal, baixa energia, recuperação ou livre. Nada zera, nada decai e nada fica vermelho: um dia parado não apaga o progresso.
+  O que eu queria resolver não eram os dias bons. Com motivação e energia, tudo fica fácil. O difícil são os dias ruins: não sentir progresso, não entender direito o que estou fazendo, e os sentimentos que levam a procrastinar e a desistir.
+
+  Por isso o app virou um jogo. Ele mostra uma missão por vez, com um primeiro passo pequeno, e se adapta ao tipo do dia: normal, baixa energia, recuperação ou livre. O progresso aparece no personagem e no mapa, e nada zera, nada decai e nada fica vermelho: um dia parado não apaga o que já foi feito. Para mim, ficou divertido de usar.
 
   Uso no PC desde novembro de 2026. O app foi feito para celular e PC desde o começo, por isso precisava funcionar sem internet e manter os dois em sincronia. O celular é o próximo passo.
 rota:
