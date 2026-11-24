@@ -194,17 +194,16 @@ test.describe('com movimento reduzido', () => {
     expect(await video.evaluate((v) => (v as HTMLVideoElement).paused)).toBe(false);
   });
 
-  test('no estudo de caso o KM em destaque acompanha a rolagem', async ({ page }) => {
+  test('no estudo de caso a rota é a mesma da home: anda sozinha, com o painel da parada ativa embaixo', async ({ page }) => {
     await page.goto('/projetos/rodoviariaos/');
-    const rota = page.locator('[data-rota][data-modo="rolagem"]');
-    await expect(rota).toHaveAttribute('data-estatico', '');
-    const primeiro = rota.locator('.rota-detalhe-texto').first();
-    await primeiro.scrollIntoViewIfNeeded();
-    await expect(primeiro).toBeVisible();
-    const terceira = rota.locator('.placa').nth(2);
-    await terceira.evaluate((el) => el.scrollIntoView({ block: 'center' }));
-    await expect(terceira).toHaveAttribute('data-ativa', '');
-    await expect(rota.locator('.placa').first()).not.toHaveAttribute('data-ativa', '');
+    const rota = page.locator('main [data-rota]');
+    await expect(rota).toHaveAttribute('data-modo', 'loop');
+    await expect(rota).not.toHaveAttribute('data-estatico');
+    await expect(page.locator('.pin-spacer')).toHaveCount(0);
+    await rota.scrollIntoViewIfNeeded();
+    const seletor = 'main [data-rota]';
+    await expect.poll(() => indiceAtivo(page, seletor), { timeout: 15_000 }).toBe(1);
+    await expect.poll(() => painelVisivel(page, seletor)).toBe(1);
   });
 
   test('nenhum vídeo toca sozinho', async ({ page }) => {

@@ -34,6 +34,7 @@ problema: |-
 
   And to buy a car or price one, market research meant opening FIPE, Brazil's reference price table, and the listings, one by one.
 rota:
+  modo: loop
   titulo: The route of a lead
   paradas:
     - titulo: The lead arrives

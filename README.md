@@ -99,7 +99,7 @@ O site respeita a preferência de movimento reduzido do sistema. Nesse modo fica
 Há três exceções escolhidas, que continuam nesse modo:
 
 - a rua da estrada corre, mais devagar e sem acelerar com a rolagem (o carro dela fica parado no lugar);
-- o carro da rota anda de placa em placa, igual ao modo com movimento (sem o quique, sem a placa subir e com o painel trocando só com fade). As rotas do Life RPG e do TechNews andam sozinhas do mesmo jeito (a lanterna e o cursor de bloco), com a chama parada no primeiro quadro, sem o pulinho e com o cursor aceso;
+- as rotas andam sozinhas de parada em parada, igual ao modo com movimento: a da home e as dos três estudos de caso (o carro no RodoviariaOS, a lanterna no Life RPG e o cursor de bloco no TechNews), sem o quique nem o pulinho, sem a placa subir, com a chama parada no primeiro quadro, o cursor aceso e o painel trocando só com fade;
 - os números do topo contam até o valor final, igual ao modo com movimento.
 
-Para parar tudo, há um botão de pausa na estrada do topo e outro na rota. Os dois mostram o mesmo estado, e a página volta a rodar a cada carregamento.
+Para parar tudo, há um botão de pausa na estrada do topo (e na faixa dos estudos de caso do Life RPG e do TechNews) e outro em cada rota. Todos mostram o mesmo estado, e a página volta a rodar a cada carregamento.

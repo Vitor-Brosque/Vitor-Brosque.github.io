@@ -175,9 +175,10 @@ test.describe('rota com movimento reduzido', () => {
   test.use({ reducedMotion: 'reduce' });
 
   // As rotas do Life RPG e do TechNews andam sozinhas, como a rota grande da home (modo loop), também com movimento reduzido.
-  for (const { caminho, veiculo, n } of [
-    { caminho: '/projetos/life-rpg/', veiculo: '.lanterna', n: 5 },
-    { caminho: '/projetos/technews/', veiculo: '.cursor-rota', n: 6 },
+  for (const { caminho, veiculo, n, marcos } of [
+    { caminho: '/projetos/rodoviariaos/', veiculo: '.carrinho', n: 6, marcos: false },
+    { caminho: '/projetos/life-rpg/', veiculo: '.lanterna', n: 5, marcos: true },
+    { caminho: '/projetos/technews/', veiculo: '.cursor-rota', n: 6, marcos: true },
   ]) {
   test(`${caminho}: o veículo muda de parada sozinho, sem rolar; a pausa para; clicar numa parada leva o veículo até ela`, async ({ page }) => {
     test.setTimeout(60_000);
@@ -196,8 +197,9 @@ test.describe('rota com movimento reduzido', () => {
     const primeira = await ativa();
     await expect.poll(ativa, { timeout: 12_000 }).not.toBe(primeira);
     expect(await page.evaluate(() => window.scrollY)).toBe(y);
+    // Nos temas próprios há um nó por parada, que acende quando o veículo passa (a rodovia não tem nós).
     const acesos = () => rota.locator('.marco[data-aceso]').count();
-    expect(await acesos()).toBeGreaterThan(0);
+    if (marcos) expect(await acesos()).toBeGreaterThan(0);
     // A pausa da rota para o veículo: mais que uma parada inteira (4 s) depois, ele segue na mesma parada e no mesmo lugar.
     const pausa = rota.locator('[data-rota-pausa]');
     await pausa.click();
@@ -210,7 +212,8 @@ test.describe('rota com movimento reduzido', () => {
     // Clicar na última parada leva o veículo até ela.
     await rota.locator('[data-placa-botao]').nth(n - 1).click();
     await expect.poll(ativa).toBe(n - 1);
-    await expect.poll(acesos).toBe(n);
+    await expect.poll(() => rota.evaluate((el) => el.hasAttribute('data-andando'))).toBe(false);
+    if (marcos) await expect.poll(acesos).toBe(n);
     // Chama no primeiro quadro e cursor aceso, sem loop.
     expect(await page.locator('.lanterna .quadro-2').evaluateAll((qs) => qs.every((q) => getComputedStyle(q).visibility === 'hidden'))).toBe(true);
     expect(await page.locator('.cursor-rota, .cursor-bloco').evaluateAll((cs) => cs.every((c) => getComputedStyle(c).opacity === '1'))).toBe(true);
@@ -231,13 +234,6 @@ test.describe('rota com movimento reduzido', () => {
     expect(await lanterna.evaluate((l) => l.getAnimations({ subtree: true }).length)).toBe(0);
   });
 
-  test('no RodoviariaOS a rota continua a lista estática, sem veículo', async ({ page }) => {
-    await page.goto('/projetos/rodoviariaos/');
-    const rota = page.locator('[data-rota][data-modo="rolagem"]');
-    await expect(rota).toHaveAttribute('data-estatico', '');
-    await rota.scrollIntoViewIfNeeded();
-    await expect(rota.locator('.carro')).toBeHidden();
-  });
 });
 
 // Tema terminal: o log do pipeline no cabeçalho, no formato real do TechNews.

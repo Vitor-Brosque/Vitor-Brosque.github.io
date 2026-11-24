@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test';
 
 test.use({ reducedMotion: 'no-preference' });
 
-test('navegação pelo ClientRouter mantém a rota, o pin e o idioma funcionando', async ({ page }, info) => {
-  test.skip(info.project.name === 'celular', 'cobre o layout de desktop (pin da rota)');
+test('navegação pelo ClientRouter mantém as rotas e o idioma funcionando', async ({ page }, info) => {
+  test.skip(info.project.name === 'celular', 'cobre o layout de desktop');
   const erros: string[] = [];
   page.on('pageerror', (e) => erros.push(`pageerror: ${e.message}`));
   page.on('console', (m) => {
@@ -18,17 +18,15 @@ test('navegação pelo ClientRouter mantém a rota, o pin e o idioma funcionando
   await expect(page).toHaveURL(/\/projetos\/rodoviariaos\/$/);
   expect(await page.evaluate(() => (window as unknown as { __marca?: number }).__marca)).toBe(1);
 
-  const rota = page.locator('[data-rota][data-modo="rolagem"]');
+  // A rota do estudo de caso anda sozinha depois da troca de página (o script reinicia no astro:page-load).
+  const rota = page.locator('main [data-rota]');
   await rota.scrollIntoViewIfNeeded();
-  await expect(page.locator('.pin-spacer')).toHaveCount(1);
+  // O ponteiro ficou onde o link foi clicado; sobre a vitrine ele seguraria a parada (de propósito): tira de cima.
+  await page.mouse.move(1, 1);
   const indiceAtivo = () => rota.locator('.placa').evaluateAll((ps) => ps.findIndex((p) => p.hasAttribute('data-ativa')));
-  const topo = await rota.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
-  await page.evaluate((y) => window.scrollTo(0, y - 80 + 400), topo);
   await expect.poll(indiceAtivo, { timeout: 5000 }).toBeGreaterThanOrEqual(0);
   const antes = await indiceAtivo();
-  await page.evaluate((y) => window.scrollTo(0, y - 80 + 2200), topo);
-  await expect.poll(indiceAtivo, { timeout: 5000 }).not.toBe(antes);
-  await expect(page.locator('.pin-spacer')).toHaveCount(1);
+  await expect.poll(indiceAtivo, { timeout: 15_000 }).not.toBe(antes);
 
   await page.goBack();
   await expect(page).toHaveURL(/\/$/);
