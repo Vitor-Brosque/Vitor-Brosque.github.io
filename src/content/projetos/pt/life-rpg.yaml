@@ -2,11 +2,11 @@ titulo: Life RPG
 ordem: 2
 frase: App de estudo e rotina em pixel art, offline-first, que mostra uma missão por vez.
 status: aberto
-statusTexto: Código aberto (MIT) · uso pessoal diário
-statusDetalhe: Em uso diário. Faltam testes no iPhone, IA com chave real e CI.
+statusTexto: Código aberto (MIT) · em uso no PC
+statusDetalhe: "Em uso no PC desde novembro de 2026. A versão pública é de 23/11/2026. Faltam: ligar o acesso pelo iPhone (HTTPS na rede privada), testar no iPhone, testar a IA com chave real e configurar CI."
 papel: Projeto pessoal, do design à infraestrutura
 periodo: "2026"
-stack: [TypeScript, React 19, Vite, Dexie (IndexedDB), Zustand, Fastify 5, "SQLite (node:sqlite)", Zod 4, ts-fsrs, Vitest, Docker]
+stack: [TypeScript, React 19, Vite, Dexie (IndexedDB), Zustand, Fastify 5, "SQLite (node:sqlite)", Zod 4, ts-fsrs, Vitest, "Docker (receita pronta, hoje roda direto no PC)"]
 links:
   codigo: https://github.com/Vitor-Brosque/life-rpg
 cartao: capa
@@ -15,23 +15,23 @@ capa:
   moldura: celular
   alt: Mapa do mundo do Life RPG em pixel art, com seis territórios (vila, aldeia, acampamentos e ruínas) ligados por trilhas e um personagem no centro
 emResumo: >-
-  App que eu uso todos os dias para estudar e organizar a rotina. Funciona sem internet no celular e sincroniza com o PC quase em tempo real. O código é aberto, com testes, e as regras do app foram comparadas com 64 fontes científicas sobre hábitos e aprendizagem.
+  App que uso no PC desde novembro de 2026 para estudar e organizar a rotina. Foi feito para funcionar sem internet no celular e sincronizar com o PC quase em tempo real. O código é aberto, com testes, e as regras do app foram comparadas com uma base de pesquisa de 63 fontes sobre hábitos e aprendizagem.
 resumo:
   problema: >-
     Eu sei o que preciso fazer, mas travo na hora de começar. Lista longa me sobrecarrega e plano
     rígido vira culpa.
   construi: >-
-    Um app que mostra uma missão por vez, se adapta ao tipo do dia e funciona sem internet,
-    sincronizando celular e PC.
+    Um app que mostra uma missão por vez, se adapta ao tipo do dia e foi feito para funcionar sem
+    internet e sincronizar celular e PC.
   orgulho: >-
     Sincronização por cursor com atualização quase em tempo real, regras de domínio puras e decisões
-    baseadas em 64 fontes científicas.
+    revisadas com uma base de pesquisa de 63 fontes.
 problema: |-
   Muitas vezes eu sei o que preciso fazer, mas travo na hora de começar. Lista longa me sobrecarrega, plano rígido vira culpa quando falha, e os apps de tarefas registram o que fazer sem ajudar a fazer.
 
   O Life RPG tenta diminuir a distância entre saber e fazer. Ele mostra uma missão por vez, com um primeiro passo pequeno, e se adapta ao tipo do dia: normal, baixa energia, recuperação ou livre. Nada zera, nada decai e nada fica vermelho: um dia parado não apaga o progresso.
 
-  Eu uso todo dia, no celular e no PC. Por isso ele precisava funcionar sem internet e manter os dois aparelhos em sincronia.
+  Uso no PC desde novembro de 2026. O celular é o próximo passo, e o app foi feito para os dois desde o começo: por isso ele precisava funcionar sem internet e manter os dois aparelhos em sincronia. A sincronização foi testada com testes automáticos e com dois perfis na mesma máquina, ainda não entre dois aparelhos reais.
 rota:
   titulo: A rota de uma mudança
   paradas:
@@ -52,11 +52,11 @@ rota:
     - titulo: Servidor
       curto: Last-write-wins e revisão global.
       texto: >-
-        A API Fastify aplica as mudanças com last-write-wins (vence o `updatedAt` mais recente) e
-        avança a revisão global no SQLite.
+        A API Fastify aplica as mudanças com last-write-wins (vence o `updatedAt` mais recente; em
+        empate, fica a versão que chegou primeiro ao servidor) e avança a revisão global no SQLite.
     - titulo: Aviso aos aparelhos
       curto: Server-Sent Events.
-      texto: Quando entra uma revisão nova, o servidor avisa os outros aparelhos por Server-Sent Events.
+      texto: Quando entra uma revisão nova, o servidor avisa os aparelhos conectados por Server-Sent Events, e cada um busca as mudanças.
     - titulo: Painel no PC
       curto: Atualiza quase em tempo real.
       texto: O Painel aberto no monitor secundário se atualiza quase em tempo real.
@@ -65,7 +65,8 @@ rota:
         alt: Painel do Life RPG no computador, com a missão atual, a linha do tempo do dia, o cronômetro de foco e o formulário de captura
 funcionalidades:
   - titulo: Agora
-    texto: Uma missão por vez, os blocos do dia, cronômetro opcional e captura rápida por botões.
+    texto: >-
+      Uma missão por vez, os blocos do dia, cronômetro opcional e captura rápida: escrever e ajustar por botões.
     midia:
       imagem: ../../../assets/projetos/life-rpg/agora.png
       moldura: celular
@@ -77,17 +78,17 @@ funcionalidades:
     midia:
       imagem: ../../../assets/projetos/life-rpg/revisao.png
       moldura: celular
-      alt: Revisão de um card com a pergunta "O que é uma chave estrangeira?", a resposta e quatro botões de avaliação: Errei, Difícil, Bom e Fácil
+      alt: 'Revisão de um card com a pergunta "O que é uma chave estrangeira?", a resposta e quatro botões de avaliação: Errei, Difícil, Bom e Fácil'
   - titulo: Personagem
     texto: >-
-      XP por esforço, e não por tempo nem por volume de registro, com atributos ligados a áreas
-      reais da vida.
+      XP pelo esforço estimado de cada tarefa, com teto para o tempo de foco e sem XP por só registrar
+      dados, e atributos ligados a áreas reais da vida.
     midia:
       imagem: ../../../assets/projetos/life-rpg/personagem.png
       moldura: celular
       alt: Ficha da personagem fictícia Lia, com nível, XP, o atalho para o mapa do mundo e atributos por área da vida
   - titulo: Semana
-    texto: Planejamento em blocos, objetivos, itens recorrentes e um experimento por semana.
+    texto: Planejamento em blocos, itens recorrentes, objetivos da semana e de longo prazo, temporadas de 6 a 8 semanas e estratégias em teste.
     midia:
       imagem: ../../../assets/projetos/life-rpg/semana.png
       moldura: celular
@@ -102,8 +103,8 @@ arquitetura:
     - { id: idb, rotulo: IndexedDB, detalhe: Dexie 4, col: 1, lin: 0, explicacao: "Tudo é gravado primeiro no aparelho. A interface nunca espera a rede." }
     - { id: api, rotulo: API Fastify 5, detalhe: POST /api/sync, col: 2, lin: 0, explicacao: "Recebe as mudanças com o cursor do aparelho e devolve o que mudou desde ele. Em conflito, vence o updatedAt mais recente." }
     - { id: sqlite, rotulo: SQLite, detalhe: "node:sqlite", col: 3, lin: 0, destaque: true, explicacao: "Banco nativo do Node 24, com uma revisão global que só cresce. Se o banco foi restaurado de um backup e o aparelho conhece revisões que ele não tem, o aparelho recomeça do zero e reenvia tudo." }
-    - { id: backup, rotulo: Backup diário, detalhe: mídia por SHA-256, col: 4, lin: 0, explicacao: "Backup com 14 dias de retenção. A mídia é guardada pelo hash SHA-256 e espelhada com hard links, sem ocupar espaço extra." }
-    - { id: sse, rotulo: SSE, detalhe: /api/stream, col: 3, lin: 1, explicacao: "Avisa os outros aparelhos quando entra uma revisão nova." }
+    - { id: backup, rotulo: Backup diário, detalhe: mídia por SHA-256, col: 4, lin: 0, explicacao: "O banco tem uma cópia por dia, com as 14 mais recentes guardadas. A mídia é guardada pelo hash SHA-256 e fica numa pasta-espelho com hard links, que não ocupa espaço extra e nunca é apagada." }
+    - { id: sse, rotulo: SSE, detalhe: /api/stream, col: 3, lin: 1, explicacao: "Avisa os aparelhos conectados quando entra uma revisão nova, e cada um busca as mudanças." }
     - { id: painel, rotulo: Painel no PC, detalhe: atualiza ao vivo, col: 4, lin: 1, explicacao: "O Painel no monitor secundário acompanha o celular quase em tempo real." }
   faixas:
     - { de: app, para: idb }
@@ -118,15 +119,16 @@ decisoes:
       O app grava tudo no próprio aparelho primeiro, então funciona sem internet e nunca fica esperando a rede.
     escolha: Tudo é gravado primeiro no IndexedDB, e a sincronização acontece depois.
     porque: >-
-      Eu uso no celular em qualquer lugar. A interface nunca espera a rede, e o app funciona com o
-      servidor desligado.
+      Quero poder usar no celular em qualquer lugar, mesmo sem sinal. A interface nunca espera a rede,
+      e o app funciona com o servidor desligado.
     deixeiDeLado: Um app só online, mais simples de escrever, mas inútil sem sinal.
   - titulo: Sincronização por cursor e last-write-wins
     resumo: >-
       Cada aparelho envia o que mudou e recebe o que os outros mudaram. Se dois mexerem na mesma coisa, vale a alteração mais recente.
     escolha: >-
       O servidor mantém uma revisão global. Cada aparelho envia as próprias mudanças e recebe o que
-      mudou desde o seu cursor. Em conflito, vence o `updatedAt` mais recente.
+      mudou desde o seu cursor. Em conflito, vence o `updatedAt` mais recente (no empate, fica o que
+      chegou primeiro). A exceção são as gravações de fala, que se somam.
     porque: >-
       Para um usuário só, com poucos conflitos reais, last-write-wins é previsível e fácil de testar.
       Se o servidor for restaurado de um backup e o aparelho conhecer revisões que ele não tem, o
@@ -148,22 +150,24 @@ decisoes:
       Imagens e áudios são guardados pelo hash SHA-256, e o backup diário espelha a mídia com hard
       links.
     porque: >-
-      O mesmo arquivo nunca é guardado duas vezes, e 14 dias de backup não ocupam espaço extra com
-      mídia repetida.
-    deixeiDeLado: Nomes de arquivo por id, que duplicariam a mídia em cada backup.
+      O mesmo arquivo nunca é guardado duas vezes. O banco tem uma cópia por dia, com as 14 mais
+      recentes guardadas, e a mídia fica numa pasta-espelho com hard links, que não ocupa espaço extra
+      e nunca é apagada.
+    deixeiDeLado: Nomes de arquivo por id, em que o mesmo arquivo poderia ser guardado duas vezes e mudar depois do backup.
   - titulo: Seguro mesmo sendo pessoal
     resumo: >-
-      O servidor fica em casa e não é exposto direto na internet: o acesso de fora passa por uma rede privada com HTTPS.
+      O servidor não é exposto direto na internet. O acesso de fora está planejado por uma rede privada com HTTPS.
     escolha: >-
-      Token comparado em tempo constante, servidor escutando só em `127.0.0.1` e acesso remoto por
-      HTTPS do Tailscale. A chave da IA fica só no servidor.
-    porque: É um servidor em casa, com meus dados pessoais. Nada fica exposto direto na internet.
+      Token comparado em tempo constante e servidor que só aceita conexões da própria máquina. O acesso
+      de fora está planejado pela rede privada do Tailscale, com HTTPS. A chave da IA fica só no
+      servidor.
+    porque: É um servidor com meus dados pessoais. Nada fica exposto direto na internet.
     deixeiDeLado: Abrir uma porta no roteador, que seria mais simples e muito mais arriscado.
   - titulo: Evidência antes de gamificação
     resumo: >-
-      Antes de decidir o que dá pontos, comparei cada regra do app com pesquisas sobre hábitos e aprendizagem.
+      Antes de decidir o que dá pontos, revisei os fluxos principais do app à luz de pesquisas sobre hábitos e aprendizagem.
     escolha: >-
-      Reuni [64 fontes científicas](https://github.com/Vitor-Brosque/life-rpg/blob/main/docs/analise-pesquisa-cientifica-2026-11-13.md) sobre hábitos, aprendizagem e sono, e comparei cada regra do app com elas.
+      Comparei as regras do app com uma base de pesquisa de 63 fontes sobre hábitos, aprendizagem e sono, e revisei os fluxos principais à luz dela. O resultado está [neste documento](https://github.com/Vitor-Brosque/life-rpg/blob/main/docs/analise-pesquisa-cientifica-2026-11-13.md), que cita as fontes por código.
     porque: >-
       Gamificação mal feita recompensa a coisa errada. Por isso, registrar o sono não dá XP:
       recompensar o registro, e não o comportamento, pode piorar a motivação.
@@ -171,7 +175,7 @@ decisoes:
       Dar XP para tudo, que parece motivador e cria incentivo errado. XP, níveis e mapa são assumidos
       como gosto pessoal, não como técnica comprovada.
 proximos:
-  - "Testar no iPhone real: instalação como PWA, notificações, microfone e uso offline."
+  - "Ligar o acesso HTTPS pela rede privada e testar no iPhone real: instalação como PWA, notificações, microfone, uso offline e sincronização com o PC."
   - Testar as ajudas de IA com uma chave real.
   - Configurar integração contínua (CI).
 seo:
