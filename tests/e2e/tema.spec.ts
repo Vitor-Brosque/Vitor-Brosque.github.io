@@ -199,7 +199,8 @@ test.describe('rota com movimento reduzido', () => {
     // Nos temas próprios há um nó por parada, que acende quando o veículo passa (a rodovia não tem nós).
     const acesos = () => rota.locator('.marco[data-aceso]').count();
     if (marcos) expect(await acesos()).toBeGreaterThan(0);
-    // A pausa da rota para o veículo: mais que uma parada inteira (4 s) depois, ele segue na mesma parada e no mesmo lugar.
+    // A pausa da rota para o veículo: mais que uma parada inteira e um trecho (2,5 s + 0,6 s) depois, ele segue na mesma
+    // parada e no mesmo lugar.
     const pausa = rota.locator('[data-rota-pausa]');
     await pausa.click();
     await expect(pausa).toHaveText('Continuar');

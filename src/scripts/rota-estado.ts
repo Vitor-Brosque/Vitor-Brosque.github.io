@@ -22,11 +22,19 @@ export const LOOP: Readonly<TemposDoLoop> = { entrada: 0.7, parada: 1, trecho: 0
 /** Duração de uma unidade do loop (parada numa placa da rota compacta), em ms. */
 export const UNIDADE_MS = 1500;
 /**
- * Na rota grande (com a vitrine), cada parada dura 4 s: o tempo de olhar a tela sem demorar para mostrar que a rota anda.
- * Com a entrada (0,7 unidade), o carro chega à primeira placa em cerca de 1 s e parte para a segunda em cerca de 5 s.
+ * Na rota grande (com a vitrine: home e estudos de caso), cada parada dura 2,5 s e o trecho entre duas paradas, 0,6 s.
+ * A entrada e a saída encolhem na mesma proporção do trecho: o carro chega à primeira placa em 0,7 s e parte para a
+ * segunda em cerca de 3,2 s. A rota compacta dos cartões continua com o LOOP (1,5 s por parada, 0,9 s por trecho).
  */
-export const PARADA_GRANDE_MS = 4000;
-export const TEMPOS_GRANDE: Readonly<TemposDoLoop> = { ...LOOP, parada: PARADA_GRANDE_MS / UNIDADE_MS };
+export const PARADA_GRANDE_MS = 2500;
+export const TRECHO_GRANDE_MS = 600;
+const proporcaoGrande = TRECHO_GRANDE_MS / (LOOP.trecho * UNIDADE_MS);
+export const TEMPOS_GRANDE: Readonly<TemposDoLoop> = {
+  entrada: LOOP.entrada * proporcaoGrande,
+  parada: PARADA_GRANDE_MS / UNIDADE_MS,
+  trecho: TRECHO_GRANDE_MS / UNIDADE_MS,
+  saida: LOOP.saida * proporcaoGrande,
+};
 
 export function unidadesDoLoop(total: number, tempos: TemposDoLoop = LOOP): number {
   const n = Math.max(total, 1);

@@ -155,14 +155,14 @@ test.describe('com movimento reduzido', () => {
     const rota = page.locator(seletor);
     await rota.scrollIntoViewIfNeeded();
     const inicial = await indiceAtivo(page, seletor);
-    // 4 s por parada (o tempo exato é provado no teste de tempos da rota, no fim deste arquivo).
+    // 2,5 s por parada (o tempo exato é provado no teste de tempos da rota, no fim deste arquivo).
     await expect.poll(() => indiceAtivo(page, seletor), { timeout: 15_000 }).not.toBe(inicial);
     expect(await painelVisivel(page, seletor)).toBe(await indiceAtivo(page, seletor));
     const pausa = rota.locator('[data-rota-pausa]');
     await pausa.click();
     await expect(pausa).toHaveText('Continuar');
     const pausado = await indiceAtivo(page, seletor);
-    // Mais que uma parada inteira (4 s): sem a pausa, teria trocado.
+    // Mais que uma parada inteira e um trecho (2,5 s + 0,6 s): sem a pausa, teria trocado.
     await page.waitForTimeout(6000);
     expect(await indiceAtivo(page, seletor)).toBe(pausado);
     // O clique com a rota rodando também pausa: retoma, e então clica na placa.
@@ -306,7 +306,7 @@ test.describe('com movimento permitido', () => {
     await expect(rota).not.toHaveAttribute('data-andando');
     await pausa.click();
     await expect(pausa).toHaveText('Pausar');
-    // Se a pausa pegou o carro já chegando a uma placa, ele ainda fica até 4 s parado nela antes de seguir.
+    // Se a pausa pegou o carro já chegando a uma placa, ele ainda fica até 2,5 s parado nela antes de seguir.
     await expect.poll(pos, { timeout: 25_000 }).not.toBe(parado);
   });
 
@@ -410,7 +410,7 @@ test.describe('com movimento permitido', () => {
       await expect.poll(andando, { timeout: 5000 }).toBe(false);
       const parada = await indiceAtivo(page, seletor);
       expect(parada).toBeGreaterThanOrEqual(0);
-      // Mais que uma parada inteira (4 s): sem o ponteiro, teria saído.
+      // Mais que uma parada inteira e um trecho (2,5 s + 0,6 s): sem o ponteiro, teria saído.
       await page.waitForTimeout(6000);
       expect(await indiceAtivo(page, seletor)).toBe(parada);
       expect(await painelVisivel(page, seletor)).toBe(parada);
@@ -582,10 +582,10 @@ for (const modo of ['reduce', 'no-preference'] as const) {
   });
 }
 
-// A rota grande da home mostra logo que anda: com a seção à vista, o carro chega à primeira placa em cerca de 1 s e parte
-// para a segunda em cerca de 5 s (4 s por parada), nos dois modos de movimento.
+// A rota grande da home mostra logo que anda: com a seção à vista, o carro chega à primeira placa em menos de 1 s e parte
+// para a segunda em cerca de 3,2 s (2,5 s por parada), nos dois modos de movimento.
 for (const modo of ['reduce', 'no-preference'] as const) {
-  test(`rota grande da home: primeira placa em ~1 s e saída para a segunda em ~5 s (${modo})`, async ({ page }) => {
+  test(`rota grande da home: primeira placa em ~1 s e saída para a segunda em ~3,5 s (${modo})`, async ({ page }) => {
     test.setTimeout(30_000);
     await page.emulateMedia({ reducedMotion: modo });
     await page.goto('/');
@@ -607,8 +607,9 @@ for (const modo of ['reduce', 'no-preference'] as const) {
     const marcas = await page.evaluate(() => (window as unknown as { __marcas: Array<[number, boolean]> }).__marcas);
     const chegou = marcas.find(([, a]) => !a)![0];
     const saiu = marcas.filter(([, a]) => a).find(([t]) => t > chegou)![0];
-    expect(chegou).toBeLessThan(2000);
-    expect(saiu).toBeGreaterThan(4300);
-    expect(saiu).toBeLessThan(6500);
+    // Faixa que falharia nos tempos antigos (4 s por parada: saída em ~5 s).
+    expect(chegou).toBeLessThan(1500);
+    expect(saiu).toBeGreaterThan(2700);
+    expect(saiu).toBeLessThan(4300);
   });
 }

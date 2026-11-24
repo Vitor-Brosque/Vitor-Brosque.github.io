@@ -108,17 +108,26 @@ describe('inicioDaParada', () => {
   });
 });
 
-describe('tempos da rota grande (home)', () => {
-  // Em ms desde que a rota aparece: quando o carro chega à placa i e quando sai dela.
+describe('tempos da rota grande (home e estudos de caso)', () => {
+  // Em ms desde que a rota aparece: quando o carro chega à placa i.
   const chegada = (i: number) => inicioDaParada(i, 6, TEMPOS_GRANDE) * unidadesDoLoop(6, TEMPOS_GRANDE) * UNIDADE_MS;
-  it('o carro chega à primeira placa em cerca de 1 s', () => {
-    expect(chegada(0)).toBeGreaterThan(800);
-    expect(chegada(0)).toBeLessThan(1200);
+  it('o carro chega à primeira placa em menos de 1 s', () => {
+    expect(chegada(0)).toBeGreaterThan(500);
+    expect(chegada(0)).toBeLessThan(1000);
   });
-  it('fica 4 s em cada parada e parte para a segunda em cerca de 5 s', () => {
-    expect(TEMPOS_GRANDE.parada * UNIDADE_MS).toBe(4000);
+  it('fica 2,5 s em cada parada, parte para a segunda em cerca de 3,2 s e o trecho leva 0,6 s', () => {
+    expect(TEMPOS_GRANDE.parada * UNIDADE_MS).toBe(2500);
+    expect(TEMPOS_GRANDE.trecho * UNIDADE_MS).toBeCloseTo(600);
     const saida = chegada(0) + TEMPOS_GRANDE.parada * UNIDADE_MS;
-    expect(saida).toBeGreaterThan(4800);
-    expect(saida).toBeLessThan(5200);
+    expect(saida).toBeGreaterThan(3000);
+    expect(saida).toBeLessThan(3500);
+    expect(chegada(1) - saida).toBeCloseTo(600);
+  });
+  it('a entrada e a saída encolhem na mesma proporção do trecho', () => {
+    expect(TEMPOS_GRANDE.entrada / TEMPOS_GRANDE.trecho).toBeCloseTo(LOOP.entrada / LOOP.trecho);
+    expect(TEMPOS_GRANDE.saida / TEMPOS_GRANDE.trecho).toBeCloseTo(LOOP.saida / LOOP.trecho);
+  });
+  it('a rota compacta dos cartões não muda', () => {
+    expect(LOOP).toEqual({ entrada: 0.7, parada: 1, trecho: 0.6, saida: 0.7 });
   });
 });
