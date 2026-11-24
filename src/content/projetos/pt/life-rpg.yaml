@@ -175,6 +175,7 @@ decisoes:
     deixeiDeLado: >-
       Dar XP para tudo, que parece motivador e cria incentivo errado. XP, níveis e mapa são assumidos
       como gosto pessoal, não como técnica comprovada.
+hoje: Funciona sem internet, tem 2.347 testes automáticos e está em uso no PC.
 proximos:
   - "Ligar o acesso HTTPS pela rede privada e testar no iPhone real: instalação como PWA, notificações, microfone, uso offline e sincronização com o PC."
   - Testar as ajudas de IA com uma chave real.

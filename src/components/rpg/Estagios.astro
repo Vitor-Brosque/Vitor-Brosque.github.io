@@ -1,0 +1,78 @@
+---
+import ruinas from '../../assets/temas/rpg/territorio-intelecto-0-ruinas.svg?raw';
+import acampamento from '../../assets/temas/rpg/territorio-intelecto-1-acampamento.svg?raw';
+import aldeia from '../../assets/temas/rpg/territorio-intelecto-2-aldeia.svg?raw';
+import vila from '../../assets/temas/rpg/territorio-intelecto-3-vila.svg?raw';
+import castelo from '../../assets/temas/rpg/territorio-intelecto-4-castelo.svg?raw';
+import { spriteInline } from '../../lib/sprite';
+import { textoRico } from '../../lib/texto';
+import { t, type Idioma } from '../../i18n/ui';
+
+/**
+ * Os estágios do projeto com os cinco estágios de território do jogo. Os quatro primeiros acesos; o Castelo apagado
+ * (dessaturado, sem vermelho). Sob a Vila, onde o projeto está hoje; sob o Castelo, o que falta. Sem porcentagem.
+ */
+interface Props { idioma: Idioma; hoje: string; proximos: string[] }
+const { idioma, hoje, proximos } = Astro.props;
+const estagios = [
+  { chave: 'estagio.ruinas', arte: ruinas },
+  { chave: 'estagio.acampamento', arte: acampamento },
+  { chave: 'estagio.aldeia', arte: aldeia },
+  { chave: 'estagio.vila', arte: vila },
+  { chave: 'estagio.castelo', arte: castelo },
+] as const;
+const HOJE = 3;
+---
+<ol class="estagios revelar">
+  {estagios.map((e, i) => (
+    <li class:list={['estagio', { 'estagio--hoje': i === HOJE, 'estagio--apagado': i > HOJE }]} aria-current={i === HOJE ? 'step' : undefined}>
+      <div class="estagio-arte" set:html={spriteInline(e.arte, 'sprite')} />
+      <div class="estagio-texto">
+        <strong class="estagio-nome">{t(idioma, e.chave)}</strong>
+        {i === HOJE && (
+          <div class="estagio-nota estagio-nota--hoje">
+            <span class="tag">{t(idioma, 'caso.hoje')}</span>
+            <p set:html={textoRico(hoje)} />
+          </div>
+        )}
+        {i === estagios.length - 1 && proximos.length > 0 && (
+          <div class="estagio-nota estagio-nota--falta">
+            <p class="rotulo">{t(idioma, 'caso.faltaCastelo')}</p>
+            <ul>{proximos.map((p) => <li set:html={textoRico(p)} />)}</ul>
+          </div>
+        )}
+      </div>
+    </li>
+  ))}
+</ol>
+<style>
+  .estagios { --s: 4px; --vao: 18px; list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 24px var(--vao); grid-template-columns: repeat(3, minmax(0, 0.8fr)) minmax(0, 1.3fr) minmax(0, 1.5fr); align-items: start; }
+  .estagio { position: relative; display: grid; gap: 12px; justify-items: start; }
+  .estagio-arte { position: relative; z-index: 1; width: calc(24 * var(--s)); height: calc(24 * var(--s)); }
+  .estagio-arte :global(.sprite) { display: block; width: 100%; height: 100%; }
+  /* A estrada que liga os estágios, na linha de base dos sprites: de pedra até a Vila, de terra até o Castelo. */
+  .estagio::before { content: ''; position: absolute; top: calc(21 * var(--s)); height: calc(2 * var(--s)); left: calc(12 * var(--s)); right: calc(-1 * var(--vao) - 12 * var(--s)); background: #cdb88f; box-shadow: 0 var(--s) 0 #1a1220, 0 calc(-1 * var(--s)) 0 #1a1220; }
+  .estagio:nth-last-child(2)::before { background: #8c7350; right: calc(-1 * var(--vao)); }
+  .estagio:last-child::before { background: #8c7350; left: 0; right: auto; width: calc(12 * var(--s)); }
+  .estagio-nome { display: block; font-family: var(--fonte-pixel); font-weight: 400; font-size: 1.05rem; line-height: 1.2; color: var(--ink); }
+  .estagio--apagado .estagio-arte { filter: grayscale(1) brightness(0.8); opacity: 0.55; }
+  .estagio--apagado .estagio-nome { color: var(--mute); }
+  .estagio-nota { margin-top: 10px; padding: 12px 14px 14px; font-size: 0.98rem; line-height: 1.5; }
+  /* Hoje: o único pergaminho da faixa, com o selo dourado como o "Nv" do jogo. */
+  .estagio-nota--hoje { margin-inline: 6px; background: var(--pergaminho); color: var(--tinta); box-shadow: var(--moldura-pergaminho); }
+  .tag { display: inline-block; margin-bottom: 6px; padding: 2px 8px 3px; font-family: var(--fonte-pixel); font-size: 0.9rem; line-height: 1.2; background: var(--signal); color: var(--tinta); box-shadow: inset 0 calc(-1 * var(--px)) 0 var(--dourado-escuro), 0 0 0 var(--px) var(--tinta); margin-left: var(--px); }
+  .estagio-nota--falta { margin-inline: 3px; background: var(--pedra); color: var(--ink-2); box-shadow: var(--moldura-pedra); }
+  .estagio-nota--falta .rotulo { color: var(--mute); }
+  .estagio-nota--falta ul { display: grid; gap: 8px; margin: 8px 0 0; padding: 0; list-style: none; }
+  .estagio-nota--falta li { display: flex; gap: 10px; }
+  .estagio-nota--falta li::before { content: ''; flex: none; width: 6px; height: 6px; margin-top: 0.62em; background: var(--pedra-clara); box-shadow: 0 0 0 2px #1a1220; }
+
+  @media (max-width: 899px) {
+    /* No celular: uma linha por estágio, o sprite à esquerda e a estrada descendo entre eles. */
+    .estagios { --s: 3px; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+    .estagio { grid-template-columns: calc(24 * var(--s)) minmax(0, 1fr); align-items: start; gap: 14px; }
+    .estagio-texto { padding-top: calc(8 * var(--s)); }
+    .estagio::before, .estagio:nth-last-child(2)::before { top: calc(23 * var(--s)); bottom: -18px; left: calc(11 * var(--s)); right: auto; width: calc(2 * var(--s)); height: auto; box-shadow: var(--s) 0 0 #1a1220, calc(-1 * var(--s)) 0 0 #1a1220; }
+    .estagio:last-child::before { display: none; }
+  }
+</style>

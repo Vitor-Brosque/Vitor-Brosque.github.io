@@ -91,3 +91,38 @@ for (const modo of ['reduce', 'no-preference'] as const) {
     });
   });
 }
+
+// Estágios do projeto (tema rpg): os cinco estágios de território, Hoje sob a Vila e o que falta sob o Castelo.
+const estagios = [
+  { caminho: '/projetos/life-rpg/', nomes: ['Ruínas', 'Acampamento', 'Aldeia', 'Vila', 'Castelo'], hoje: 'Hoje', falta: 'Falta para o castelo', proximo: /testar no iPhone real/ },
+  { caminho: '/en/projects/life-rpg/', nomes: ['Ruins', 'Camp', 'Village', 'Town', 'Castle'], hoje: 'Today', falta: 'Left before the castle', proximo: /test on a real iPhone/ },
+] as const;
+for (const js of [true, false]) {
+  test.describe(js ? 'com JavaScript' : 'sem JavaScript', () => {
+    test.use({ javaScriptEnabled: js });
+    for (const e of estagios) {
+      test(`${e.caminho}: os cinco estágios na ordem, Hoje sob a Vila e os próximos passos sob o Castelo`, async ({ page }) => {
+        await page.goto(e.caminho);
+        const itens = page.locator('.estagios > .estagio');
+        await expect(itens.locator('.estagio-nome')).toHaveText([...e.nomes]);
+        await itens.nth(4).scrollIntoViewIfNeeded();
+        const vila = itens.nth(3);
+        await expect(vila).toHaveAttribute('aria-current', 'step');
+        await expect(vila.locator('.tag')).toHaveText(e.hoje);
+        await expect(vila.locator('.estagio-nota')).toContainText('2');
+        await expect(vila.locator('.estagio-nota')).toBeVisible();
+        const castelo = itens.nth(4);
+        await expect(castelo.locator('.rotulo')).toHaveText(e.falta);
+        await expect(castelo.locator('li')).toHaveCount(3);
+        await expect(castelo.getByText(e.proximo)).toBeVisible();
+        for (const i of [0, 1, 2]) await expect(itens.nth(i).locator('.estagio-nota')).toHaveCount(0);
+        await expect(page.locator('body')).not.toContainText('%');
+      });
+    }
+  });
+}
+
+test('o RodoviariaOS continua com a lista de próximos passos, sem estágios', async ({ page }) => {
+  await page.goto('/projetos/rodoviariaos/');
+  await expect(page.locator('.estagios')).toHaveCount(0);
+});

@@ -1,15 +1,20 @@
 ---
+import agora from '../assets/temas/rpg/agora.svg?raw';
+import { spriteInline } from '../lib/sprite';
 import { textoRico } from '../lib/texto';
-import { t, type Idioma } from '../i18n/ui';
+import { t, type Idioma, type Tema } from '../i18n/ui';
 interface Props {
   idioma: Idioma;
   decisao: { titulo: string; resumo: string; escolha: string; porque: string; deixeiDeLado: string };
+  /** No tema rpg a decisão vira um cartão de missão do jogo, com a espada do ícone "Agora" ao lado do título. */
+  tema?: Tema;
 }
-const { idioma, decisao } = Astro.props;
+const { idioma, decisao, tema = 'rodovia' } = Astro.props;
+const rpg = tema === 'rpg';
 ---
-<details class="decisao recolhivel revelar">
+<details class:list={['decisao', 'recolhivel', 'revelar', { 'decisao--missao': rpg }]}>
   <summary>
-    <span class="resumo-titulo">{decisao.titulo}</span>
+    <span class="resumo-titulo">{rpg && <span class="missao-icone" set:html={spriteInline(agora, 'icone')} />}{decisao.titulo}</span>
     <span class="resumo-texto">{decisao.resumo}</span>
     <span class="resumo-icone" aria-hidden="true"></span>
   </summary>
@@ -26,4 +31,17 @@ const { idioma, decisao } = Astro.props;
   .decisao { background: var(--bg-2); border: 1px solid var(--line); border-top: 3px solid var(--signal); border-radius: var(--raio); color: var(--ink-2); }
   .corpo { display: flex; flex-direction: column; gap: 6px; max-width: var(--medida); padding: 4px clamp(16px, 3vw, 24px) 22px; }
   .rotulo { margin-top: 10px; }
+
+  /* Cartão de missão (tema rpg): pedra com a moldura em pixels; aberto, o conteúdo vem em pergaminho. */
+  .decisao--missao { margin-inline: var(--px); border: 0; background: var(--pedra); box-shadow: var(--moldura-pedra); }
+  .decisao--missao .resumo-titulo { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; }
+  .missao-icone { flex: none; width: 24px; height: 24px; color: var(--signal); }
+  .missao-icone :global(.icone) { display: block; width: 100%; height: 100%; }
+  .decisao--missao .corpo {
+    --ink-2: var(--tinta); --mute: var(--tinta-suave); --surface: var(--pergaminho-escuro); --line: var(--pergaminho-escuro);
+    max-width: none; margin: 0 clamp(12px, 2.4vw, 20px) clamp(16px, 2.4vw, 20px); padding: 6px clamp(14px, 2.4vw, 22px) 18px;
+    background: var(--pergaminho); color: var(--tinta); box-shadow: var(--moldura-pergaminho);
+  }
+  .decisao--missao .corpo p { max-width: var(--medida); }
+  .decisao--missao .corpo .rotulo { color: var(--tinta-suave); }
 </style>

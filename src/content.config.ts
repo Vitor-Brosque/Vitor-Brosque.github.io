@@ -77,6 +77,8 @@ const projetos = defineCollection({
       numeros: z.array(z.object({ valor: z.string(), rotulo: z.string() })).default([]),
       numerosFonte: z.string().optional(),
       proximos: z.array(z.string()).default([]),
+      /** Onde o projeto está hoje, em uma frase (tema rpg: vai sob o estágio "Vila" da faixa de estágios). */
+      hoje: z.string().optional(),
       seo: z.object({ descricao: z.string().max(160) }),
     }),
 });

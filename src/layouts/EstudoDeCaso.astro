@@ -5,6 +5,8 @@ import Rota from '../components/Rota.astro';
 import MolduraMidia from '../components/MolduraMidia.astro';
 import Decisao from '../components/Decisao.astro';
 import MapaArquitetura from '../components/MapaArquitetura.tsx';
+import CenaRpg from '../components/rpg/CenaRpg.astro';
+import Estagios from '../components/rpg/Estagios.astro';
 import type { Projeto } from '../lib/projetos';
 import { slugDe } from '../lib/projetos-puro';
 import { paragrafos, textoRico } from '../lib/texto';
@@ -42,6 +44,7 @@ const jsonLd = {
       <a class="voltar" data-entrada style="--ordem: 0" href={urlDaHome(idioma, 'projetos')}>← {t(idioma, 'caso.voltar')}</a>
       <p class="rotulo rotulo--sinal" data-entrada style="--ordem: 0">{d.statusTexto}</p>
       <h1 transition:name={`titulo-${slug}`}>{d.titulo}</h1>
+      {rpg && <div class="caso-cena" data-entrada style="--ordem: 1"><CenaRpg /></div>}
       <p class="caso-frase" data-entrada style="--ordem: 2">{d.frase}</p>
       <dl class="ficha" data-entrada style="--ordem: 3">
         <div><dt class="rotulo">{t(idioma, 'caso.papel')}</dt><dd>{d.papel}</dd></div>
@@ -122,10 +125,15 @@ const jsonLd = {
       )}
 
       <h3 class="decisoes-titulo revelar">{t(idioma, 'caso.decisoes')}</h3>
-      <div class="decisoes">{d.decisoes.map((dec) => <Decisao decisao={dec} idioma={idioma} />)}</div>
+      <div class="decisoes">{d.decisoes.map((dec) => <Decisao decisao={dec} idioma={idioma} tema={tema} />)}</div>
     </section>
 
-    {d.proximos.length > 0 && (
+    {rpg && d.hoje ? (
+      <section class="secao wrap" aria-labelledby="estagios">
+        <h2 id="estagios" class="revelar">{t(idioma, 'caso.estagios')}</h2>
+        <Estagios idioma={idioma} hoje={d.hoje} proximos={d.proximos} />
+      </section>
+    ) : d.proximos.length > 0 && (
       <section class="secao wrap" aria-labelledby="proximos">
         <h2 id="proximos" class="revelar">{t(idioma, 'caso.proximos')}</h2>
         <ul class="proximos revelar">{d.proximos.map((p) => <li set:html={textoRico(p)} />)}</ul>
@@ -188,6 +196,13 @@ const jsonLd = {
   :global(html:not(.js)) .xp { display: none; }
   @media print { .xp { display: none; } }
   main[data-tema='rpg'] .voltar { font-family: var(--fonte-pixel); }
+  /* Cena do jogo: à direita do título no desktop (fora do fluxo, sem empurrar nada); no celular, logo abaixo dele. */
+  main[data-tema='rpg'] .caso-topo { position: relative; }
+  .caso-cena { margin-top: 18px; }
+  @media (min-width: 900px) {
+    .caso-cena { position: absolute; margin: 0; top: clamp(96px, 9vw, 120px); right: clamp(16px, 4vw, 40px); }
+  }
+  @media (max-width: 639px) { main[data-tema='rpg'] h1 { font-size: clamp(2.2rem, 12vw, 3.2rem); } }
   main[data-tema='rpg'] .caso-frase { color: var(--ink); }
   /* "Em resumo" vira a ficha do personagem: pergaminho com moldura de madeira, texto em tinta. */
   main[data-tema='rpg'] .em-resumo { margin: calc(2 * var(--px)); background: var(--pergaminho); border: 0; border-radius: 0; box-shadow: var(--moldura-pergaminho); color: var(--tinta); }

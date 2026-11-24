@@ -56,14 +56,12 @@ main[data-tema='rpg'] {
   /* Na Pixelify a ligadura "fi" vira um desenho só, que lê como "A": desligada na página toda. */
   font-variant-ligatures: none;
   color: var(--ink);
-  /* A parede de tijolos do jogo, bem discreta: argamassa um tom abaixo do azul-noite, fiadas desencontradas. */
-  background-color: var(--bg);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='36' shape-rendering='crispEdges'%3E%3Cg fill='%230e1019'%3E%3Crect width='54' height='3'/%3E%3Crect y='18' width='54' height='3'/%3E%3Crect width='3' height='18'/%3E%3Crect x='27' y='18' width='3' height='18'/%3E%3C/g%3E%3Cg fill='%23141624'%3E%3Crect x='3' y='3' width='51' height='3'/%3E%3Crect y='21' width='27' height='3'/%3E%3Crect x='30' y='21' width='24' height='3'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 54px 36px;
 }
 
 /* Fora do <main> só o necessário para a página não ter duas cores de fundo: o corpo e a navegação ficam azul-noite e chapados. */
-body:has(main[data-tema='rpg']) { background: #12141f; }
+/* A parede de tijolos do jogo, bem discreta (argamassa um tom abaixo do azul-noite, fiadas desencontradas).
+   Fica no corpo da página para seguir até o rodapé sem emenda no fim do <main>. */
+body:has(main[data-tema='rpg']) { background: #12141f url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='36' shape-rendering='crispEdges'%3E%3Cg fill='%230e1019'%3E%3Crect width='54' height='3'/%3E%3Crect y='18' width='54' height='3'/%3E%3Crect width='3' height='18'/%3E%3Crect x='27' y='18' width='3' height='18'/%3E%3C/g%3E%3Cg fill='%23141624'%3E%3Crect x='3' y='3' width='51' height='3'/%3E%3Crect y='21' width='27' height='3'/%3E%3Crect x='30' y='21' width='24' height='3'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 54px 36px; }
 body:has(main[data-tema='rpg']) .nav { background: #1b1e2e; backdrop-filter: none; border-bottom-color: #0b0c14; }
 /* A linha de progresso da navegação dá lugar à barra de XP (abaixo). */
 body:has(main[data-tema='rpg']) .nav::after { display: none; }
@@ -106,3 +104,9 @@ main[data-tema='rpg'] .mapa-tracejado { stroke: var(--pedra-clara); }
 main[data-tema='rpg'] .mapa-no.is-destaque rect { stroke: var(--dourado-escuro); }
 main[data-tema='rpg'] .mapa-rotulo { font-family: var(--fonte-corpo); font-weight: 700; }
 main[data-tema='rpg'] .mapa-explicacao { background: var(--pedra); border-left-color: var(--signal); }
+
+/* Blocos recolhidos (arquitetura e decisões): o botão de abrir é um quadrado de pedra, sem círculo. */
+main[data-tema='rpg'] .resumo-icone { border-radius: 0; border: 0; background: var(--bg-2); box-shadow: 0 0 0 var(--px) var(--pedra-clara); }
+main[data-tema='rpg'] .recolhivel > summary:hover .resumo-icone,
+main[data-tema='rpg'] .recolhivel[open] .resumo-icone { box-shadow: 0 0 0 var(--px) var(--signal); }
+main[data-tema='rpg'] .resumo-icone::before, main[data-tema='rpg'] .resumo-icone::after { width: 12px; height: 3px; margin: -1.5px 0 0 -6px; }
