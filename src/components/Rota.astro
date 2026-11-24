@@ -178,7 +178,7 @@ const vitrine = modo === 'loop' && !compacta;
   :global(html:not(.js)) .vitrine { display: grid; gap: 28px; }
   :global(html:not(.js)) .vitrine-painel + .vitrine-painel { padding-top: 28px; border-top: 1px solid var(--line); }
   .vitrine-painel { display: grid; grid-template-rows: auto 1fr; align-items: start; gap: 16px; }
-  .vitrine .rota-detalhe :global(.moldura) { margin: 0; height: var(--area); container-type: size; display: grid; place-items: start center; }
+  .vitrine .rota-detalhe :global(.moldura) { margin: 0; height: var(--area); container-type: size; display: grid; place-items: center; }
   /* Na vitrine o vídeo usa os controles nativos (e a tela inteira deles); o botão próprio ficaria por cima da barra. */
   .vitrine :global(.moldura-play) { display: none; }
 
@@ -202,7 +202,7 @@ const vitrine = modo === 'loop' && !compacta;
 
   @media (max-width: 899px) {
     /* Rota grande no celular: seis botões só com o KM, a estrada horizontal embaixo e a vitrine em seguida. */
-    .rota--vitrine { --area: clamp(280px, 48vh, 400px); }
+    .rota--vitrine { --area: clamp(260px, 36vh, 300px); }
     .rota--vitrine .placas { gap: 6px; }
     .rota--vitrine .placa-corpo { display: grid; place-items: center; min-height: 40px; padding: 6px 2px; }
     .rota--vitrine .km { font-size: 0.74rem; letter-spacing: 0.04em; }
