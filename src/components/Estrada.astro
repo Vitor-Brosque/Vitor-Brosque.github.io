@@ -1,15 +1,18 @@
 ---
 import CarrinhoPixel from './CarrinhoPixel.astro';
-import { t, type Idioma } from '../i18n/ui';
-interface Props { carro?: boolean; idioma?: Idioma }
-const { carro = false, idioma = 'pt' } = Astro.props;
+import { t, type Idioma, type Tema } from '../i18n/ui';
+interface Props { carro?: boolean; idioma?: Idioma; tema?: Tema }
+const { carro = false, idioma = 'pt', tema = 'rodovia' } = Astro.props;
+// No tema rpg a pista vira a trilha de terra do mapa do jogo. Ela tem o botão de pausa: a chama da lanterna fica em loop nessa página.
+const trilha = tema === 'rpg';
+const comPausa = carro || trilha;
 // Nome próprio para este botão: o da rota já se chama "Pausar", e dois botões com o mesmo nome confundem no leitor de tela.
 const pausar = t(idioma, 'animacoes.pausar');
 ---
-{/* A pista é decorativa (aria-hidden); na estrada com carro o botão de pausa fica fora da parte escondida do leitor de tela. */}
-<div class:list={['estrada', { 'estrada--carro': carro }]} data-estrada aria-hidden={carro ? undefined : 'true'}>
+{/* A pista é decorativa (aria-hidden); na estrada com botão de pausa ele fica fora da parte escondida do leitor de tela. */}
+<div class:list={['estrada', { 'estrada--carro': carro, 'estrada--trilha': trilha }]} data-estrada aria-hidden={comPausa ? undefined : 'true'}>
   {carro && <div class="estrada-carro" aria-hidden="true"><CarrinhoPixel /></div>}
-  {carro && (
+  {comPausa && (
     <button type="button" class="estrada-pausa" data-estrada-pausa data-pausar={pausar} data-continuar={t(idioma, 'animacoes.continuar')} aria-label={pausar}>
       <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" shape-rendering="crispEdges">
         <g class="icone-pausar"><rect x="2" y="1" width="3" height="10" /><rect x="7" y="1" width="3" height="10" /></g>
@@ -56,6 +59,39 @@ const pausar = t(idioma, 'animacoes.pausar');
   .estrada-pausa[data-pausada] .icone-pausar { display: none; }
   .estrada-pausa[data-pausada] .icone-continuar { display: inline; }
   :global(html:not(.js)) .estrada-pausa { display: none; }
+  /* Trilha do tema rpg: terra sobre grama, com as cores do mapa do jogo. Tudo corre junto com o mesmo --desloc
+     (cada desenho repete em 34 ou 17 px, divisores dos 68 px do período da rua; ver estrada-calculo.ts). */
+  .estrada--trilha {
+    /* A trilha anda de pixel em pixel do jogo (3 px), sem borrar os pontos. */
+    --d: round(var(--desloc), 3px);
+    height: 60px; border-block: 3px solid #0b0c14;
+    background:
+      /* pedrinhas da terra (pontos de 3 px, como as estradas do mapa) */
+      linear-gradient(90deg, #a07d52 3px, transparent 3px) calc(var(--d) + 5px) 21px / 34px 3px repeat-x,
+      linear-gradient(90deg, #a07d52 3px, transparent 3px) calc(var(--d) + 22px) 33px / 34px 3px repeat-x,
+      linear-gradient(90deg, #6f5a3c 3px, transparent 3px) calc(var(--d) + 13px) 27px / 34px 3px repeat-x,
+      linear-gradient(90deg, #cdb88f 3px, transparent 3px) calc(var(--d) + 29px) 24px / 34px 3px repeat-x,
+      /* tufos de grama clara e escura */
+      linear-gradient(90deg, #5ea152 3px, transparent 3px) calc(var(--d) + 9px) 6px / 34px 3px repeat-x,
+      linear-gradient(90deg, #437d3b 3px, transparent 3px) calc(var(--d) + 26px) 3px / 34px 3px repeat-x,
+      linear-gradient(90deg, #5ea152 3px, transparent 3px) calc(var(--d) + 18px) 45px / 34px 3px repeat-x,
+      linear-gradient(90deg, #437d3b 3px, transparent 3px) calc(var(--d) + 3px) 48px / 34px 3px repeat-x,
+      linear-gradient(90deg, #5ea152 3px, transparent 3px) calc(var(--d) + 31px) 51px / 34px 3px repeat-x,
+      /* a trilha, com a borda de grama escura, sobre a grama */
+      linear-gradient(#437d3b 0 0) 0 15px / 100% 3px no-repeat,
+      linear-gradient(#437d3b 0 0) 0 39px / 100% 3px no-repeat,
+      linear-gradient(#8c7350 0 0) 0 18px / 100% 21px no-repeat,
+      #4f8f45;
+  }
+  .estrada--trilha::after { display: none; }
+  .estrada--trilha .estrada-pausa {
+    width: 36px; height: 36px; margin-top: -18px; border: 0; border-radius: 0; background: #2a2e45; color: #ece6d6;
+    box-shadow: 0 -3px 0 #0b0c14, 0 3px 0 #0b0c14, -3px 0 0 #0b0c14, 3px 0 0 #0b0c14, inset 3px 3px 0 #3b4063, inset -3px -3px 0 #1b1e2e;
+  }
+  .estrada--trilha .estrada-pausa:hover { background: #3b4063; color: #f2c14e; }
+  .estrada--trilha .estrada-pausa:focus-visible { outline: 3px solid #f2c14e; outline-offset: 3px; }
+  .estrada--trilha .estrada-pausa[data-pausada] { background: #f2c14e; color: #2b1d12; box-shadow: 0 -3px 0 #0b0c14, 0 3px 0 #0b0c14, -3px 0 0 #0b0c14, 3px 0 0 #0b0c14, inset 0 -3px 0 #a8741f; }
+
   @media (prefers-reduced-motion: no-preference) {
     .estrada-carro :global(.carrinho) { animation: quicar-estrada 0.26s steps(2) infinite; }
     @keyframes quicar-estrada { 50% { translate: 0 -1px; } }

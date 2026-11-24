@@ -75,16 +75,18 @@ main[data-tema='rpg'] :is(h1, h2, h3, .rotulo, .botao, .resumo-titulo) {
   letter-spacing: 0;
 }
 main[data-tema='rpg'] :is(h1, h2, h3) { font-weight: 700; line-height: 1.1; }
+/* Peso 700 só nos títulos grandes: em tamanho de texto, a Pixelify em negrito fecha o "c" e o "e" (lê "oelular"). */
+main[data-tema='rpg'] :is(h3, .resumo-titulo, .botao) { font-weight: 400; }
 main[data-tema='rpg'] h1 { color: var(--signal); text-shadow: var(--px) var(--px) 0 var(--contorno); }
 main[data-tema='rpg'] h2 { color: var(--signal); text-shadow: var(--px) var(--px) 0 var(--contorno); }
 main[data-tema='rpg'] .rotulo { font-size: 0.85rem; font-weight: 400; letter-spacing: 0.04em; }
-main[data-tema='rpg'] code { border-radius: 0; background: var(--bg-2); border-color: var(--line-2); }
+main[data-tema='rpg'] code { border-radius: 0; background: var(--surface); border-color: var(--line); color: inherit; }
 
 /* Fichas da stack: cantos retos, fonte do sistema (há números nos nomes). */
 main[data-tema='rpg'] .chips li { border-radius: 0; font-family: var(--fonte-corpo); font-size: 0.8rem; background: var(--pedra); border-color: var(--pedra-clara); color: var(--ink); }
 
 /* Botões do jogo: o principal é dourado, com a base mais escura e texto em tinta. */
-main[data-tema='rpg'] .botao { font-weight: 700; border-radius: 0; border: 0; padding: 12px 20px 15px; background: var(--pedra); color: var(--ink); box-shadow: var(--moldura-pedra); margin: var(--px); }
+main[data-tema='rpg'] .botao { font-size: 1.05rem; border-radius: 0; border: 0; padding: 12px 20px 15px; background: var(--pedra); color: var(--ink); box-shadow: var(--moldura-pedra); margin: var(--px); }
 main[data-tema='rpg'] .botao:hover { background: var(--pedra-clara); }
 main[data-tema='rpg'] .botao--sinal { background: var(--signal); color: var(--tinta); box-shadow: 0 calc(-1 * var(--px)) 0 var(--contorno), 0 var(--px) 0 var(--contorno), calc(-1 * var(--px)) 0 0 var(--contorno), var(--px) 0 0 var(--contorno), inset 0 calc(-1 * var(--px)) 0 var(--dourado-escuro), inset var(--px) var(--px) 0 #f8dc84; }
 main[data-tema='rpg'] .botao--sinal:hover { background: #f8dc84; }

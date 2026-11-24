@@ -12,6 +12,7 @@ import { t, urlDaHome, urlDoProjeto, type Idioma } from '../i18n/ui';
 import '@fontsource/pixelify-sans/latin-400.css';
 import '@fontsource/pixelify-sans/latin-700.css';
 import '../styles/tema-rpg.css';
+import pixelify400 from '@fontsource/pixelify-sans/files/pixelify-sans-latin-400-normal.woff2?url';
 import pixelify700 from '@fontsource/pixelify-sans/files/pixelify-sans-latin-700-normal.woff2?url';
 
 interface Props { projeto: Projeto; proximo: Projeto; idioma: Idioma }
@@ -33,7 +34,7 @@ const jsonLd = {
   author: { '@type': 'Person', name: 'Vitor Brosque', url: site.href },
 };
 ---
-<Base titulo={`${d.titulo} · Vitor Brosque`} descricao={d.seo.descricao} idioma={idioma} imagemOg={d.capa?.imagem} altOg={d.capa?.alt} jsonLd={jsonLd} fontes={rpg ? [pixelify700] : []}>
+<Base titulo={`${d.titulo} · Vitor Brosque`} descricao={d.seo.descricao} idioma={idioma} imagemOg={d.capa?.imagem} altOg={d.capa?.alt} jsonLd={jsonLd} fontes={rpg ? [pixelify700, pixelify400] : []}>
   <main id="conteudo" data-tema={tema}>
     {/* No tema rpg a leitura enche a barra de XP do jogo, presa ao pé da navegação (xp.ts; sem JS não aparece). */}
     {rpg && <div class="xp" data-xp aria-hidden="true"><span class="xp-cheio"></span></div>}
@@ -69,7 +70,7 @@ const jsonLd = {
 
     {capa && <div class="wrap caso-capa revelar revelar--zoom"><MolduraMidia midia={capa} idioma={idioma} sizes="(min-width: 1120px) 1040px, 92vw" /></div>}
 
-    <div class="caso-estrada"><Estrada /></div>
+    <div class="caso-estrada"><Estrada tema={tema} idioma={idioma} /></div>
 
     <section class="secao wrap" aria-labelledby="problema">
       <h2 id="problema" class="revelar">{t(idioma, 'caso.problema')}</h2>
@@ -78,7 +79,7 @@ const jsonLd = {
 
     <section class="secao wrap" aria-labelledby="rota">
       <h2 id="rota" class="revelar">{d.rota.titulo}</h2>
-      <div class="caso-rota"><Rota titulo={d.rota.titulo} paradas={d.rota.paradas} modo="rolagem" idioma={idioma} /></div>
+      <div class="caso-rota"><Rota titulo={d.rota.titulo} paradas={d.rota.paradas} modo="rolagem" idioma={idioma} tema={tema} /></div>
     </section>
 
     {d.funcionalidades.length > 0 && (

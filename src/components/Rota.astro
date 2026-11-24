@@ -1,9 +1,10 @@
 ---
 import CarrinhoPixel from './CarrinhoPixel.astro';
+import Lanterna from './rpg/Lanterna.astro';
 import MolduraMidia from './MolduraMidia.astro';
 import type { Parada } from '../lib/projetos';
 import { textoRico } from '../lib/texto';
-import { t, type Idioma } from '../i18n/ui';
+import { rotuloDaParada, t, type Idioma, type Tema } from '../i18n/ui';
 
 interface Props {
   titulo: string;
@@ -11,13 +12,17 @@ interface Props {
   modo: 'loop' | 'rolagem';
   idioma: Idioma;
   compacta?: boolean;
+  /** No tema rpg (Life RPG): a lanterna no lugar do carrinho, a estrada do mapa com um marco por parada, placas de pedra e pergaminho. */
+  tema?: Tema;
 }
-const { titulo, paradas, modo, idioma, compacta = false } = Astro.props;
+const { titulo, paradas, modo, idioma, compacta = false, tema = 'rodovia' } = Astro.props;
+const rpg = tema === 'rpg';
+const rotulo = (i: number) => rotuloDaParada(idioma, tema, i);
 /** A rota grande da home: placas que são botões e, embaixo, a vitrine com a tela de cada parada. */
 const vitrine = modo === 'loop' && !compacta;
 ---
 <div
-  class:list={['rota', { 'rota--compacta': compacta, 'rota--vitrine': vitrine }]}
+  class:list={['rota', { 'rota--compacta': compacta, 'rota--vitrine': vitrine, 'rota--rpg': rpg }]}
   data-rota
   data-modo={modo}
   style={`--n: ${paradas.length}`}
@@ -48,7 +53,7 @@ const vitrine = modo === 'loop' && !compacta;
             </button>
           ) : (
             <div class="placa-corpo">
-              <span class="km">KM {i}</span>
+              <span class="km">{rotulo(i).prefixo} {rpg ? <span class="num">{rotulo(i).numero}</span> : rotulo(i).numero}</span>
               <strong class="placa-titulo">{p.titulo}</strong>
             </div>
           )}
@@ -57,19 +62,24 @@ const vitrine = modo === 'loop' && !compacta;
             <div class:list={['rota-detalhe', { 'rota-detalhe--midia': p.midia }]}>
               <div class="rota-detalhe-corpo">
                 {/* KM e título repetem a placa: só aparecem no painel da rota presa e o leitor de tela não os ouve de novo. */}
-                <span class="rota-detalhe-km" aria-hidden="true">KM {i}</span>
+                <span class="rota-detalhe-km" aria-hidden="true">{rotulo(i).prefixo} {rpg ? <span class="num">{rotulo(i).numero}</span> : rotulo(i).numero}</span>
                 <strong class="rota-detalhe-titulo" aria-hidden="true">{p.titulo}</strong>
                 <p class="rota-detalhe-texto" set:html={textoRico(p.texto)} />
               </div>
               {p.midia
                 ? <MolduraMidia midia={p.midia} idioma={idioma} sizes="(min-width: 900px) 40vw, 90vw" />
-                : <span class="rota-detalhe-marco" aria-hidden="true">KM {i}</span>}
+                : <span class="rota-detalhe-marco" aria-hidden="true">{rpg ? rotulo(i).numero : `KM ${i}`}</span>}
+              {/* Tema rpg: o texto curto sai da lanterna num balão de pergaminho, como o do companheiro no jogo (só no painel da rota presa). */}
+              {rpg && p.curto && <p class="fala" aria-hidden="true"><span set:html={textoRico(p.curto)} /></p>}
             </div>
           )}
         </li>
       ))}
     </ol>
-    <div class="asfalto" aria-hidden="true"><div class="carro"><CarrinhoPixel /></div></div>
+    <div class="asfalto" aria-hidden="true">
+      {rpg && paradas.map((_, i) => <span class="marco" style={`--c: ${((i + 0.5) / paradas.length).toFixed(4)}`}></span>)}
+      <div class="carro">{rpg ? <Lanterna /> : <CarrinhoPixel />}</div>
+    </div>
   </div>
   {vitrine && (
     <div class="vitrine" data-vitrine>
@@ -276,6 +286,75 @@ const vitrine = modo === 'loop' && !compacta;
   @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
     :global(.js) .rota[data-modo='rolagem']:not([data-estatico]) .rota-detalhe { translate: 0 14px; transition: opacity 0.35s, visibility 0.35s, translate 0.45s var(--ease); }
     :global(.js) .rota[data-modo='rolagem']:not([data-estatico]) .placa[data-ativa] .rota-detalhe { translate: none; }
+  }
+
+  /* ===== Tema rpg (Life RPG). As cores e a moldura vêm de tema-rpg.css (variáveis do <main data-tema="rpg">). ===== */
+  .rota--rpg { --area: min(calc(52vh - 64px), 400px); margin: var(--px); background: var(--bg-2); border: 0; border-radius: 0; box-shadow: var(--moldura-pedra); }
+  .rota--rpg .num { font-family: var(--fonte-corpo); font-weight: 700; }
+  .rota--rpg .km { font-family: var(--fonte-pixel); font-size: 0.85rem; letter-spacing: 0.02em; }
+  .rota--rpg .placa-titulo { font-family: var(--fonte-pixel); font-weight: 400; font-stretch: normal; font-size: 1.1rem; }
+  /* Placas: painéis de pedra; a ativa vira pergaminho, com tinta escura (as variáveis passam a tinta para o texto de dentro). */
+  .rota--rpg .placa-corpo { border: 0; border-radius: 0; background: var(--pedra); box-shadow: var(--moldura-pedra); }
+  .rota--rpg .poste { width: 6px; margin-left: 21px; background: #5c3a21; }
+  .rota--rpg .placa[data-ativa] .poste { background: #9a6a3c; }
+  /* Estrada do mapa: terra sobre grama; o trecho já percorrido vira pedra, como a estrada de uma jornada no jogo. */
+  .rota--rpg .asfalto { height: 60px; border-radius: 0; background: #4f8f45; overflow: visible; box-shadow: 0 0 0 3px var(--contorno); }
+  .rota--rpg .asfalto::before { inset-inline: 0; top: 50%; height: 15px; margin-top: -7.5px; background: #8c7350; box-shadow: 0 3px 0 #437d3b, 0 -3px 0 #437d3b; animation: none; }
+  .rota--rpg .asfalto::after { top: 50%; height: 15px; margin-top: -7.5px; background: #cdb88f; box-shadow: none; }
+  /* Um marco por parada: apagado (MARKER_OPEN) até a lanterna passar, depois aceso em dourado (MARKER_DONE). */
+  .marco { position: absolute; z-index: 1; left: calc(var(--c) * 100%); top: 50%; width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px; background: #3b4063; box-shadow: 0 0 0 3px #1a1220; transition: background-color 0.3s; }
+  .marco[data-aceso] { background: #f2c14e; }
+  .rota--rpg .carro { z-index: 2; width: 48px; height: 48px; translate: -50% -62%; }
+  .rota--rpg .carro::after { display: none; }
+  .rota--rpg .carro :global(.lanterna) { filter: drop-shadow(0 3px 0 rgb(11 12 20 / 0.6)); }
+  /* Painel da parada (rota presa): rótulo do marco em dourado, título na fonte pixel. */
+  .rota--rpg .rota-detalhe-km { font-family: var(--fonte-pixel); font-size: 0.95rem; letter-spacing: 0.02em; }
+  .rota--rpg .rota-detalhe-titulo { font-family: var(--fonte-pixel); font-weight: 700; font-stretch: normal; color: var(--signal); text-shadow: var(--px) var(--px) 0 var(--contorno); }
+  .rota--rpg .rota-detalhe-marco { font-family: var(--fonte-corpo); font-weight: 900; font-stretch: normal; -webkit-text-stroke: 3px var(--pedra-clara); }
+  .fala { display: none; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* Andando, a lanterna dá pulinhos de 3 px (um pixel do jogo); a chama segue o próprio loop. */
+    .rota--rpg[data-andando] .carro :global(.lanterna) { animation: pular-lanterna 0.5s steps(1) infinite; }
+    @keyframes pular-lanterna { 50% { translate: 0 -3px; } }
+  }
+
+  @media (max-width: 899px) {
+    .rota--rpg[data-modo='rolagem'] .asfalto { height: auto; }
+    .rota--rpg[data-modo='rolagem'] .asfalto::before { inset-inline: auto; left: 50%; top: 0; bottom: 0; width: 15px; height: auto; margin: 0 0 0 -7.5px; background: #8c7350; box-shadow: 3px 0 0 #437d3b, -3px 0 0 #437d3b; animation: none; }
+    .rota--rpg[data-modo='rolagem'] .asfalto::after { left: 50%; top: 0; width: 15px; margin: 0 0 0 -7.5px; }
+    .rota--rpg .marco { left: 50%; top: calc(var(--c) * 100%); }
+    .rota--rpg[data-modo='rolagem'] .carro { rotate: none; width: 48px; height: 48px; translate: -50% -50%; }
+    .rota--rpg[data-modo='rolagem'] .placa { border: 0; border-radius: 0; background: var(--pedra); box-shadow: var(--moldura-pedra); }
+    .rota--rpg[data-modo='rolagem'] .placa[data-ativa] { --ink: var(--tinta); --ink-2: var(--tinta); --mute: var(--tinta-suave); --signal: var(--tinta-suave); --surface: var(--pergaminho-escuro); --line: var(--pergaminho-escuro); color: var(--tinta); background: var(--pergaminho); box-shadow: var(--moldura-pergaminho); }
+    :global(html:not(.js)) .rota--rpg[data-modo='rolagem'] .placa { background: var(--pedra); box-shadow: var(--moldura-pedra); }
+  }
+
+  @media (min-width: 900px) {
+    :global(.js) .rota--rpg[data-modo='rolagem']:not([data-estatico]) .placa[data-ativa] .placa-corpo { --mute: var(--tinta-suave); --signal: var(--tinta-suave); --ink-2: var(--tinta); color: var(--tinta); background: var(--pergaminho); box-shadow: var(--moldura-pergaminho); }
+    .rota--rpg[data-modo='rolagem'][data-estatico] .placa,
+    :global(html:not(.js)) .rota--rpg[data-modo='rolagem'] .placa { border: 0; border-radius: 0; background: var(--pedra); box-shadow: var(--moldura-pedra); }
+    .rota--rpg[data-modo='rolagem'][data-estatico] .placa[data-ativa] { --ink: var(--tinta); --ink-2: var(--tinta); --mute: var(--tinta-suave); --signal: var(--tinta-suave); --surface: var(--pergaminho-escuro); --line: var(--pergaminho-escuro); color: var(--tinta); background: var(--pergaminho); box-shadow: var(--moldura-pergaminho); }
+
+    /* Rota presa: espaço no alto do painel para o balão, que sai da lanterna e acompanha onde ela está (--pos). */
+    :global(.js) .rota--rpg[data-modo='rolagem']:not([data-estatico]) .rota-palco { padding-bottom: calc(var(--area) + 24px + 64px); }
+    :global(.js) .rota--rpg[data-modo='rolagem']:not([data-estatico]) .rota-detalhe { height: calc(var(--area) + 64px); padding-top: 64px; }
+    :global(.js) .rota--rpg[data-modo='rolagem']:not([data-estatico]) .fala {
+      --p: clamp(0, var(--pos), 1);
+      display: block; position: absolute; top: 2px; left: calc(var(--p) * 100%); translate: calc(var(--p) * -100%) 0;
+      width: max-content; max-width: min(420px, 100%); margin: 0; padding: 8px 14px 10px;
+      background: var(--pergaminho); color: var(--tinta); font-size: 1rem; line-height: 1.35;
+      box-shadow:
+        0 calc(-1 * var(--px)) 0 var(--contorno), 0 var(--px) 0 var(--contorno),
+        calc(-1 * var(--px)) 0 0 var(--contorno), var(--px) 0 0 var(--contorno),
+        inset 0 calc(-1 * var(--px)) 0 var(--pergaminho-escuro);
+    }
+    /* O rabicho do balão, em pixels, aponta para a lanterna. */
+    :global(.js) .rota--rpg[data-modo='rolagem']:not([data-estatico]) .fala::before {
+      content: ''; position: absolute; bottom: calc(100% - 3px); left: calc(var(--p) * 100%); width: 21px; height: 18px; margin-left: -10.5px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 6' shape-rendering='crispEdges'%3E%3Cpath fill='%230b0c14' d='M3 0h1v1h1v2h1v2h1v1H0V5h1V3h1V1h1z'/%3E%3Cpath fill='%23f1e3c4' d='M3 1h1v2h1v2h1v1H1V5h1V3h1z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+    }
+    :global(.js) .rota--rpg[data-modo='rolagem']:not([data-estatico]) .fala :global(code) { background: var(--pergaminho-escuro); border-color: var(--pergaminho-escuro); color: var(--tinta); }
   }
 </style>
 <script>import '../scripts/rota';</script>

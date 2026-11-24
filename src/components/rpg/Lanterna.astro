@@ -1,0 +1,27 @@
+---
+import quadro1 from '../../assets/temas/rpg/faisca-quadro-1.svg?raw';
+import quadro2 from '../../assets/temas/rpg/faisca-quadro-2.svg?raw';
+import { spriteQuadros } from '../../lib/sprite';
+
+/**
+ * A lanterna (Faísca, o companheiro do Life RPG), com os dois quadros da chama no mesmo SVG.
+ * A chama troca de quadro a cada 0,5 s, como no jogo, só com movimento permitido; com movimento reduzido
+ * e na pausa da página fica no primeiro quadro. O tamanho vem de quem usa (múltiplo inteiro de 16 px).
+ */
+interface Props { class?: string }
+const { class: classe } = Astro.props;
+const svg = spriteQuadros([quadro1, quadro2], ['lanterna', classe].filter(Boolean).join(' '));
+---
+<Fragment set:html={svg} />
+<style is:global>
+  .lanterna { display: block; width: 100%; height: 100%; overflow: visible; }
+  .lanterna .quadro-2 { visibility: hidden; }
+  @media (prefers-reduced-motion: no-preference) {
+    .lanterna .quadro-1 { animation: lanterna-quadro-1 1s step-end infinite; }
+    .lanterna .quadro-2 { animation: lanterna-quadro-2 1s step-end infinite; }
+    @keyframes lanterna-quadro-1 { 50% { visibility: hidden; } }
+    @keyframes lanterna-quadro-2 { 50% { visibility: visible; } }
+    /* Na pausa da página, de volta ao primeiro quadro (a regra geral só congelaria o quadro em que estava). */
+    html[data-pausado] .lanterna .quadro { animation: none; }
+  }
+</style>

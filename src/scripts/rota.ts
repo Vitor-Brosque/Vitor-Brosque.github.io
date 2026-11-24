@@ -34,6 +34,8 @@ class Rota {
   readonly placas: HTMLElement[];
   readonly botoes: HTMLButtonElement[];
   readonly paineis: HTMLElement[];
+  /** Marcos da estrada (só no tema rpg): acendem quando a lanterna passa por eles. */
+  readonly marcos: HTMLElement[];
   /** Painel da vitrine à mostra; fica o último enquanto o carro está fora da rota. */
   painel = 0;
   /** A troca automática espera (ponteiro sobre a vitrine ou foco de teclado dentro da rota). */
@@ -48,6 +50,7 @@ class Rota {
     this.placas = [...raiz.querySelectorAll<HTMLElement>('.placa')];
     this.botoes = [...raiz.querySelectorAll<HTMLButtonElement>('[data-placa-botao]')];
     this.paineis = [...raiz.querySelectorAll<HTMLElement>('[data-painel]')];
+    this.marcos = [...raiz.querySelectorAll<HTMLElement>('.marco')];
     this.mostrarPainel(0, true);
     this.medir();
     this.obsTamanho = 'ResizeObserver' in window ? new ResizeObserver(() => this.remedir()) : null;
@@ -73,6 +76,8 @@ class Rota {
       return vertical ? (r.top + r.height / 2 - caixa.top) / comprimento : (r.left + r.width / 2 - caixa.left) / comprimento;
     });
     this.medida = { centros, margem: (carro?.offsetWidth ?? 0) / comprimento };
+    // Cada marco fica sob a sua placa (no celular, ao lado dela).
+    this.marcos.forEach((m, i) => centros[i] !== undefined && m.style.setProperty('--c', centros[i].toFixed(4)));
   }
 
   private remedir() {
@@ -85,12 +90,15 @@ class Rota {
     const f = fracaoDoCarro(u, this.medida.centros, this.medida.margem);
     this.raiz.style.setProperty('--pos', f.toFixed(4));
     this.raiz.style.setProperty('--feito', Math.min(Math.max(f, 0), 1).toFixed(4));
+    this.marcos.forEach((m, i) => m.toggleAttribute('data-aceso', f >= (this.medida.centros[i] ?? Infinity) - 0.001));
   }
 
   acender(estadoAtiva: number) {
     // Na rota grande, com o carro fora da rota (entrando ou saindo) o painel da última parada continua à mostra: a placa dele fica acesa.
     const ativa = estadoAtiva < 0 && this.paineis.length > 0 ? this.painel : estadoAtiva;
     this.placas.forEach((p, i) => p.toggleAttribute('data-ativa', i === ativa));
+    // Na lista (movimento reduzido) a lanterna não anda: acendem os marcos até a parada ativa.
+    if (this.raiz.hasAttribute('data-estatico')) this.marcos.forEach((m, i) => m.toggleAttribute('data-aceso', i <= ativa));
     this.botoes.forEach((b, i) => (i === ativa ? b.setAttribute('aria-current', 'step') : b.removeAttribute('aria-current')));
     if (ativa >= 0) this.mostrarPainel(ativa);
   }

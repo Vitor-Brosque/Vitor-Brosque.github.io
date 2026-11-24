@@ -19,6 +19,7 @@ export const ui = {
     'rota.pausar': 'Pausar',
     'rota.continuar': 'Continuar',
     'rota.dica': 'Escolha uma parada',
+    'rota.marco': 'Marco',
     'animacoes.pausar': 'Pausar animações',
     'animacoes.continuar': 'Continuar animações',
     'midia.tocar': 'Tocar vídeo',
@@ -65,6 +66,7 @@ export const ui = {
     'rota.pausar': 'Pause',
     'rota.continuar': 'Resume',
     'rota.dica': 'Pick a stop',
+    'rota.marco': 'Milestone',
     'animacoes.pausar': 'Pause animations',
     'animacoes.continuar': 'Resume animations',
     'midia.tocar': 'Play video',
@@ -124,4 +126,11 @@ export function urlEquivalente(caminho: string, destino: Idioma): string {
   const projeto = normal.match(/^\/(?:projetos|en\/projects)\/([^/]+)\/$/);
   if (projeto) return urlDoProjeto(destino, projeto[1]);
   return urlDaHome(destino);
+}
+
+export type Tema = 'rodovia' | 'rpg';
+
+/** Rótulo de uma parada da rota: "KM 0, 1, 2…" na rodovia; no tema rpg, o marco da jornada do jogo, contado a partir de 1. */
+export function rotuloDaParada(i: Idioma, tema: Tema, indice: number): { prefixo: string; numero: number } {
+  return tema === 'rpg' ? { prefixo: t(i, 'rota.marco'), numero: indice + 1 } : { prefixo: 'KM', numero: indice };
 }
