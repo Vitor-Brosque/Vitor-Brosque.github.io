@@ -13,7 +13,7 @@ cartao: capa
 capa:
   imagem: ../../../assets/projetos/life-rpg/mapa.png
   moldura: celular
-  alt: Mapa do mundo do Life RPG em pixel art, com territórios, acampamentos e NPCs
+  alt: Mapa do mundo do Life RPG em pixel art, com seis territórios (vila, aldeia, acampamentos e ruínas) ligados por trilhas e um personagem no centro
 emResumo: >-
   App que eu uso todos os dias para estudar e organizar a rotina. Funciona sem internet no celular e sincroniza com o PC quase em tempo real. O código é aberto, com testes, e as regras do app foram comparadas com 64 fontes científicas sobre hábitos e aprendizagem.
 resumo:
@@ -43,7 +43,7 @@ rota:
       midia:
         imagem: ../../../assets/projetos/life-rpg/agora.png
         moldura: celular
-        alt: Tela Agora do Life RPG, com o bloco atual e uma missão por vez
+        alt: Tela Agora do Life RPG, com uma missão de estudo em destaque, os botões Começar e Concluir e outra missão que também cabe agora
     - titulo: Sincronização
       curto: Envia o cursor e as mudanças.
       texto: >-
@@ -62,14 +62,14 @@ rota:
       texto: O Painel aberto no monitor secundário se atualiza quase em tempo real.
       midia:
         imagem: ../../../assets/projetos/life-rpg/painel.png
-        alt: Painel do Life RPG no computador, com missão atual, linha do tempo do dia e cronômetro
+        alt: Painel do Life RPG no computador, com a missão atual, a linha do tempo do dia, o cronômetro de foco e o formulário de captura
 funcionalidades:
   - titulo: Agora
     texto: Uma missão por vez, os blocos do dia, cronômetro opcional e captura rápida por botões.
     midia:
       imagem: ../../../assets/projetos/life-rpg/agora.png
       moldura: celular
-      alt: Tela Agora, com o bloco atual e uma missão por vez
+      alt: Tela Agora, com uma missão de estudo em destaque e os botões Começar e Concluir
   - titulo: Revisão espaçada
     texto: >-
       Cards de código, de lacuna, com imagem e com áudio, agendados com FSRS-6 e um orçamento de
@@ -77,7 +77,7 @@ funcionalidades:
     midia:
       imagem: ../../../assets/projetos/life-rpg/revisao.png
       moldura: celular
-      alt: Revisão de um card de código SQL, com a resposta escrita ao lado da resposta certa
+      alt: Revisão de um card com a pergunta "O que é uma chave estrangeira?", a resposta e quatro botões de avaliação: Errei, Difícil, Bom e Fácil
   - titulo: Personagem
     texto: >-
       XP por esforço, e não por tempo nem por volume de registro, com atributos ligados a áreas
@@ -85,13 +85,13 @@ funcionalidades:
     midia:
       imagem: ../../../assets/projetos/life-rpg/personagem.png
       moldura: celular
-      alt: Ficha do personagem com nível, XP e atributos por área da vida
+      alt: Ficha da personagem fictícia Lia, com nível, XP, o atalho para o mapa do mundo e atributos por área da vida
   - titulo: Semana
     texto: Planejamento em blocos, objetivos, itens recorrentes e um experimento por semana.
     midia:
       imagem: ../../../assets/projetos/life-rpg/semana.png
       moldura: celular
-      alt: Tela Planejar com a semana organizada em blocos
+      alt: Tela Planejar na aba Objetivos, com uma jornada de projeto em andamento e o progresso de 2 de 5 missões
 arquitetura:
   titulo: Arquitetura
   texto: >-
