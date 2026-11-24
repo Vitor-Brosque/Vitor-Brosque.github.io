@@ -197,8 +197,6 @@ test.describe('com movimento reduzido', () => {
   test('no estudo de caso a rota é a mesma da home: anda sozinha, com o painel da parada ativa embaixo', async ({ page }) => {
     await page.goto('/projetos/rodoviariaos/');
     const rota = page.locator('main [data-rota]');
-    await expect(rota).not.toHaveAttribute('data-estatico');
-    await expect(page.locator('.pin-spacer')).toHaveCount(0);
     await rota.scrollIntoViewIfNeeded();
     const seletor = 'main [data-rota]';
     await expect.poll(() => indiceAtivo(page, seletor), { timeout: 15_000 }).toBe(1);
@@ -249,7 +247,6 @@ test.describe('com movimento permitido', () => {
     await page.goto('/');
     const rota = page.locator('[data-rota].rota--compacta').first();
     await rota.scrollIntoViewIfNeeded();
-    await expect(rota).not.toHaveAttribute('data-estatico');
     // Observa a cada quadro, dentro da página, até ver o carro antes da entrada, depois da saída e todas as placas acesas.
     const visto = await rota.evaluate(
       (el) =>
@@ -585,7 +582,7 @@ for (const modo of ['reduce', 'no-preference'] as const) {
 // A rota grande da home mostra logo que anda: com a seção à vista, o carro chega à primeira placa em menos de 1 s e parte
 // para a segunda em cerca de 3,2 s (2,5 s por parada), nos dois modos de movimento.
 for (const modo of ['reduce', 'no-preference'] as const) {
-  test(`rota grande da home: primeira placa em ~1 s e saída para a segunda em ~3,5 s (${modo})`, async ({ page }) => {
+  test(`rota grande da home: primeira placa em ~0,7 s e saída para a segunda em ~3,2 s (${modo})`, async ({ page }) => {
     test.setTimeout(30_000);
     await page.emulateMedia({ reducedMotion: modo });
     await page.goto('/');

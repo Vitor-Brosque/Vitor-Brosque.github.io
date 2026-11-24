@@ -16,15 +16,22 @@ test('a home é legível sem JavaScript', async ({ page }) => {
   await expect(page.locator('#projetos .rota-dica')).toBeHidden();
 });
 
-test('o estudo de caso é legível sem JavaScript', async ({ page }) => {
-  await page.goto('/projetos/rodoviariaos/');
-  await expect(page.locator('h1')).toBeVisible();
-  const textos = page.locator('.rota-detalhe-texto');
-  expect(await textos.count()).toBe(6);
-  for (let i = 0; i < 6; i++) await expect(textos.nth(i)).toBeVisible();
-  await expect(page.locator('#problema')).toBeVisible();
-  await expect(page.locator('#problema + .texto p').first()).toBeVisible();
-});
+// A rota de cada estudo de caso anda sozinha com script; sem ele, todas as paradas aparecem em lista.
+for (const { caminho, paradas } of [
+  { caminho: '/projetos/rodoviariaos/', paradas: 6 },
+  { caminho: '/projetos/life-rpg/', paradas: 5 },
+  { caminho: '/projetos/technews/', paradas: 6 },
+]) {
+  test(`${caminho}: o estudo de caso é legível sem JavaScript`, async ({ page }) => {
+    await page.goto(caminho);
+    await expect(page.locator('h1')).toBeVisible();
+    const textos = page.locator('main .rota-detalhe-texto');
+    expect(await textos.count()).toBe(paradas);
+    for (let i = 0; i < paradas; i++) await expect(textos.nth(i)).toBeVisible();
+    await expect(page.locator('#problema')).toBeVisible();
+    await expect(page.locator('#problema + .texto p').first()).toBeVisible();
+  });
+}
 
 test('o bloco Em resumo e as decisões aparecem sem JavaScript', async ({ page }) => {
   await page.goto('/projetos/rodoviariaos/');

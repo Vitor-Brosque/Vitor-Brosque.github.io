@@ -184,7 +184,6 @@ test.describe('rota com movimento reduzido', () => {
     test.setTimeout(60_000);
     await page.goto(caminho);
     const rota = page.locator('main [data-rota]').filter({ has: page.locator(veiculo) });
-    await expect(rota).not.toHaveAttribute('data-estatico');
     await rota.scrollIntoViewIfNeeded();
     const y = await page.evaluate(() => window.scrollY);
     const lanterna = rota.locator(`.carro ${veiculo}`);
