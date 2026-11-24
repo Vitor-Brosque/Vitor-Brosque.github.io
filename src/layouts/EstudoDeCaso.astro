@@ -12,10 +12,8 @@ import { slugDe } from '../lib/projetos-puro';
 import { paragrafos, textoRico } from '../lib/texto';
 import { t, urlDaHome, urlDoProjeto, type Idioma } from '../i18n/ui';
 import '@fontsource/pixelify-sans/latin-400.css';
-import '@fontsource/pixelify-sans/latin-700.css';
 import '../styles/tema-rpg.css';
 import pixelify400 from '@fontsource/pixelify-sans/files/pixelify-sans-latin-400-normal.woff2?url';
-import pixelify700 from '@fontsource/pixelify-sans/files/pixelify-sans-latin-700-normal.woff2?url';
 
 interface Props { projeto: Projeto; proximo: Projeto; idioma: Idioma }
 const { projeto, proximo, idioma } = Astro.props;
@@ -36,7 +34,7 @@ const jsonLd = {
   author: { '@type': 'Person', name: 'Vitor Brosque', url: site.href },
 };
 ---
-<Base titulo={`${d.titulo} · Vitor Brosque`} descricao={d.seo.descricao} idioma={idioma} imagemOg={d.capa?.imagem} altOg={d.capa?.alt} jsonLd={jsonLd} fontes={rpg ? [pixelify700, pixelify400] : []}>
+<Base titulo={`${d.titulo} · Vitor Brosque`} descricao={d.seo.descricao} idioma={idioma} imagemOg={d.capa?.imagem} altOg={d.capa?.alt} jsonLd={jsonLd} fontes={rpg ? [pixelify400] : []}>
   <main id="conteudo" data-tema={tema}>
     {/* No tema rpg a leitura enche a barra de XP do jogo, presa ao pé da navegação (xp.ts; sem JS não aparece). */}
     {rpg && <div class="xp" data-xp aria-hidden="true"><span class="xp-cheio"></span></div>}
@@ -206,16 +204,16 @@ const jsonLd = {
   main[data-tema='rpg'] .caso-frase { color: var(--ink); }
   /* "Em resumo" vira a ficha do personagem: pergaminho com moldura de madeira, texto em tinta. */
   main[data-tema='rpg'] .em-resumo { margin: calc(2 * var(--px)); background: var(--pergaminho); border: 0; border-radius: 0; box-shadow: var(--moldura-pergaminho); color: var(--tinta); }
-  main[data-tema='rpg'] .em-resumo-titulo { font-family: var(--fonte-pixel); font-weight: 700; letter-spacing: 0; color: var(--tinta); text-shadow: none; }
+  main[data-tema='rpg'] .em-resumo-titulo { font-family: var(--fonte-pixel); font-weight: 400; letter-spacing: 0; color: var(--tinta); text-shadow: none; }
   main[data-tema='rpg'] .em-resumo-titulo::before { width: 12px; height: 12px; margin-right: 12px; background: var(--dourado-escuro); box-shadow: 0 0 0 3px var(--tinta); vertical-align: 0.1em; }
   main[data-tema='rpg'] .em-resumo-texto { color: var(--tinta); }
-  main[data-tema='rpg'] .numeros dt { font-family: var(--fonte-corpo); color: var(--dourado-escuro); }
+  main[data-tema='rpg'] .numeros dt { font-family: var(--fonte-corpo); color: #7a5210; /* sobre o pergaminho, acima de 4,5:1 */ }
   main[data-tema='rpg'] .numeros dd, main[data-tema='rpg'] .numeros-fonte { color: var(--tinta-suave); }
   /* Painéis de pedra com a moldura em pixels. */
   main[data-tema='rpg'] .arquitetura,
   main[data-tema='rpg'] .proximo { margin-inline: var(--px); border: 0; border-radius: 0; background: var(--pedra); box-shadow: var(--moldura-pedra); }
   main[data-tema='rpg'] .proximo:hover { background: var(--pedra-clara); }
-  main[data-tema='rpg'] .proximo strong { font-family: var(--fonte-pixel); font-weight: 700; font-stretch: normal; color: var(--signal); }
+  main[data-tema='rpg'] .proximo strong { font-family: var(--fonte-pixel); font-weight: 400; font-stretch: normal; color: var(--signal); }
   main[data-tema='rpg'] .funcs h3 { color: var(--ink); }
   main[data-tema='rpg'] .proximos li::before { height: 6px; width: 6px; margin-top: 0.6em; }
 </style>

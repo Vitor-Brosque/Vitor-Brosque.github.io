@@ -26,8 +26,8 @@ import { spriteInline } from '../../lib/sprite';
   /* Grama do mapa: um tom claro por cima, o verde de base e o contorno escuro, com os cantos recortados. */
   .cena-grama {
     position: absolute; left: 0; right: 0; top: calc(22 * var(--s)); bottom: 0;
-    background: #4f8f45; border-top: var(--s) solid #5ea152;
-    box-shadow: 0 var(--s) 0 #1a1220, calc(-1 * var(--s)) 0 0 #1a1220, var(--s) 0 0 #1a1220, 0 calc(-1 * var(--s)) 0 #1a1220;
+    background: var(--grama); border-top: var(--s) solid var(--grama-clara);
+    box-shadow: 0 var(--s) 0 var(--contorno-arte), calc(-1 * var(--s)) 0 0 var(--contorno-arte), var(--s) 0 0 var(--contorno-arte), 0 calc(-1 * var(--s)) 0 var(--contorno-arte);
   }
   @media (max-width: 639px) { .cena { --s: 4px; } }
   @media (min-width: 900px) { .cena { --s: 6px; } }

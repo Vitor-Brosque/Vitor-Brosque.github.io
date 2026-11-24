@@ -166,7 +166,7 @@ decisoes:
     deixeiDeLado: >-
       XP for everything, which feels motivating and creates the wrong incentive. XP, levels and the map
       are treated as personal taste, not as a proven technique.
-hoje: It works offline, has 2,347 automated tests and is in use on the PC.
+hoje: It works offline, has more than 2,300 automated tests and is in use on the PC.
 proximos:
   - "Turn on HTTPS access over the private network and test on a real iPhone: installing as a PWA, notifications, microphone, offline use and syncing with the PC."
   - Test the AI helpers with a real key.

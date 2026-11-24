@@ -51,9 +51,9 @@ const HOJE = 3;
   .estagio-arte { position: relative; z-index: 1; width: calc(24 * var(--s)); height: calc(24 * var(--s)); }
   .estagio-arte :global(.sprite) { display: block; width: 100%; height: 100%; }
   /* A estrada que liga os estágios, na linha de base dos sprites: de pedra até a Vila, de terra até o Castelo. */
-  .estagio::before { content: ''; position: absolute; top: calc(21 * var(--s)); height: calc(2 * var(--s)); left: calc(12 * var(--s)); right: calc(-1 * var(--vao) - 12 * var(--s)); background: #cdb88f; box-shadow: 0 var(--s) 0 #1a1220, 0 calc(-1 * var(--s)) 0 #1a1220; }
-  .estagio:nth-last-child(2)::before { background: #8c7350; right: calc(-1 * var(--vao)); }
-  .estagio:last-child::before { background: #8c7350; left: 0; right: auto; width: calc(12 * var(--s)); }
+  .estagio::before { content: ''; position: absolute; top: calc(21 * var(--s)); height: calc(2 * var(--s)); left: calc(12 * var(--s)); right: calc(-1 * var(--vao) - 12 * var(--s)); background: var(--estrada-pedra); box-shadow: 0 var(--s) 0 var(--contorno-arte), 0 calc(-1 * var(--s)) 0 var(--contorno-arte); }
+  .estagio:nth-last-child(2)::before { background: var(--terra); right: calc(-1 * var(--vao)); }
+  .estagio:last-child::before { background: var(--terra); left: 0; right: auto; width: calc(12 * var(--s)); }
   .estagio-nome { display: block; font-family: var(--fonte-pixel); font-weight: 400; font-size: 1.05rem; line-height: 1.2; color: var(--ink); }
   .estagio--apagado .estagio-arte { filter: grayscale(1) brightness(0.8); opacity: 0.55; }
   .estagio--apagado .estagio-nome { color: var(--mute); }
@@ -65,14 +65,14 @@ const HOJE = 3;
   .estagio-nota--falta .rotulo { color: var(--mute); }
   .estagio-nota--falta ul { display: grid; gap: 8px; margin: 8px 0 0; padding: 0; list-style: none; }
   .estagio-nota--falta li { display: flex; gap: 10px; }
-  .estagio-nota--falta li::before { content: ''; flex: none; width: 6px; height: 6px; margin-top: 0.62em; background: var(--pedra-clara); box-shadow: 0 0 0 2px #1a1220; }
+  .estagio-nota--falta li::before { content: ''; flex: none; width: 6px; height: 6px; margin-top: 0.62em; background: var(--pedra-clara); box-shadow: 0 0 0 2px var(--contorno-arte); }
 
   @media (max-width: 899px) {
     /* No celular: uma linha por estágio, o sprite à esquerda e a estrada descendo entre eles. */
     .estagios { --s: 3px; grid-template-columns: minmax(0, 1fr); gap: 18px; }
     .estagio { grid-template-columns: calc(24 * var(--s)) minmax(0, 1fr); align-items: start; gap: 14px; }
     .estagio-texto { padding-top: calc(8 * var(--s)); }
-    .estagio::before, .estagio:nth-last-child(2)::before { top: calc(23 * var(--s)); bottom: -18px; left: calc(11 * var(--s)); right: auto; width: calc(2 * var(--s)); height: auto; box-shadow: var(--s) 0 0 #1a1220, calc(-1 * var(--s)) 0 0 #1a1220; }
+    .estagio::before, .estagio:nth-last-child(2)::before { top: calc(23 * var(--s)); bottom: -18px; left: calc(11 * var(--s)); right: auto; width: calc(2 * var(--s)); height: auto; box-shadow: var(--s) 0 0 var(--contorno-arte), calc(-1 * var(--s)) 0 0 var(--contorno-arte); }
     .estagio:last-child::before { display: none; }
   }
 </style>

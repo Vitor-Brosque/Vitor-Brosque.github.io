@@ -339,6 +339,8 @@ function rolagemAndando(rota: Rota): () => void {
   const atualizar = (st: ScrollTrigger) => rota.aplicar(estadoDaRolagem(st.progress, n));
   const mm = gsap.matchMedia();
   mm.add('(min-width: 900px)', () => {
+    // Rota presa: o CSS do tema rpg usa o atributo para saber qual elemento é o quadro da parada ativa.
+    rota.raiz.setAttribute('data-presa', '');
     ScrollTrigger.create({
       trigger: rota.raiz,
       pin: true,
@@ -348,6 +350,7 @@ function rolagemAndando(rota: Rota): () => void {
       onUpdate: atualizar,
     });
     rota.aplicar(estadoDaRolagem(0, n));
+    return () => rota.raiz.removeAttribute('data-presa');
   });
   mm.add('(max-width: 899px)', () => {
     const gatilho = ScrollTrigger.create({

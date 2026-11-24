@@ -63,34 +63,38 @@ const pausar = t(idioma, 'animacoes.pausar');
      (cada desenho repete em 34 ou 17 px, divisores dos 68 px do período da rua; ver estrada-calculo.ts). */
   .estrada--trilha {
     /* A trilha anda de pixel em pixel do jogo (3 px), sem borrar os pontos. */
-    --d: round(var(--desloc), 3px);
-    height: 60px; border-block: 3px solid #0b0c14;
+    --d: var(--desloc);
+    height: 60px; border-block: 3px solid var(--contorno);
     background:
       /* pedrinhas da terra (pontos de 3 px, como as estradas do mapa) */
-      linear-gradient(90deg, #a07d52 3px, transparent 3px) calc(var(--d) + 5px) 21px / 34px 3px repeat-x,
-      linear-gradient(90deg, #a07d52 3px, transparent 3px) calc(var(--d) + 22px) 33px / 34px 3px repeat-x,
-      linear-gradient(90deg, #6f5a3c 3px, transparent 3px) calc(var(--d) + 13px) 27px / 34px 3px repeat-x,
-      linear-gradient(90deg, #cdb88f 3px, transparent 3px) calc(var(--d) + 29px) 24px / 34px 3px repeat-x,
+      linear-gradient(90deg, var(--terra-clara) 3px, transparent 3px) calc(var(--d) + 5px) 21px / 34px 3px repeat-x,
+      linear-gradient(90deg, var(--terra-clara) 3px, transparent 3px) calc(var(--d) + 22px) 33px / 34px 3px repeat-x,
+      linear-gradient(90deg, var(--terra-escura) 3px, transparent 3px) calc(var(--d) + 13px) 27px / 34px 3px repeat-x,
+      linear-gradient(90deg, var(--estrada-pedra) 3px, transparent 3px) calc(var(--d) + 29px) 24px / 34px 3px repeat-x,
       /* tufos de grama clara e escura */
-      linear-gradient(90deg, #5ea152 3px, transparent 3px) calc(var(--d) + 9px) 6px / 34px 3px repeat-x,
-      linear-gradient(90deg, #437d3b 3px, transparent 3px) calc(var(--d) + 26px) 3px / 34px 3px repeat-x,
-      linear-gradient(90deg, #5ea152 3px, transparent 3px) calc(var(--d) + 18px) 45px / 34px 3px repeat-x,
-      linear-gradient(90deg, #437d3b 3px, transparent 3px) calc(var(--d) + 3px) 48px / 34px 3px repeat-x,
-      linear-gradient(90deg, #5ea152 3px, transparent 3px) calc(var(--d) + 31px) 51px / 34px 3px repeat-x,
+      linear-gradient(90deg, var(--grama-clara) 3px, transparent 3px) calc(var(--d) + 9px) 6px / 34px 3px repeat-x,
+      linear-gradient(90deg, var(--grama-escura) 3px, transparent 3px) calc(var(--d) + 26px) 3px / 34px 3px repeat-x,
+      linear-gradient(90deg, var(--grama-clara) 3px, transparent 3px) calc(var(--d) + 18px) 45px / 34px 3px repeat-x,
+      linear-gradient(90deg, var(--grama-escura) 3px, transparent 3px) calc(var(--d) + 3px) 48px / 34px 3px repeat-x,
+      linear-gradient(90deg, var(--grama-clara) 3px, transparent 3px) calc(var(--d) + 31px) 51px / 34px 3px repeat-x,
       /* a trilha, com a borda de grama escura, sobre a grama */
-      linear-gradient(#437d3b 0 0) 0 15px / 100% 3px no-repeat,
-      linear-gradient(#437d3b 0 0) 0 39px / 100% 3px no-repeat,
-      linear-gradient(#8c7350 0 0) 0 18px / 100% 21px no-repeat,
-      #4f8f45;
+      linear-gradient(var(--grama-escura) 0 0) 0 15px / 100% 3px no-repeat,
+      linear-gradient(var(--grama-escura) 0 0) 0 39px / 100% 3px no-repeat,
+      linear-gradient(var(--terra) 0 0) 0 18px / 100% 21px no-repeat,
+      var(--grama);
+  }
+  /* Sem round() no navegador a trilha anda em frações de pixel, mas não some. */
+  @supports (width: round(1px, 3px)) {
+    .estrada--trilha { --d: round(var(--desloc), 3px); }
   }
   .estrada--trilha::after { display: none; }
   .estrada--trilha .estrada-pausa {
-    width: 36px; height: 36px; margin-top: -18px; border: 0; border-radius: 0; background: #2a2e45; color: #ece6d6;
-    box-shadow: 0 -3px 0 #0b0c14, 0 3px 0 #0b0c14, -3px 0 0 #0b0c14, 3px 0 0 #0b0c14, inset 3px 3px 0 #3b4063, inset -3px -3px 0 #1b1e2e;
+    width: 36px; height: 36px; margin-top: -18px; border: 0; border-radius: 0; background: var(--pedra); color: var(--ink);
+    box-shadow: var(--moldura-pedra);
   }
-  .estrada--trilha .estrada-pausa:hover { background: #3b4063; color: #f2c14e; }
-  .estrada--trilha .estrada-pausa:focus-visible { outline: 3px solid #f2c14e; outline-offset: 3px; }
-  .estrada--trilha .estrada-pausa[data-pausada] { background: #f2c14e; color: #2b1d12; box-shadow: 0 -3px 0 #0b0c14, 0 3px 0 #0b0c14, -3px 0 0 #0b0c14, 3px 0 0 #0b0c14, inset 0 -3px 0 #a8741f; }
+  .estrada--trilha .estrada-pausa:hover { background: var(--pedra-clara); color: var(--signal); }
+  .estrada--trilha .estrada-pausa:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
+  .estrada--trilha .estrada-pausa[data-pausada] { background: var(--signal); color: var(--tinta); box-shadow: 0 -3px 0 var(--contorno), 0 3px 0 var(--contorno), -3px 0 0 var(--contorno), 3px 0 0 var(--contorno), inset 0 -3px 0 var(--dourado-escuro); }
 
   @media (prefers-reduced-motion: no-preference) {
     .estrada-carro :global(.carrinho) { animation: quicar-estrada 0.26s steps(2) infinite; }

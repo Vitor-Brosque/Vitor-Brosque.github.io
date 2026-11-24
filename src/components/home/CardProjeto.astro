@@ -61,21 +61,31 @@ const rpg = d.tema === 'rpg';
   /* Tema rpg (Life RPG): moldura em pixels do jogo (contorno com os cantos recortados e o chanfro de pedra),
      cantos retos e o título na Pixelify Sans. As cores são as do jogo ("noite na taverna"). */
   .card--rpg {
-    --px: 3px; overflow: visible; border-color: transparent; border-radius: 0; background: #1b1e2e;
-    box-shadow: 0 calc(-1 * var(--px)) 0 #0b0c14, 0 var(--px) 0 #0b0c14, calc(-1 * var(--px)) 0 0 #0b0c14, var(--px) 0 0 #0b0c14,
-      inset var(--px) var(--px) 0 #3b4063, inset calc(-1 * var(--px)) calc(-1 * var(--px)) 0 #12141f;
+    /* A home fica fora do <main data-tema="rpg">: as cores do jogo vêm declaradas aqui, uma vez. */
+    --px: 3px;
+    --rpg-noite: #12141f;
+    --rpg-noite-2: #1b1e2e;
+    --rpg-pedra: #2a2e45;
+    --rpg-pedra-clara: #3b4063;
+    --rpg-contorno: #0b0c14;
+    --rpg-ouro: #f2c14e;
+    --rpg-moldura: 0 calc(-1 * var(--px)) 0 var(--rpg-contorno), 0 var(--px) 0 var(--rpg-contorno),
+      calc(-1 * var(--px)) 0 0 var(--rpg-contorno), var(--px) 0 0 var(--rpg-contorno);
+    overflow: visible; border-color: transparent; border-radius: 0; background: var(--rpg-noite-2);
+    box-shadow: var(--rpg-moldura), inset var(--px) var(--px) 0 var(--rpg-pedra-clara), inset calc(-1 * var(--px)) calc(-1 * var(--px)) 0 var(--rpg-noite);
   }
   .card--rpg:hover, .card--rpg:focus-within {
-    box-shadow: 0 calc(-1 * var(--px)) 0 #f2c14e, 0 var(--px) 0 #f2c14e, calc(-1 * var(--px)) 0 0 #f2c14e, var(--px) 0 0 #f2c14e,
-      inset var(--px) var(--px) 0 #3b4063, inset calc(-1 * var(--px)) calc(-1 * var(--px)) 0 #12141f;
+    box-shadow: 0 calc(-1 * var(--px)) 0 var(--rpg-ouro), 0 var(--px) 0 var(--rpg-ouro), calc(-1 * var(--px)) 0 0 var(--rpg-ouro), var(--px) 0 0 var(--rpg-ouro),
+      inset var(--px) var(--px) 0 var(--rpg-pedra-clara), inset calc(-1 * var(--px)) calc(-1 * var(--px)) 0 var(--rpg-noite);
   }
   /* A moldura fica por fora (sombras): o cartão mede o mesmo que antes e o resto da home não se mexe. */
-  .card--rpg .card-midia { position: relative; border-bottom: var(--px) solid #0b0c14; background: #12141f; }
+  .card--rpg .card-midia { position: relative; border-bottom: var(--px) solid var(--rpg-contorno); background: var(--rpg-noite); }
   .card--rpg h3 { font-family: 'Pixelify Sans', system-ui, sans-serif; font-weight: 400; font-stretch: normal; letter-spacing: 0; font-variant-ligatures: none; font-size: 1.75rem; line-height: calc(1.45rem * 1.15); /* a mesma altura de linha do título dos outros cartões */ }
-  .card--rpg .card-link:hover { color: #f2c14e; text-decoration: none; }
-  /* A lanterna (16 × 16, em escala 3) no canto de baixo da imagem; a chama alterna os quadros só com movimento permitido. */
+  .card--rpg .card-link:hover { color: var(--rpg-ouro); text-decoration: none; }
+  /* A lanterna (16 × 16, em escala 3) numa plaquinha de pedra no canto de baixo da imagem; a chama alterna os quadros só com movimento permitido. */
   .card-lanterna {
     position: absolute; right: 12px; bottom: 12px; z-index: 1; box-sizing: content-box; width: 48px; height: 48px; padding: 6px;
-    background: #2a2e45; box-shadow: 0 -3px 0 #0b0c14, 0 3px 0 #0b0c14, -3px 0 0 #0b0c14, 3px 0 0 #0b0c14, inset 3px 3px 0 #3b4063, inset -3px -3px 0 #1b1e2e;
+    background: var(--rpg-pedra);
+    box-shadow: var(--rpg-moldura), inset var(--px) var(--px) 0 var(--rpg-pedra-clara), inset calc(-1 * var(--px)) calc(-1 * var(--px)) 0 var(--rpg-noite-2);
   }
 </style>

@@ -1,4 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
+
+/** A Pixelify Sans, no peso 400 (o único usado), já carregou de fato na página. */
+const pixelifyCarregada = (page: Page) =>
+  page.evaluate(async () => {
+    await document.fonts.ready;
+    return document.fonts.check('400 16px "Pixelify Sans"') && [...document.fonts].some((f) => f.family.replace(/"/g, '') === 'Pixelify Sans' && f.status === 'loaded');
+  });
 
 // Tema por projeto: só a página do Life RPG tem a cara do jogo.
 const casos = [
@@ -13,8 +20,11 @@ for (const c of casos) {
     await page.goto(c.caminho);
     await expect(page.locator('main')).toHaveAttribute('data-tema', c.tema);
     const fonte = await page.locator('h1').evaluate((h) => getComputedStyle(h).fontFamily);
-    if (c.tema === 'rpg') expect(fonte).toMatch(/Pixelify Sans/);
-    else expect(fonte).not.toMatch(/Pixelify/);
+    if (c.tema === 'rpg') {
+      expect(fonte).toMatch(/Pixelify Sans/);
+      // A pilha declarada não prova que a fonte chegou: confere que a Pixelify carregou no peso do título (400).
+      await expect.poll(() => pixelifyCarregada(page)).toBe(true);
+    } else expect(fonte).not.toMatch(/Pixelify/);
   });
 }
 
@@ -72,8 +82,13 @@ for (const modo of ['reduce', 'no-preference'] as const) {
               return a.playState === 'running' && alvo?.closest('.lanterna');
             }).length,
         );
-      if (modo === 'no-preference') expect(await chamas()).toBeGreaterThan(0);
-      else expect(await chamas()).toBe(0);
+      const segundoQuadroAVista = () =>
+        page.locator('.lanterna .quadro-2').evaluateAll((qs) => qs.some((q) => getComputedStyle(q).visibility === 'visible'));
+      if (modo === 'no-preference') {
+        expect(await chamas()).toBeGreaterThan(0);
+        // Só prova a volta ao primeiro quadro se o segundo chegou a aparecer antes da pausa.
+        await expect.poll(segundoQuadroAVista, { timeout: 3000, intervals: [50] }).toBe(true);
+      } else expect(await chamas()).toBe(0);
 
       await botao.click();
       await expect(botao).toHaveAttribute('aria-label', 'Continuar animações');
@@ -82,6 +97,7 @@ for (const modo of ['reduce', 'no-preference'] as const) {
       expect(await desloc()).toBe(parada);
       expect(await chamas()).toBe(0);
       // Na pausa a chama volta ao primeiro quadro.
+      expect(await segundoQuadroAVista()).toBe(false);
       const visiveis = await page.locator('.lanterna .quadro').evaluateAll((qs) => qs.map((q) => getComputedStyle(q).visibility));
       expect(visiveis.filter((v, i) => i % 2 === 0).every((v) => v === 'visible')).toBe(true);
       expect(visiveis.filter((v, i) => i % 2 === 1).every((v) => v === 'hidden')).toBe(true);
@@ -94,8 +110,8 @@ for (const modo of ['reduce', 'no-preference'] as const) {
 
 // Estágios do projeto (tema rpg): os cinco estágios de território, Hoje sob a Vila e o que falta sob o Castelo.
 const estagios = [
-  { caminho: '/projetos/life-rpg/', nomes: ['Ruínas', 'Acampamento', 'Aldeia', 'Vila', 'Castelo'], hoje: 'Hoje', falta: 'Falta para o castelo', proximo: /testar no iPhone real/ },
-  { caminho: '/en/projects/life-rpg/', nomes: ['Ruins', 'Camp', 'Village', 'Town', 'Castle'], hoje: 'Today', falta: 'Left before the castle', proximo: /test on a real iPhone/ },
+  { caminho: '/projetos/life-rpg/', nomes: ['Ruínas', 'Acampamento', 'Aldeia', 'Vila', 'Castelo'], hoje: 'Hoje', frase: 'Funciona sem internet, tem mais de 2.300 testes automáticos e está em uso no PC.', falta: 'Falta para o castelo', proximo: /testar no iPhone real/ },
+  { caminho: '/en/projects/life-rpg/', nomes: ['Ruins', 'Camp', 'Village', 'Town', 'Castle'], hoje: 'Today', frase: 'It works offline, has more than 2,300 automated tests and is in use on the PC.', falta: 'Left before the castle', proximo: /test on a real iPhone/ },
 ] as const;
 for (const js of [true, false]) {
   test.describe(js ? 'com JavaScript' : 'sem JavaScript', () => {
@@ -109,7 +125,9 @@ for (const js of [true, false]) {
         const vila = itens.nth(3);
         await expect(vila).toHaveAttribute('aria-current', 'step');
         await expect(vila.locator('.tag')).toHaveText(e.hoje);
-        await expect(vila.locator('.estagio-nota')).toContainText('2');
+        await expect(vila.locator('.estagio-nota p')).toHaveText(e.frase);
+        // Só o Castelo está apagado.
+        expect(await itens.evaluateAll((ls) => ls.map((l) => l.classList.contains('estagio--apagado')))).toEqual([false, false, false, false, true]);
         await expect(vila.locator('.estagio-nota')).toBeVisible();
         const castelo = itens.nth(4);
         await expect(castelo.locator('.rotulo')).toHaveText(e.falta);
@@ -125,6 +143,7 @@ for (const js of [true, false]) {
 test('o RodoviariaOS continua com a lista de próximos passos, sem estágios', async ({ page }) => {
   await page.goto('/projetos/rodoviariaos/');
   await expect(page.locator('.estagios')).toHaveCount(0);
+  expect(await page.locator('.proximos li').count()).toBeGreaterThan(0);
 });
 
 test('na home só o cartão do Life RPG tem a moldura do jogo e a lanterna', async ({ page }) => {
@@ -133,6 +152,8 @@ test('na home só o cartão do Life RPG tem a moldura do jogo e a lanterna', asy
   await expect(cartao).toHaveCount(1);
   await expect(cartao.locator('h3')).toHaveText('Life RPG');
   expect(await cartao.locator('h3').evaluate((h) => getComputedStyle(h).fontFamily)).toMatch(/Pixelify Sans/);
+  await cartao.scrollIntoViewIfNeeded();
+  await expect.poll(() => pixelifyCarregada(page)).toBe(true);
   await expect(cartao.locator('.card-midia .lanterna')).toHaveCount(1);
   await expect(page.locator('.card:not(.card--rpg) .lanterna')).toHaveCount(0);
 });

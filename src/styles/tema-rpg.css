@@ -33,6 +33,19 @@ main[data-tema='rpg'] {
   --dourado-escuro: #a8741f;
   --contorno: #0b0c14;
   --madeira: #3a2614;
+  /* Mundo do jogo (worldSprites.ts): grama, terra, estrada de pedra de uma jornada, marcos, madeira e o contorno da arte. */
+  --grama: #4f8f45;
+  --grama-clara: #5ea152;
+  --grama-escura: #437d3b;
+  --terra: #8c7350;
+  --terra-clara: #a07d52;
+  --terra-escura: #6f5a3c;
+  --estrada-pedra: #cdb88f;
+  --marco-aberto: #3b4063;
+  --marco-feito: #f2c14e;
+  --madeira-escura: #5c3a21;
+  --madeira-clara: #9a6a3c;
+  --contorno-arte: #1a1220;
   --fonte-pixel: 'Pixelify Sans', system-ui, sans-serif;
   --fonte-corpo: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
@@ -72,9 +85,9 @@ main[data-tema='rpg'] :is(h1, h2, h3, .rotulo, .botao, .resumo-titulo) {
   font-stretch: normal;
   letter-spacing: 0;
 }
-main[data-tema='rpg'] :is(h1, h2, h3) { font-weight: 700; line-height: 1.1; }
-/* Peso 700 só nos títulos grandes: em tamanho de texto, a Pixelify em negrito fecha o "c" e o "e" (lê "oelular"). */
-main[data-tema='rpg'] :is(h3, .resumo-titulo, .botao) { font-weight: 400; }
+/* Pixelify sempre no peso normal, como nos títulos do próprio jogo: em negrito ela fecha o "c", o "e" e o "O" (lê "oelular"). */
+main[data-tema='rpg'] :is(h1, h2, h3) { font-weight: 400; line-height: 1.1; }
+main[data-tema='rpg'] :is(.resumo-titulo, .botao) { font-weight: 400; }
 main[data-tema='rpg'] h1 { color: var(--signal); text-shadow: var(--px) var(--px) 0 var(--contorno); }
 main[data-tema='rpg'] h2 { color: var(--signal); text-shadow: var(--px) var(--px) 0 var(--contorno); }
 main[data-tema='rpg'] .rotulo { font-size: 0.85rem; font-weight: 400; letter-spacing: 0.04em; }
