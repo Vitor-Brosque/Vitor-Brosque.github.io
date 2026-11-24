@@ -52,6 +52,12 @@ code { font-family: var(--fonte-mono); font-size: 0.86em; background: var(--surf
   *, *::before, *::after { scroll-behavior: auto !important; }
 }
 
+/* Pausa da página (botões da estrada e da rota): para também os loops feitos em CSS.
+   As entradas ficam de fora: elas terminam sozinhas e não podem travar pela metade. */
+html[data-pausado] *:not([data-entrada], [data-hero-titulo], .hero-visual),
+html[data-pausado] *::before,
+html[data-pausado] *::after { animation-play-state: paused !important; }
+
 @media (prefers-reduced-motion: no-preference) {
   .js [data-hero-titulo] { visibility: hidden; animation: hero-titulo-seguranca 0s linear 2.5s forwards; }
   @keyframes hero-titulo-seguranca { to { visibility: visible; } }

@@ -20,6 +20,8 @@ export function aoMudarPausa(f: Ouvinte): () => void {
 }
 
 function mostrar() {
+  // O CSS usa este atributo para parar também os loops feitos em CSS (ver global.css).
+  document.documentElement.toggleAttribute('data-pausado', pausado);
   for (const b of botoes) {
     const texto = (pausado ? b.dataset.continuar : b.dataset.pausar) ?? '';
     // O botão só com ícone troca o aria-label; o outro, o texto. Sem aria-pressed: o leitor de tela diria "Continuar, pressionado".
@@ -47,6 +49,7 @@ aoCarregarPagina(() => {
     botoes.forEach((b) => b.removeEventListener('click', alternar));
     botoes = [];
     pausado = false;
+    document.documentElement.removeAttribute('data-pausado');
     ouvintes.clear();
   };
 });
