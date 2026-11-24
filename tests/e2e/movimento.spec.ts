@@ -1,4 +1,29 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
+
+/**
+ * Espera, dentro da página e a cada quadro, a rota ficar "andando" (o carro entre duas placas). O trecho dura 0,6 s, e
+ * uma checagem feita de fora, que espaça para 1 s entre tentativas, pode passar por ele sem ver. Com `clicar`, clica
+ * nesse botão (seletor no documento) no mesmo quadro, para a ação pegar o carro de fato em movimento.
+ */
+async function esperarAndando(rota: Locator, clicar = '', limite = 25_000) {
+  const viu = await rota.evaluate(
+    (el, [clicar, limite]) =>
+      new Promise<boolean>((ok) => {
+        const t0 = performance.now();
+        const ver = () => {
+          if (el.hasAttribute('data-andando')) {
+            if (clicar) (document.querySelector(clicar) as HTMLElement).click();
+            return ok(true);
+          }
+          if (performance.now() - t0 > limite) return ok(false);
+          requestAnimationFrame(ver);
+        };
+        ver();
+      }),
+    [clicar, limite] as const,
+  );
+  expect(viu, 'a rota não ficou andando a tempo').toBe(true);
+}
 
 async function rolarAteOFim(page: Page, passo = 500, aCada?: () => Promise<void>) {
   for (;;) {
@@ -291,8 +316,7 @@ test.describe('com movimento permitido', () => {
     const pausa = rota.locator('[data-rota-pausa]');
     await expect(pausa).toHaveText('Pausar');
     // O caso difícil: pausar com o carro andando entre duas placas.
-    await expect(rota).toHaveAttribute('data-andando', '', { timeout: 25_000 });
-    await pausa.click();
+    await esperarAndando(rota, '#projetos [data-rota] [data-rota-pausa]');
     await expect(pausa).toHaveText('Continuar');
     await expect(rota).not.toHaveAttribute('data-andando');
     await expect.poll(rodando, { timeout: 3000 }).toEqual([]);
@@ -401,7 +425,7 @@ test.describe('com movimento permitido', () => {
       const andando = () => rota.evaluate((el) => el.hasAttribute('data-andando'));
       // Espera a entrada acabar, o carro parar na primeira placa e sair para o próximo trecho.
       await expect.poll(andando, { timeout: 15_000 }).toBe(false);
-      await expect.poll(andando, { timeout: 15_000 }).toBe(true);
+      await esperarAndando(rota);
       const caixa = (await rota.locator('.vitrine').boundingBox())!;
       await page.mouse.move(caixa.x + caixa.width / 2, caixa.y + caixa.height / 2);
       await expect.poll(andando, { timeout: 5000 }).toBe(false);
@@ -512,9 +536,8 @@ for (const modo of ['reduce', 'no-preference'] as const) {
       await expect.poll(() => desloc(page)).not.toBe('');
       // A rota precisa estar rodando de verdade antes da pausa: sem isso, "o carro parou" não provaria nada.
       await rota.scrollIntoViewIfNeeded();
-      await expect(rota).toHaveAttribute('data-andando', '', { timeout: 25_000 });
-      // O botão da estrada ficou fora da tela: o clique vai por script.
-      await botaoEstrada.evaluate((b) => (b as HTMLButtonElement).click());
+      // O botão da estrada ficou fora da tela: o clique vai por script, no mesmo quadro em que o carro anda.
+      await esperarAndando(rota, '[data-estrada-pausa]');
       await expect(botaoEstrada).toHaveAttribute('aria-label', 'Continuar animações');
       await expect(rota).not.toHaveAttribute('data-andando');
       const carroNaPausa = await pos(page);
