@@ -3,14 +3,15 @@ import CarrinhoPixel from './CarrinhoPixel.astro';
 import { t, type Idioma, type Tema } from '../i18n/ui';
 interface Props { carro?: boolean; idioma?: Idioma; tema?: Tema }
 const { carro = false, idioma = 'pt', tema = 'rodovia' } = Astro.props;
-// No tema rpg a pista vira a trilha de terra do mapa do jogo. Ela tem o botão de pausa: a chama da lanterna fica em loop nessa página.
-const trilha = tema === 'rpg';
-const comPausa = carro || trilha;
+// Cada tema próprio troca a pista: a trilha de terra do mapa do jogo (rpg) ou o duto com os pacotes de dados (terminal).
+// Essas páginas têm loops próprios (a chama, o cursor), por isso a faixa delas leva o botão de pausa.
+const variante = { rodovia: null, rpg: 'trilha', terminal: 'duto' }[tema];
+const comPausa = carro || variante !== null;
 // Nome próprio para este botão: o da rota já se chama "Pausar", e dois botões com o mesmo nome confundem no leitor de tela.
 const pausar = t(idioma, 'animacoes.pausar');
 ---
 {/* A pista é decorativa (aria-hidden); na estrada com botão de pausa ele fica fora da parte escondida do leitor de tela. */}
-<div class:list={['estrada', { 'estrada--carro': carro, 'estrada--trilha': trilha }]} data-estrada aria-hidden={comPausa ? undefined : 'true'}>
+<div class:list={['estrada', { 'estrada--carro': carro }, variante && `estrada--${variante}`]} data-estrada aria-hidden={comPausa ? undefined : 'true'}>
   {carro && <div class="estrada-carro" aria-hidden="true"><CarrinhoPixel /></div>}
   {comPausa && (
     <button type="button" class="estrada-pausa" data-estrada-pausa data-pausar={pausar} data-continuar={t(idioma, 'animacoes.continuar')} aria-label={pausar}>
@@ -95,6 +96,26 @@ const pausar = t(idioma, 'animacoes.pausar');
   .estrada--trilha .estrada-pausa:hover { background: var(--pedra-clara); color: var(--signal); }
   .estrada--trilha .estrada-pausa:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
   .estrada--trilha .estrada-pausa[data-pausada] { background: var(--signal); color: var(--tinta); box-shadow: 0 -3px 0 var(--contorno), 0 3px 0 var(--contorno), -3px 0 0 var(--contorno), 3px 0 0 var(--contorno), inset 0 -3px 0 var(--dourado-escuro); }
+
+  /* Duto do tema terminal: um tubo fino com pacotes de dados correndo com o mesmo --desloc. O desenho só pode repetir a
+     cada 68 px (o período da rua), por isso o âmbar é um pacote curto entre três verdes. */
+  .estrada--duto {
+    height: 44px; border-block: 1px solid var(--line);
+    background:
+      linear-gradient(90deg, var(--verde) 12px, transparent 12px) calc(var(--desloc) + 4px) 18px / 68px 6px repeat-x,
+      linear-gradient(90deg, var(--verde) 6px, transparent 6px) calc(var(--desloc) + 24px) 18px / 68px 6px repeat-x,
+      linear-gradient(90deg, var(--verde) 9px, transparent 9px) calc(var(--desloc) + 38px) 18px / 68px 6px repeat-x,
+      linear-gradient(90deg, var(--ambar) 4px, transparent 4px) calc(var(--desloc) + 56px) 18px / 68px 6px repeat-x,
+      linear-gradient(var(--line-2) 0 0) 0 11px / 100% 1px no-repeat,
+      linear-gradient(var(--line-2) 0 0) 0 30px / 100% 1px no-repeat,
+      linear-gradient(var(--bg-2) 0 0) 0 12px / 100% 18px no-repeat,
+      var(--bg);
+  }
+  .estrada--duto::after { display: none; }
+  .estrada--duto .estrada-pausa { width: 30px; height: 30px; margin-top: -15px; border: 1px solid var(--line-2); border-radius: var(--raio); background: var(--bg); color: var(--ink-2); }
+  .estrada--duto .estrada-pausa:hover { border-color: var(--verde); color: var(--verde); }
+  .estrada--duto .estrada-pausa:focus-visible { outline: 2px solid var(--verde); outline-offset: 2px; }
+  .estrada--duto .estrada-pausa[data-pausada] { border-color: var(--verde); background: var(--verde-fundo); color: var(--verde); }
 
   @media (prefers-reduced-motion: no-preference) {
     .estrada-carro :global(.carrinho) { animation: quicar-estrada 0.26s steps(2) infinite; }

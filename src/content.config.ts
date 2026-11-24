@@ -52,6 +52,8 @@ const projetos = defineCollection({
       cartao: z.enum(['capa', 'rota']).default('capa'),
       /** Cara da página: `rodovia` (asfalto, placas de KM e o carrinho), `rpg` (a cara do jogo, no Life RPG) ou `terminal` (o pipeline rodando, no TechNews). */
       tema: z.enum(['rodovia', 'rpg', 'terminal']).default('rodovia'),
+      /** Tema terminal: o log que aparece no cabeçalho, linha a linha (`$ ...` é comando; o resto, linhas no formato real do log). */
+      logDoTopo: z.array(z.string()).optional(),
       capa: midia(image).optional(),
       emResumo: z.string(),
       resumo: z.object({ problema: z.string(), construi: z.string(), orgulho: z.string() }),

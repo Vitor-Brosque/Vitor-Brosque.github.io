@@ -10,6 +10,13 @@ links:
   codigo: https://github.com/Vitor-Brosque/TechNews
 cartao: rota
 tema: terminal
+logDoTopo:
+  - "$ python scr/main.py"
+  - "$ tail technews.log"
+  - "2026-11-23 10:12:04,518 | WARNING | SEM_URL_OU_TITULO | ID = 46012907"
+  - "2026-11-23 10:12:09,131 | INFO | EXTRACAO_OK | ID = 46013377"
+  - "2026-11-23 10:12:11,870 | WARNING | FALHA_DOWNLOAD | ID=46013412 | URL=https://…"
+  - "2026-11-23 10:13:40,002 | INFO | RESUMO_INGESTAO | INSERIDAS=… | DUPLICADAS=… | REJEITADAS=…"
 emResumo: >-
   A Python pipeline that fetches the previous day's stories from Hacker News, drops anything
   incomplete or repeated, extracts the text of the original page and stores it in PostgreSQL

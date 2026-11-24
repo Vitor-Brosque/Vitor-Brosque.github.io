@@ -7,6 +7,7 @@ import Decisao from '../components/Decisao.astro';
 import MapaArquitetura from '../components/MapaArquitetura.tsx';
 import CenaRpg from '../components/rpg/CenaRpg.astro';
 import Estagios from '../components/rpg/Estagios.astro';
+import LogTerminal from '../components/terminal/LogTerminal.astro';
 import type { Projeto } from '../lib/projetos';
 import { slugDe } from '../lib/projetos-puro';
 import { paragrafos, textoRico } from '../lib/texto';
@@ -50,6 +51,7 @@ const jsonLd = {
       <p class="rotulo rotulo--sinal" data-entrada style="--ordem: 0">{d.statusTexto}</p>
       <h1 transition:name={`titulo-${slug}`}>{d.titulo}</h1>
       {rpg && <div class="caso-cena" data-entrada style="--ordem: 1"><CenaRpg /></div>}
+      {terminal && d.logDoTopo && <div class="caso-log" data-entrada style="--ordem: 1"><LogTerminal idioma={idioma} linhas={d.logDoTopo} /></div>}
       <p class="caso-frase" data-entrada style="--ordem: 2">{d.frase}</p>
       <dl class="ficha" data-entrada style="--ordem: 3">
         <div><dt class="rotulo">{t(idioma, 'caso.papel')}</dt><dd>{d.papel}</dd></div>
@@ -243,5 +245,13 @@ const jsonLd = {
   main[data-tema='terminal'] .numeros-fonte { color: var(--mute); }
   main[data-tema='terminal'] .proximo { border-radius: var(--raio); }
   main[data-tema='terminal'] .proximo strong { font-family: var(--fonte-mono); font-weight: 700; font-stretch: normal; letter-spacing: -0.03em; }
+  /* O log do pipeline: ao lado do título no desktop largo (o cabeçalho vira duas colunas), logo abaixo dele no resto. */
+  .caso-log { margin-top: 20px; }
+  @media (min-width: 1100px) {
+    main[data-tema='terminal'] .caso-topo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 470px); column-gap: 48px; align-items: start; }
+    main[data-tema='terminal'] .caso-topo > * { grid-column: 1; }
+    main[data-tema='terminal'] .caso-topo > .voltar { justify-self: start; }
+    main[data-tema='terminal'] .caso-topo > .caso-log { grid-column: 2; grid-row: 1 / span 7; margin-top: 8px; }
+  }
 </style>
 <script>import '../scripts/leitura';</script>

@@ -80,7 +80,7 @@ const painelVisivel = (page: Page, seletor: string) =>
 test.describe('com movimento reduzido', () => {
   test.use({ reducedMotion: 'reduce' });
 
-  for (const caminho of ['/', '/projetos/rodoviariaos/', '/projetos/life-rpg/']) {
+  for (const caminho of ['/', '/projetos/rodoviariaos/', '/projetos/life-rpg/', '/projetos/technews/']) {
     test(`${caminho}: nada desliza e nada fica em loop`, async ({ page }) => {
       await page.goto(caminho);
       const ruins = new Set<string>();

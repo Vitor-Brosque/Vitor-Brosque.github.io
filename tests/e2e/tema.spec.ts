@@ -204,3 +204,86 @@ test.describe('rota com movimento reduzido', () => {
     await expect(rota.locator('.carro')).toBeHidden();
   });
 });
+
+// Tema terminal: o log do pipeline no cabeçalho, no formato real do TechNews.
+const logDoTopo = [
+  '$ python scr/main.py',
+  '$ tail technews.log',
+  '2026-11-23 10:12:04,518 | WARNING | SEM_URL_OU_TITULO | ID = 46012907',
+  '2026-11-23 10:12:09,131 | INFO | EXTRACAO_OK | ID = 46013377',
+  '2026-11-23 10:12:11,870 | WARNING | FALHA_DOWNLOAD | ID=46013412 | URL=https://…',
+  '2026-11-23 10:13:40,002 | INFO | RESUMO_INGESTAO | INSERIDAS=… | DUPLICADAS=… | REJEITADAS=…',
+];
+for (const js of [true, false]) {
+  test.describe(js ? 'log do topo, com JavaScript' : 'log do topo, sem JavaScript', () => {
+    test.use({ javaScriptEnabled: js, reducedMotion: 'reduce' });
+    for (const [caminho, legenda] of [
+      ['/projetos/technews/', 'Formato real do log do projeto. IDs e horários de exemplo.'],
+      ['/en/projects/technews/', "The project's real log format. Sample IDs and times."],
+    ] as const) {
+      test(`${caminho}: as seis linhas na ordem, com os níveis coloridos e a legenda`, async ({ page }) => {
+        await page.goto(caminho);
+        const janela = page.locator('.log-janela');
+        await expect(janela).toBeVisible();
+        await expect(janela).toHaveAttribute('aria-label', /technews\.log/);
+        await expect(janela.locator('.log-linha')).toHaveText(logDoTopo);
+        await expect(janela.locator('.log-nivel')).toHaveText(['WARNING', 'INFO', 'WARNING', 'INFO']);
+        const cores = await janela.locator('.log-nivel').evaluateAll((ns) => ns.map((n) => getComputedStyle(n).color));
+        expect(cores[0]).toBe(cores[2]);
+        expect(cores[1]).toBe(cores[3]);
+        expect(cores[0]).not.toBe(cores[1]);
+        await expect(janela.locator('figcaption')).toHaveText(legenda);
+        // Nada de rolagem horizontal: as linhas quebram dentro da janela.
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+      });
+    }
+  });
+}
+test('as outras páginas não têm o log do topo', async ({ page }) => {
+  await page.goto('/projetos/rodoviariaos/');
+  await expect(page.locator('.log-janela')).toHaveCount(0);
+  await page.goto('/projetos/life-rpg/');
+  await expect(page.locator('.log-janela')).toHaveCount(0);
+});
+
+for (const modo of ['reduce', 'no-preference'] as const) {
+  test.describe(`pausa no TechNews (${modo === 'reduce' ? 'movimento reduzido' : 'movimento permitido'})`, () => {
+    test.use({ reducedMotion: modo });
+
+    test('o botão do duto para os pacotes e o cursor piscando, que fica aceso', async ({ page }) => {
+      await page.goto('/projetos/technews/');
+      const duto = page.locator('[data-estrada]');
+      const botao = page.locator('[data-estrada-pausa]');
+      const desloc = () => duto.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--desloc'));
+      const piscando = () =>
+        page.evaluate(
+          () =>
+            document.getAnimations().filter((a) => {
+              const alvo = (a.effect as KeyframeEffect | null)?.target as Element | null;
+              return a.playState === 'running' && alvo?.matches('.cursor-bloco, .cursor-rota');
+            }).length,
+        );
+      const cursoresApagados = () =>
+        page.locator('.cursor-bloco, .cursor-rota').evaluateAll((cs) => cs.filter((c) => getComputedStyle(c).opacity !== '1').length);
+      // Antes da pausa: os pacotes andam e, com movimento, o cursor chega a apagar ao piscar.
+      await duto.scrollIntoViewIfNeeded();
+      await expect.poll(desloc).not.toBe('');
+      const antes = await desloc();
+      await expect.poll(desloc, { timeout: 3000 }).not.toBe(antes);
+      if (modo === 'no-preference') {
+        await expect.poll(piscando, { timeout: 5000 }).toBeGreaterThan(0);
+        await expect.poll(cursoresApagados, { timeout: 3000, intervals: [50] }).toBeGreaterThan(0);
+      } else expect(await piscando()).toBe(0);
+
+      await botao.click();
+      await expect(botao).toHaveAttribute('aria-label', 'Continuar animações');
+      const parada = await desloc();
+      await page.waitForTimeout(800);
+      expect(await desloc()).toBe(parada);
+      expect(await piscando()).toBe(0);
+      expect(await cursoresApagados()).toBe(0);
+      await botao.click();
+      await expect.poll(desloc, { timeout: 3000 }).not.toBe(parada);
+    });
+  });
+}

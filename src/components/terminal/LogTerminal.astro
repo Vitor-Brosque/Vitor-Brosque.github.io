@@ -1,0 +1,49 @@
+---
+import { partesDoLog } from '../../lib/log';
+import { t, type Idioma } from '../../i18n/ui';
+
+/**
+ * Janela de terminal com o log do pipeline (tema terminal, no cabeçalho do TechNews). É conteúdo: texto selecionável,
+ * um bloco de código com rótulo para o leitor de tela. O nível de cada linha ganha a cor (INFO verde, WARNING âmbar,
+ * ERROR vermelho claro). Com movimento permitido as linhas entram uma a uma, uma vez só (CSS, sem script), e o cursor
+ * pisca no fim; com movimento reduzido e na pausa o log aparece inteiro e o cursor fica aceso.
+ */
+interface Props { idioma: Idioma; linhas: string[]; arquivo?: string }
+const { idioma, linhas, arquivo = 'technews.log' } = Astro.props;
+const partes = linhas.map(partesDoLog);
+---
+<figure class="log-janela" aria-label={t(idioma, 'terminal.logRotulo')} style={`--n: ${partes.length}`}>
+  <div class="janela-barra" aria-hidden="true"><i></i><i></i><i></i><span>{arquivo}</span></div>
+  <pre class="log"><code>{partes.map((p, i) => (
+    <span class="log-linha" style={`--i: ${i}`}>{
+      p.tipo === 'comando' ? <><span class="log-prompt" aria-hidden="true">$ </span>{p.comando}</>
+      : p.tipo === 'log' ? <>{p.data && <span class="log-data">{p.data} | </span>}<span class:list={['log-nivel', `log-nivel--${p.nivel.toLowerCase()}`]}>{p.nivel}</span> | {p.mensagem}</>
+      : p.texto
+    }{i === partes.length - 1 && <span class="cursor-bloco" aria-hidden="true"></span>}</span>
+  ))}</code></pre>
+  <figcaption class="log-legenda">{t(idioma, 'terminal.logLegenda')}</figcaption>
+</figure>
+<style>
+  .log-janela { margin: 0; background: var(--bg-2); border: 1px solid var(--line-2); border-radius: var(--raio); overflow: hidden; }
+  .log { margin: 0; padding: 14px 16px 16px; font: 400 0.8rem/1.65 var(--fonte-mono); color: var(--ink); white-space: normal; }
+  .log code { all: unset; display: block; }
+  /* Linha longa quebra dentro da janela (com recuo nas continuações), sem rolagem horizontal. */
+  .log-linha { display: block; padding-left: 2ch; text-indent: -2ch; overflow-wrap: anywhere; }
+  .log-prompt { color: var(--verde); }
+  .log-data { color: var(--mute); }
+  .log-nivel--info { color: var(--verde); }
+  .log-nivel--warning { color: var(--ambar); }
+  .log-nivel--error { color: var(--vermelho); }
+  .cursor-bloco { display: inline-block; width: 0.62em; height: 1.1em; margin-left: 0.35ch; vertical-align: -0.2em; background: var(--verde); }
+  .log-legenda { padding: 9px 16px 10px; border-top: 1px solid var(--line); font: 400 0.75rem/1.4 var(--fonte-mono); color: var(--mute); }
+  @media (prefers-reduced-motion: no-preference) {
+    /* As linhas entram uma a uma, uma vez só; o cursor começa a piscar quando a última chega. */
+    .log-linha { animation: log-linha 0s steps(1) both; animation-delay: calc(0.35s + var(--i) * 0.38s); }
+    .cursor-bloco { animation: cursor-piscar 1.06s steps(1) calc(0.35s + var(--n) * 0.38s) infinite; }
+    @keyframes log-linha { from { visibility: hidden; } }
+    @keyframes cursor-piscar { 50% { opacity: 0; } }
+    /* Na pausa da página o log fica inteiro e o cursor aceso (a regra geral só congelaria onde estavam). */
+    :global(html[data-pausado]) .log-linha,
+    :global(html[data-pausado]) .cursor-bloco { animation: none; }
+  }
+</style>
