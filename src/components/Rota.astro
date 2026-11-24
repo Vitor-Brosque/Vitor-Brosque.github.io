@@ -428,7 +428,7 @@ const vitrine = modo === 'loop' && !compacta;
   @media (max-width: 899px) {
     .rota--terminal[data-modo='rolagem'] .asfalto::before { background: var(--line-2); left: 50%; width: 2px; margin: 0 0 0 -1px; animation: none; }
     .rota--terminal[data-modo='rolagem'] .asfalto::after { width: 2px; margin: 0 0 0 -1px; }
-    .rota--terminal .marco { left: 50%; top: calc(var(--c) * 100%); }
+    .rota--terminal[data-modo='rolagem'] .marco { left: 50%; top: calc(var(--c) * 100%); }
     .rota--terminal[data-modo='rolagem'] .carro { rotate: none; width: 14px; height: 26px; translate: -50% -50%; }
   }
   /* O quadro da etapa é o item inteiro no celular e sem JS (sem rota presa): caixa de 1 px, a ativa em verde, sem brilho. */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { idiomaDe, ordenarPorOrdem, proximoDaLista, slugDe } from '../../src/lib/projetos-puro';
+import { idiomaDe, ordenarPorOrdem, outrosDaLista, slugDe } from '../../src/lib/projetos-puro';
 
 describe('slugDe / idiomaDe', () => {
   it('extrai slug e idioma do id da entrada', () => {
@@ -17,12 +17,13 @@ describe('ordenarPorOrdem', () => {
   });
 });
 
-describe('proximoDaLista', () => {
-  it('avança e volta ao início', () => {
-    expect(proximoDaLista(['a', 'b', 'c'], 0)).toBe('b');
-    expect(proximoDaLista(['a', 'b', 'c'], 2)).toBe('a');
+describe('outrosDaLista', () => {
+  it('traz os outros, na ordem, a partir do seguinte ao atual', () => {
+    expect(outrosDaLista(['a', 'b', 'c'], 0)).toEqual(['b', 'c']);
+    expect(outrosDaLista(['a', 'b', 'c'], 1)).toEqual(['c', 'a']);
+    expect(outrosDaLista(['a', 'b', 'c'], 2)).toEqual(['a', 'b']);
   });
-  it('falha com lista vazia', () => {
-    expect(() => proximoDaLista([], 0)).toThrow('lista vazia');
+  it('com um item só não há outros', () => {
+    expect(outrosDaLista(['a'], 0)).toEqual([]);
   });
 });

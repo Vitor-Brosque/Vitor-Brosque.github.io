@@ -4,15 +4,22 @@ import type { Projeto } from '../../lib/projetos';
 import { textosHome } from '../../i18n/home';
 import type { Idioma } from '../../i18n/ui';
 
-interface Props { idioma: Idioma; projetos: Projeto[] }
-const { idioma, projetos } = Astro.props;
+interface Props {
+  idioma: Idioma;
+  projetos: Projeto[];
+  /** No fim do estudo de caso a seção é a navegação para os outros projetos (`<nav>`); na home, uma seção. */
+  navegacao?: boolean;
+}
+const { idioma, projetos, navegacao = false } = Astro.props;
+const Tag = navegacao ? 'nav' : 'section';
 ---
-<section class="secao wrap" aria-labelledby="outros-titulo">
+<Tag class="secao wrap outros" aria-labelledby="outros-titulo">
   <h2 id="outros-titulo" class="revelar">{textosHome[idioma].outros.titulo}</h2>
   <div class="cards">
-    {projetos.map((p, i) => <CardProjeto projeto={p} numero={i + 2} idioma={idioma} />)}
+    {/* O número do cartão é o lugar do projeto na lista (o campo ordem), o mesmo na home e no fim dos estudos de caso. */}
+    {projetos.map((p) => <CardProjeto projeto={p} numero={p.data.ordem} idioma={idioma} />)}
   </div>
-</section>
+</Tag>
 <style>
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 18px; margin-top: 24px; }
 </style>

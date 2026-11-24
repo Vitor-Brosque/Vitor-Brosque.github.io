@@ -36,6 +36,14 @@ const rpg = d.tema === 'rpg';
 </article>
 <style>
   /* A transição repete a da revelação (.revelar), que esta regra sobrescreve: fade e, com movimento, subida. */
+  /* O cartão padrão declara as cores da rodovia (as mesmas de tokens.css): ele leva a cara do próprio projeto e não
+     herda as cores redefinidas pelo tema da página onde aparece (o fim dos estudos de caso). Na home nada muda. */
+  .card {
+    --bg: #111513; --bg-2: #171c19; --surface: #1e2522; --line: #26302b; --line-2: #34403b;
+    --ink: #ecefea; --ink-2: #c9d2ce; --mute: #9aa6a0; --signal: #f5b800; --ok: #2e9e5b;
+    --asfalto: #0c0f0e; --signal-fundo: #262410; --signal-hover: #ffcb2e; --raio: 10px;
+    color: var(--ink);
+  }
   .card { position: relative; display: flex; flex-direction: column; background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--raio); overflow: hidden; transition: border-color 0.25s, box-shadow 0.25s, opacity 0.7s var(--ease), translate 0.5s var(--ease), scale 0.8s var(--ease); transition-delay: calc(var(--ordem, 0) * 70ms); }
   .card:hover, .card:focus-within { border-color: var(--signal); box-shadow: 0 18px 40px -24px rgb(245 184 0 / 0.35); }
   .card-mais { transition: color 0.2s; }

@@ -8,6 +8,7 @@ import MapaArquitetura from '../components/MapaArquitetura.tsx';
 import CenaRpg from '../components/rpg/CenaRpg.astro';
 import Estagios from '../components/rpg/Estagios.astro';
 import LogTerminal from '../components/terminal/LogTerminal.astro';
+import OutrosProjetos from '../components/home/OutrosProjetos.astro';
 import { ARQUIVO_DO_LOG } from '../lib/log';
 import type { Projeto } from '../lib/projetos';
 import { slugDe } from '../lib/projetos-puro';
@@ -20,8 +21,8 @@ import '../styles/tema-terminal.css';
 import mono400 from '@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2?url';
 import mono700 from '@fontsource/jetbrains-mono/files/jetbrains-mono-latin-700-normal.woff2?url';
 
-interface Props { projeto: Projeto; proximo: Projeto; idioma: Idioma }
-const { projeto, proximo, idioma } = Astro.props;
+interface Props { projeto: Projeto; outros: Projeto[]; idioma: Idioma }
+const { projeto, outros, idioma } = Astro.props;
 const d = projeto.data;
 const slug = slugDe(projeto.id);
 // Capa com moldura de navegador: recorte 16/10 para não ficar altíssima com prints em retrato.
@@ -151,14 +152,9 @@ const jsonLd = {
       </section>
     )}
 
-    <nav class="secao wrap revelar" aria-label={t(idioma, 'caso.proximoProjeto')}>
-      <a class="proximo" href={urlDoProjeto(idioma, slugDe(proximo.id))}>
-        <span class="rotulo">{t(idioma, 'caso.proximoProjeto')} →</span>
-        <strong>{proximo.data.titulo}</strong>
-        <span class="proximo-frase">{proximo.data.frase}</span>
-      </a>
-    </nav>
   </main>
+  {/* Os outros dois projetos, cada um com a própria cara (fora do <main>: o cartão não herda o tema desta página). */}
+  <OutrosProjetos idioma={idioma} projetos={outros} navegacao />
 </Base>
 <style>
   .caso-topo { padding-top: clamp(28px, 5vw, 56px); }
@@ -195,10 +191,6 @@ const jsonLd = {
   .proximos { display: grid; gap: 10px; margin: 20px 0 0; padding: 0; list-style: none; color: var(--ink-2); }
   .proximos li { display: flex; gap: 12px; }
   .proximos li::before { content: ''; flex: none; width: 16px; height: 3px; margin-top: 0.75em; background: var(--signal); }
-  .proximo { display: grid; gap: 6px; padding: clamp(22px, 4vw, 36px); background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; text-decoration: none; transition: border-color 0.25s; }
-  .proximo:hover { border-color: var(--signal); }
-  .proximo strong { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 850; font-stretch: 125%; }
-  .proximo-frase { color: var(--ink-2); }
   @media (max-width: 639px) { .ficha { grid-template-columns: minmax(0, 1fr); } }
 
   /* Barra de leitura dos temas próprios: blocos de --bloco px (com --vao de folga) em --leitura-cor sobre --leitura-trilho.
@@ -230,10 +222,7 @@ const jsonLd = {
   main[data-tema='rpg'] .numeros dt { font-family: var(--fonte-corpo); color: #7a5210; /* sobre o pergaminho, acima de 4,5:1 */ }
   main[data-tema='rpg'] .numeros dd, main[data-tema='rpg'] .numeros-fonte { color: var(--tinta-suave); }
   /* Painéis de pedra com a moldura em pixels. */
-  main[data-tema='rpg'] .arquitetura,
-  main[data-tema='rpg'] .proximo { margin-inline: var(--px); border: 0; border-radius: 0; background: var(--pedra); box-shadow: var(--moldura-pedra); }
-  main[data-tema='rpg'] .proximo:hover { background: var(--pedra-clara); }
-  main[data-tema='rpg'] .proximo strong { font-family: var(--fonte-pixel); font-weight: 400; font-stretch: normal; color: var(--signal); }
+  main[data-tema='rpg'] .arquitetura { margin-inline: var(--px); border: 0; border-radius: 0; background: var(--pedra); box-shadow: var(--moldura-pedra); }
   main[data-tema='rpg'] .funcs h3 { color: var(--ink); }
   main[data-tema='rpg'] .proximos li::before { height: 6px; width: 6px; margin-top: 0.6em; }
 
@@ -246,8 +235,6 @@ const jsonLd = {
   main[data-tema='terminal'] .numeros { gap: 14px 24px; padding-top: 18px; border-top: 1px dashed var(--line-2); }
   main[data-tema='terminal'] .numeros dt { font-family: var(--fonte-mono); font-weight: 700; font-stretch: normal; letter-spacing: -0.03em; color: var(--verde); }
   main[data-tema='terminal'] .numeros-fonte { color: var(--mute); }
-  main[data-tema='terminal'] .proximo { border-radius: var(--raio); }
-  main[data-tema='terminal'] .proximo strong { font-family: var(--fonte-mono); font-weight: 700; font-stretch: normal; letter-spacing: -0.03em; }
   /* O log do pipeline: ao lado do título no desktop largo (o cabeçalho vira duas colunas), logo abaixo dele no resto. */
   .caso-log { margin-top: 20px; }
   @media (min-width: 1100px) {

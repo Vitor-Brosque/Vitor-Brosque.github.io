@@ -1,15 +1,15 @@
 ---
 import EstudoDeCaso from '../../../layouts/EstudoDeCaso.astro';
 import { projetosDoIdioma } from '../../../lib/projetos';
-import { proximoDaLista, slugDe } from '../../../lib/projetos-puro';
+import { outrosDaLista, slugDe } from '../../../lib/projetos-puro';
 
 export async function getStaticPaths() {
   const lista = await projetosDoIdioma('en');
   return lista.map((projeto, i) => ({
     params: { slug: slugDe(projeto.id) },
-    props: { projeto, proximo: proximoDaLista(lista, i) },
+    props: { projeto, outros: outrosDaLista(lista, i) },
   }));
 }
-const { projeto, proximo } = Astro.props;
+const { projeto, outros } = Astro.props;
 ---
-<EstudoDeCaso projeto={projeto} proximo={proximo} idioma="en" />
+<EstudoDeCaso projeto={projeto} outros={outros} idioma="en" />

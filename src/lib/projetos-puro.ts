@@ -13,7 +13,7 @@ export function ordenarPorOrdem<T extends { data: { ordem: number } }>(lista: re
   return [...lista].sort((a, b) => a.data.ordem - b.data.ordem);
 }
 
-export function proximoDaLista<T>(lista: readonly T[], indiceAtual: number): T {
-  if (lista.length === 0) throw new Error('lista vazia');
-  return lista[(indiceAtual + 1) % lista.length];
+/** Os outros projetos, na ordem da lista, começando pelo seguinte ao atual (e voltando ao início). */
+export function outrosDaLista<T>(lista: readonly T[], indiceAtual: number): T[] {
+  return Array.from({ length: Math.max(lista.length - 1, 0) }, (_, k) => lista[(indiceAtual + 1 + k) % lista.length]);
 }
