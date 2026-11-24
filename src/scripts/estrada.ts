@@ -18,12 +18,8 @@ aoCarregarPagina(() => {
     ultimoTempo = agora;
     ultimoScroll = window.scrollY;
     desloc = proximoDeslocamento(desloc, dt, dy);
-    // Com carro, ele avança e sai pela direita conforme a página rola.
-    const avanco = Math.min(Math.max(window.scrollY / (window.innerHeight * 0.9), 0), 1).toFixed(4);
-    for (const e of visiveis) {
-      e.style.setProperty('--desloc', `${desloc.toFixed(2)}px`);
-      if (e.classList.contains('estrada--carro')) e.style.setProperty('--avanco', avanco);
-    }
+    // Só a rua corre (tracejado e tachões); o carro fica no lugar.
+    for (const e of visiveis) e.style.setProperty('--desloc', `${desloc.toFixed(2)}px`);
     raf = visiveis.size ? requestAnimationFrame(passo) : 0;
   };
 

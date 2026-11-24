@@ -220,7 +220,8 @@ test.describe('com movimento permitido', () => {
     await expect(rota).not.toHaveAttribute('data-andando');
     await pausa.click();
     await expect(pausa).toHaveText('Pausar');
-    await expect.poll(pos, { timeout: 5000 }).not.toBe(parado);
+    // Se a pausa pegou o carro já chegando a uma placa, ele ainda fica até 7 s parado nela antes de seguir.
+    await expect.poll(pos, { timeout: 10_000 }).not.toBe(parado);
   });
 
   test.describe('rota grande da home', () => {
@@ -310,13 +311,28 @@ test.describe('com movimento permitido', () => {
     expect(await textosDaContagem(page)).toEqual(['~1.000']);
   });
 
-  test('a estrada do hero anda', async ({ page }) => {
+  test('na estrada do hero a rua corre e o carro fica no lugar, mesmo rolando', async ({ page }) => {
     await page.goto('/');
     const estrada = page.locator('[data-estrada]').first();
     await estrada.scrollIntoViewIfNeeded();
     const desloc = () => estrada.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--desloc'));
+    // Posição do carro dentro da estrada (descontando a rolagem).
+    const carro = () =>
+      estrada.evaluate((el) => {
+        const e = el.getBoundingClientRect();
+        const c = el.querySelector('.estrada-carro')!.getBoundingClientRect();
+        return Math.round(c.left - e.left);
+      });
     await expect.poll(desloc).not.toBe('');
     const antes = await desloc();
     await expect.poll(desloc, { timeout: 3000 }).not.toBe(antes);
+    await page.waitForTimeout(1600);
+    const posicao = await carro();
+    await page.mouse.wheel(0, 300);
+    await page.waitForTimeout(400);
+    const depois = await desloc();
+    await page.waitForTimeout(300);
+    expect(await desloc()).not.toBe(depois);
+    expect(await carro()).toBe(posicao);
   });
 });
