@@ -65,7 +65,8 @@ rota:
         Se o cliente para de responder, o sistema marca a próxima tentativa e sugere a mensagem. O vendedor revisa e envia: nada sai sozinho. Só contam as tentativas realmente feitas.
       midia:
         imagem: ../../../assets/projetos/rodoviariaos/mensagem-sugerida.png
-        alt: Fila de tentativas do dia com a mensagem pronta da quarta tentativa para o vendedor revisar, com dados inventados
+        moldura: nenhuma
+        alt: Mensagem de retomada sugerida pelo sistema para o vendedor revisar antes de enviar, com dados inventados
     - titulo: Resgate
       curto: Por tempo ou pelo carro de interesse.
       texto: >-
