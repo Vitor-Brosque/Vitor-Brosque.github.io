@@ -13,7 +13,7 @@ cartao: capa
 capa:
   imagem: ../../../assets/projetos/life-rpg/mapa.png
   moldura: celular
-  alt: Life RPG world map in pixel art, with territories, camps and NPCs
+  alt: Life RPG world map in pixel art, with six territories (village, hamlet, camps and ruins) joined by trails and a character at the center
 emResumo: >-
   The app I use every day to study and organize my routine. It works offline on the phone and syncs with the PC in near real time. The code is open, with tests, and the app's rules were checked against 64 scientific sources on habits and learning.
 resumo:
@@ -43,7 +43,7 @@ rota:
       midia:
         imagem: ../../../assets/projetos/life-rpg/agora.png
         moldura: celular
-        alt: Life RPG Now screen, with the current block and one quest at a time
+        alt: Life RPG Now screen, with one study quest in focus, Start and Finish buttons and another quest that also fits right now
     - titulo: Sync
       curto: Sends the cursor and the changes.
       texto: >-
@@ -62,20 +62,20 @@ rota:
       texto: The Dashboard open on the second monitor updates in near real time.
       midia:
         imagem: ../../../assets/projetos/life-rpg/painel.png
-        alt: Life RPG dashboard on the computer, with the current quest, the day's timeline and a timer
+        alt: Life RPG dashboard on the computer, with the current quest, the day's timeline, the focus timer and the capture form
 funcionalidades:
   - titulo: Now
     texto: One quest at a time, the day's blocks, an optional timer and quick capture with buttons.
     midia:
       imagem: ../../../assets/projetos/life-rpg/agora.png
       moldura: celular
-      alt: Now screen, with the current block and one quest at a time
+      alt: Now screen, with one study quest in focus and Start and Finish buttons
   - titulo: Spaced repetition
     texto: Code, cloze, image and audio cards, scheduled with FSRS-6 and a daily time budget.
     midia:
       imagem: ../../../assets/projetos/life-rpg/revisao.png
       moldura: celular
-      alt: Reviewing a SQL code card, with the written answer next to the correct one
+      alt: Reviewing a card with the question "What is a foreign key?", the answer and four rating buttons: Missed, Hard, Good and Easy
   - titulo: Character
     texto: >-
       XP for effort, not for time or for how much you log, with attributes tied to real areas of
@@ -83,13 +83,13 @@ funcionalidades:
     midia:
       imagem: ../../../assets/projetos/life-rpg/personagem.png
       moldura: celular
-      alt: Character sheet with level, XP and attributes by area of life
+      alt: Character sheet for the fictional character Lia, with level, XP, a shortcut to the world map and attributes by area of life
   - titulo: Week
     texto: Planning in blocks, goals, recurring items and one experiment per week.
     midia:
       imagem: ../../../assets/projetos/life-rpg/semana.png
       moldura: celular
-      alt: Plan screen with the week organized in blocks
+      alt: Plan screen on the Goals tab, with a project journey in progress and 2 of 5 quests done
 arquitetura:
   titulo: Architecture
   texto: >-
