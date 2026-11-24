@@ -4,6 +4,9 @@ import { aoCarregarPagina } from './ciclo';
  * Uma pausa só para a página: para a rua da estrada e as rotas em loop. Os botões de pausa
  * (o da rota grande, com texto, e o da estrada do topo, só com ícone) mostram e mudam o mesmo estado.
  * Começa rodando a cada carregamento e volta a rodar na limpeza, antes da troca de página do ClientRouter.
+ *
+ * Ordem: quem usa a pausa (estrada, rota) importa este módulo antes de registrar o próprio início. Assim este
+ * início roda primeiro em cada página, e esta limpeza roda por último (as limpezas saem na ordem inversa).
  */
 type Ouvinte = (pausado: boolean) => void;
 
