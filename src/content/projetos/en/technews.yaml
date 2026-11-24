@@ -39,24 +39,31 @@ rota:
   titulo: From the API to the database
   paradas:
     - titulo: Collect
+      contagem: 102 results
       curto: Hacker News, previous day.
       texto: >-
         Queries the Hacker News search API for the previous day's stories, in São Paulo time, on 10
         topics across 4 areas: languages, AI, data and DevOps.
     - titulo: Validate
+      contagem: 81 stories
+      log: "WARNING | SEM_URL_OU_TITULO | ID = 46012907"
       curto: Title and URL.
       texto: Drops anything without a title or URL and logs every drop.
     - titulo: Extract
+      contagem: 70 with text
+      log: "INFO | EXTRACAO_OK | ID = 46013377"
       curto: Page text.
       texto: >-
         Downloads the original page and extracts the text with trafilatura. A failed download or
         extraction is logged and the story is skipped.
     - titulo: PostgreSQL
+      log: "INFO | POSTGRES_CONECTADO | DB = …"
       curto: No duplicates.
       texto: >-
         Writes with `INSERT ... ON CONFLICT (fonte, id_externo) DO NOTHING RETURNING id`. If no id comes
         back, it was a duplicate.
     - titulo: Summary
+      log: "INFO | RESUMO_INGESTAO | INSERIDAS=… | DUPLICADAS=… | REJEITADAS=…"
       curto: Inserted, duplicates, rejected.
       texto: At the end, a log line says how many stories were inserted, how many were duplicates and how many were rejected.
 decisoes:

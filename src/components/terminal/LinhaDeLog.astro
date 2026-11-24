@@ -1,0 +1,17 @@
+---
+import { partesDoLog } from '../../lib/log';
+
+/** Uma linha do log do TechNews com o nível colorido (INFO verde, WARNING âmbar, ERROR vermelho claro); `$ ...` vira comando. */
+interface Props { linha: string }
+const p = partesDoLog(Astro.props.linha);
+---
+{p.tipo === 'comando' ? <><span class="log-prompt" aria-hidden="true">$ </span>{p.comando}</>
+  : p.tipo === 'log' ? <>{p.data && <span class="log-data">{p.data} | </span>}<span class:list={['log-nivel', `log-nivel--${p.nivel.toLowerCase()}`]}>{p.nivel}</span> | {p.mensagem}</>
+  : p.texto}
+<style is:global>
+  .log-prompt { color: var(--verde); }
+  .log-data { color: var(--mute); }
+  .log-nivel--info { color: var(--verde); }
+  .log-nivel--warning { color: var(--ambar); }
+  .log-nivel--error { color: var(--vermelho); }
+</style>

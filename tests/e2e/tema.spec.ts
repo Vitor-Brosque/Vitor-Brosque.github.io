@@ -52,6 +52,8 @@ const rotulos = [
   { caminho: '/projetos/life-rpg/', rotulo: /^Marco 1$/ },
   { caminho: '/en/projects/life-rpg/', rotulo: /^Milestone 1$/ },
   { caminho: '/projetos/rodoviariaos/', rotulo: /^KM 0$/ },
+  { caminho: '/projetos/technews/', rotulo: /^Etapa 1$/ },
+  { caminho: '/en/projects/technews/', rotulo: /^Stage 1$/ },
 ] as const;
 for (const r of rotulos) {
   test(`${r.caminho}: rótulo da primeira parada da rota`, async ({ page }) => {
@@ -171,10 +173,14 @@ test('na home só o cartão do Life RPG tem a moldura do jogo e a lanterna', asy
 test.describe('rota com movimento reduzido', () => {
   test.use({ reducedMotion: 'reduce' });
 
-  test('no Life RPG a lanterna anda com a rolagem e a placa ativa troca', async ({ page }) => {
-    await page.goto('/projetos/life-rpg/');
+  for (const { caminho, veiculo } of [
+    { caminho: '/projetos/life-rpg/', veiculo: '.lanterna' },
+    { caminho: '/projetos/technews/', veiculo: '.cursor-rota' },
+  ]) {
+  test(`${caminho}: o veículo anda com a rolagem e a parada ativa troca`, async ({ page }) => {
+    await page.goto(caminho);
     const rota = page.locator('[data-rota][data-modo="rolagem"]');
-    const lanterna = rota.locator('.carro .lanterna');
+    const lanterna = rota.locator(`.carro ${veiculo}`);
     await expect(rota).not.toHaveAttribute('data-estatico');
     await expect(page.locator('[data-rota] [data-estatico], [data-rota][data-estatico]')).toHaveCount(0);
     const topo = await rota.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
@@ -192,9 +198,11 @@ test.describe('rota com movimento reduzido', () => {
     await expect.poll(pos).not.toBe(antes);
     await expect.poll(ativa).not.toBe(placaAntes);
     await expect(lanterna).toBeVisible();
-    // A chama fica no primeiro quadro e nada fica em loop.
+    // A chama fica no primeiro quadro, o cursor fica aceso e nada fica em loop.
     expect(await page.locator('.lanterna .quadro-2').evaluateAll((qs) => qs.every((q) => getComputedStyle(q).visibility === 'hidden'))).toBe(true);
+    expect(await page.locator('.cursor-rota, .cursor-bloco').evaluateAll((cs) => cs.every((c) => getComputedStyle(c).opacity === '1'))).toBe(true);
   });
+  }
 
   test('no RodoviariaOS a rota continua a lista estática, sem veículo', async ({ page }) => {
     await page.goto('/projetos/rodoviariaos/');
@@ -287,3 +295,23 @@ for (const modo of ['reduce', 'no-preference'] as const) {
     });
   });
 }
+
+test('na rota do TechNews as três primeiras etapas trazem a contagem da execução de teste; as do banco não', async ({ page }) => {
+  for (const [caminho, contagens] of [
+    ['/projetos/technews/', ['102 resultados', '81 notícias', '70 com texto']],
+    ['/en/projects/technews/', ['102 results', '81 stories', '70 with text']],
+  ] as const) {
+    await page.goto(caminho);
+    const placas = page.locator('[data-rota] .placa');
+    await expect(placas).toHaveCount(5);
+    for (let i = 0; i < 3; i++) await expect(placas.nth(i).locator('.placa-contagem')).toHaveText(contagens[i]);
+    for (const i of [3, 4]) await expect(placas.nth(i).locator('.placa-contagem')).toHaveCount(0);
+    // A linha de log de cada etapa, no formato real (Coleta não tem).
+    await expect(placas.locator('.saida')).toHaveText([
+      'WARNING | SEM_URL_OU_TITULO | ID = 46012907',
+      'INFO | EXTRACAO_OK | ID = 46013377',
+      'INFO | POSTGRES_CONECTADO | DB = …',
+      'INFO | RESUMO_INGESTAO | INSERIDAS=… | DUPLICADAS=… | REJEITADAS=…',
+    ]);
+  }
+});

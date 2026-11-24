@@ -1,6 +1,7 @@
 ---
 import CarrinhoPixel from './CarrinhoPixel.astro';
 import Lanterna from './rpg/Lanterna.astro';
+import LinhaDeLog from './terminal/LinhaDeLog.astro';
 import MolduraMidia from './MolduraMidia.astro';
 import type { Parada } from '../lib/projetos';
 import { textoRico } from '../lib/texto';
@@ -12,19 +13,25 @@ interface Props {
   modo: 'loop' | 'rolagem';
   idioma: Idioma;
   compacta?: boolean;
-  /** No tema rpg (Life RPG): a lanterna no lugar do carrinho, a estrada do mapa com um marco por parada, placas de pedra e pergaminho. */
+  /**
+   * Tema próprio da página: rpg (Life RPG: a lanterna, a estrada do mapa, placas de pedra e pergaminho) ou terminal
+   * (TechNews: o cursor de bloco, a linha do pipeline, caixas de terminal). Nos dois há um nó por parada que acende
+   * quando o veículo passa, e o veículo anda também com movimento reduzido (data-anda-sempre, lido por rota.ts).
+   */
   tema?: Tema;
 }
 const { titulo, paradas, modo, idioma, compacta = false, tema = 'rodovia' } = Astro.props;
 const rpg = tema === 'rpg';
+const proprio = tema !== 'rodovia';
 const rotulo = (i: number) => rotuloDaParada(idioma, tema, i);
 /** A rota grande da home: placas que são botões e, embaixo, a vitrine com a tela de cada parada. */
 const vitrine = modo === 'loop' && !compacta;
 ---
 <div
-  class:list={['rota', { 'rota--compacta': compacta, 'rota--vitrine': vitrine, 'rota--rpg': rpg }]}
+  class:list={['rota', { 'rota--compacta': compacta, 'rota--vitrine': vitrine }, proprio && `rota--${tema}`]}
   data-rota
   data-modo={modo}
+  data-anda-sempre={proprio ? '' : undefined}
   style={`--n: ${paradas.length}`}
   role="group"
   aria-label={titulo}
@@ -53,8 +60,9 @@ const vitrine = modo === 'loop' && !compacta;
             </button>
           ) : (
             <div class="placa-corpo">
-              <span class="km">{rotulo(i).prefixo} {rpg ? <span class="num">{rotulo(i).numero}</span> : rotulo(i).numero}</span>
+              <span class="km">{rotulo(i).prefixo} {proprio ? <span class="num">{rotulo(i).numero}</span> : rotulo(i).numero}</span>
               <strong class="placa-titulo">{p.titulo}</strong>
+              {p.contagem && <span class="placa-contagem">{p.contagem}</span>}
             </div>
           )}
           <div class="poste" aria-hidden="true"></div>
@@ -62,13 +70,15 @@ const vitrine = modo === 'loop' && !compacta;
             <div class:list={['rota-detalhe', { 'rota-detalhe--midia': p.midia }]}>
               <div class="rota-detalhe-corpo">
                 {/* KM e título repetem a placa: só aparecem no painel da rota presa e o leitor de tela não os ouve de novo. */}
-                <span class="rota-detalhe-km" aria-hidden="true">{rotulo(i).prefixo} {rpg ? <span class="num">{rotulo(i).numero}</span> : rotulo(i).numero}</span>
+                <span class="rota-detalhe-km" aria-hidden="true">{rotulo(i).prefixo} {proprio ? <span class="num">{rotulo(i).numero}</span> : rotulo(i).numero}</span>
                 <strong class="rota-detalhe-titulo" aria-hidden="true">{p.titulo}</strong>
                 <p class="rota-detalhe-texto" set:html={textoRico(p.texto)} />
+                {/* Tema terminal: a linha de log da etapa, como saída do pipeline (no desktop no painel da rota presa; no celular e sem JS, no item). */}
+                {p.log && <pre class="saida"><code><LinhaDeLog linha={p.log} /></code></pre>}
               </div>
               {p.midia
                 ? <MolduraMidia midia={p.midia} idioma={idioma} sizes="(min-width: 900px) 40vw, 90vw" />
-                : <span class="rota-detalhe-marco" aria-hidden="true">{rpg ? rotulo(i).numero : `KM ${i}`}</span>}
+                : <span class="rota-detalhe-marco" aria-hidden="true">{proprio ? rotulo(i).numero : `KM ${i}`}</span>}
               {/* Tema rpg: o texto curto sai da lanterna num balão de pergaminho, como o do companheiro no jogo (só no painel da rota presa). */}
               {rpg && p.curto && <p class="fala" aria-hidden="true"><span set:html={textoRico(p.curto)} /></p>}
             </div>
@@ -77,8 +87,8 @@ const vitrine = modo === 'loop' && !compacta;
       ))}
     </ol>
     <div class="asfalto" aria-hidden="true">
-      {rpg && paradas.map((_, i) => <span class="marco" style={`--c: ${((i + 0.5) / paradas.length).toFixed(4)}`}></span>)}
-      <div class="carro">{rpg ? <Lanterna /> : <CarrinhoPixel />}</div>
+      {proprio && paradas.map((_, i) => <span class="marco" style={`--c: ${((i + 0.5) / paradas.length).toFixed(4)}`}></span>)}
+      <div class="carro">{tema === 'rpg' ? <Lanterna /> : tema === 'terminal' ? <span class="cursor-rota"></span> : <CarrinhoPixel />}</div>
     </div>
   </div>
   {vitrine && (
@@ -302,8 +312,8 @@ const vitrine = modo === 'loop' && !compacta;
   .rota--rpg .asfalto::before { inset-inline: 0; top: 50%; height: 15px; margin-top: -7.5px; background: var(--terra); box-shadow: 0 3px 0 var(--grama-escura), 0 -3px 0 var(--grama-escura); animation: none; }
   .rota--rpg .asfalto::after { top: 50%; height: 15px; margin-top: -7.5px; background: var(--estrada-pedra); box-shadow: none; }
   /* Um marco por parada: apagado (MARKER_OPEN) até a lanterna passar, depois aceso em dourado (MARKER_DONE). */
-  .marco { position: absolute; z-index: 1; left: calc(var(--c) * 100%); top: 50%; width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px; background: var(--marco-aberto); box-shadow: 0 0 0 3px var(--contorno-arte); transition: background-color 0.3s; }
-  .marco[data-aceso] { background: var(--marco-feito); }
+  .rota--rpg .marco { position: absolute; z-index: 1; left: calc(var(--c) * 100%); top: 50%; width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px; background: var(--marco-aberto); box-shadow: 0 0 0 3px var(--contorno-arte); transition: background-color 0.3s; }
+  .rota--rpg .marco[data-aceso] { background: var(--marco-feito); }
   .rota--rpg .carro { z-index: 2; width: 48px; height: 48px; translate: -50% -62%; }
   .rota--rpg .carro::after { display: none; }
   .rota--rpg .carro :global(.lanterna) { filter: drop-shadow(0 3px 0 rgb(11 12 20 / 0.6)); }
@@ -360,5 +370,52 @@ const vitrine = modo === 'loop' && !compacta;
     }
     :global(.js) .rota--rpg[data-modo='rolagem']:not([data-estatico]) .fala :global(code) { background: var(--pergaminho-escuro); border-color: var(--pergaminho-escuro); color: var(--tinta); }
   }
+
+  /* ===== Tema terminal (TechNews). Cores e fonte vêm das variáveis do tema (tema-terminal.css, ou do cartão na home). ===== */
+  .rota--terminal { border-color: var(--line-2); border-radius: var(--raio); }
+  .rota--terminal .km { color: var(--mute); letter-spacing: 0.04em; }
+  .rota--terminal .num { font-weight: 700; }
+  .rota--terminal .placa-titulo { font-family: var(--fonte-mono); font-weight: 700; font-stretch: normal; font-size: 0.95rem; letter-spacing: -0.02em; }
+  .placa-contagem { display: block; margin-top: 4px; font: 400 0.78rem/1.3 var(--fonte-mono); color: var(--ink-2); }
+  .rota--compacta .placa-contagem { display: none; }
+  /* Caixas de terminal: borda de 1 px, cantos quase retos; a ativa fica com a borda e o rótulo em verde, sem brilho. */
+  .rota--terminal .placa-corpo { border-width: 1px; border-radius: var(--raio); background: var(--bg); }
+  .rota--terminal .placa[data-ativa] .placa-corpo { box-shadow: none; }
+  .rota--terminal .poste { width: 1px; margin-left: 20px; background: var(--line-2); }
+  /* A linha do pipeline: um fio; o trecho já percorrido fica verde. */
+  .rota--terminal .asfalto { background: transparent; border-radius: 0; overflow: visible; }
+  .rota--terminal .asfalto::before { background: var(--line-2); height: 2px; margin-top: -1px; animation: none; }
+  .rota--terminal .asfalto::after { height: 2px; margin-top: -1px; background: var(--verde); box-shadow: none; }
+  /* Um nó por etapa, que fica verde quando o cursor passa. */
+  .rota--terminal .marco { position: absolute; z-index: 1; left: calc(var(--c) * 100%); top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border: 2px solid var(--line-2); border-radius: 1px; background: var(--bg-2); transition: background-color 0.3s, border-color 0.3s; }
+  .rota--terminal .marco[data-aceso] { border-color: var(--verde); background: var(--verde); }
+  /* O veículo é o cursor de bloco. */
+  .rota--terminal .carro { z-index: 2; width: 14px; height: 26px; translate: -50% -50%; }
+  .rota--terminal .carro::after { display: none; }
+  .rota--compacta.rota--terminal .carro { width: 10px; height: 18px; }
+  .cursor-rota { display: block; width: 100%; height: 100%; background: var(--verde); }
+  .rota--terminal .rota-detalhe-km { letter-spacing: 0.06em; }
+  .rota--terminal .rota-detalhe-titulo { font-family: var(--fonte-mono); font-weight: 700; font-stretch: normal; letter-spacing: -0.03em; }
+  .rota--terminal .rota-detalhe-marco { font-family: var(--fonte-mono); font-weight: 700; font-stretch: normal; -webkit-text-stroke: 1px var(--line-2); }
+  /* A linha de log da etapa, como saída do pipeline. */
+  .saida { margin: 14px 0 0; padding: 9px 12px; background: var(--bg); border: 1px solid var(--line); border-left: 2px solid var(--verde); border-radius: var(--raio); font: 400 0.8rem/1.55 var(--fonte-mono); color: var(--ink); white-space: normal; overflow-wrap: anywhere; }
+  .saida code { all: unset; }
+  @media (prefers-reduced-motion: no-preference) {
+    /* O cursor pisca quando está parado numa etapa (andando, fica aceso, como num terminal enquanto se digita). */
+    .rota--terminal:not([data-andando]) .cursor-rota { animation: cursor-rota 1.06s steps(1) infinite; }
+    @keyframes cursor-rota { 50% { opacity: 0; } }
+    /* Na pausa da página o cursor fica aceso (a regra geral só o congelaria onde estava). */
+    :global(html[data-pausado]) .rota--terminal .cursor-rota { animation: none; }
+  }
+  @media (max-width: 899px) {
+    .rota--terminal[data-modo='rolagem'] .asfalto::before { background: var(--line-2); left: 50%; width: 2px; margin: 0 0 0 -1px; animation: none; }
+    .rota--terminal[data-modo='rolagem'] .asfalto::after { width: 2px; margin: 0 0 0 -1px; }
+    .rota--terminal .marco { left: 50%; top: calc(var(--c) * 100%); }
+    .rota--terminal[data-modo='rolagem'] .carro { rotate: none; width: 14px; height: 26px; translate: -50% -50%; }
+  }
+  /* O quadro da etapa é o item inteiro no celular e sem JS (sem rota presa): caixa de 1 px, a ativa em verde, sem brilho. */
+  .rota--terminal.rota[data-modo='rolagem']:not([data-presa]) .placa { border-width: 1px; border-color: var(--line-2); border-radius: var(--raio); background: var(--bg); box-shadow: none; }
+  .rota--terminal.rota[data-modo='rolagem']:not([data-presa]) .placa[data-ativa] { border-color: var(--verde); background: var(--verde-fundo); }
+  :global(html:not(.js)) .rota--terminal.rota[data-modo='rolagem'] .placa:not([data-ativa]) { border-color: var(--line-2); background: var(--bg); box-shadow: none; }
 </style>
 <script>import '../scripts/rota';</script>

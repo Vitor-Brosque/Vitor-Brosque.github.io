@@ -41,24 +41,31 @@ rota:
   titulo: Da API ao banco
   paradas:
     - titulo: Coleta
+      contagem: 102 resultados
       curto: Hacker News, dia anterior.
       texto: >-
         Consulta a API de busca do Hacker News atrás das notícias do dia anterior, no fuso de São
         Paulo, sobre 10 temas em 4 áreas: linguagens, IA, dados e DevOps.
     - titulo: Validação
+      contagem: 81 notícias
+      log: "WARNING | SEM_URL_OU_TITULO | ID = 46012907"
       curto: Título e URL.
       texto: Descarta o que vem sem título ou sem URL e registra cada descarte no log.
     - titulo: Extração
+      contagem: 70 com texto
+      log: "INFO | EXTRACAO_OK | ID = 46013377"
       curto: Texto da página.
       texto: >-
         Baixa a página original e extrai o texto com o trafilatura. Falha no download ou na extração
         é registrada, e a notícia é pulada.
     - titulo: PostgreSQL
+      log: "INFO | POSTGRES_CONECTADO | DB = …"
       curto: Sem duplicar.
       texto: >-
         Grava com `INSERT ... ON CONFLICT (fonte, id_externo) DO NOTHING RETURNING id`. Se não voltou
         id, era duplicada.
     - titulo: Resumo
+      log: "INFO | RESUMO_INGESTAO | INSERIDAS=… | DUPLICADAS=… | REJEITADAS=…"
       curto: Inseridas, duplicadas, rejeitadas.
       texto: >-
         No fim, um log diz quantas notícias foram inseridas, quantas eram duplicadas e quantas foram

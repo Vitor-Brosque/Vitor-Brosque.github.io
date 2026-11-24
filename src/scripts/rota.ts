@@ -410,9 +410,10 @@ aoCarregarPagina(() => {
       limpezas.push(() => loop.limpar());
       if (grande) limpezas.push(vitrineViva(rota, loop, () => definirPausa(true), reduzido));
     } else {
-      // Exceção escolhida à regra dos dois modos: no tema rpg (Life RPG) a lanterna percorre a trilha também com movimento
-      // reduzido, como o carro da rota da home. Loops, pulinho e deslocamentos de painel continuam só no CSS com movimento.
-      const andaSempre = raiz.classList.contains('rota--rpg');
+      // Exceção escolhida à regra dos dois modos: nos temas próprios (o rpg do Life RPG, o terminal do TechNews) o veículo
+      // percorre a rota também com movimento reduzido, como o carro da rota da home. Quem marca é a própria rota
+      // (data-anda-sempre, posto por Rota.astro). Loops, pulinho e deslocamentos de painel continuam só no CSS com movimento.
+      const andaSempre = raiz.hasAttribute('data-anda-sempre');
       limpezas.push(reduzido && !andaSempre ? rolagemEstatica(rota) : rolagemAndando(rota, reduzido));
     }
   }

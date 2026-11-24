@@ -20,6 +20,7 @@ export const ui = {
     'rota.continuar': 'Continuar',
     'rota.dica': 'Escolha uma parada',
     'rota.marco': 'Marco',
+    'rota.etapa': 'Etapa',
     'terminal.resumo': 'resumo',
     'terminal.logRotulo': 'Log do pipeline (technews.log)',
     'terminal.logLegenda': 'Formato real do log do projeto. IDs e horários de exemplo.',
@@ -78,6 +79,7 @@ export const ui = {
     'rota.continuar': 'Resume',
     'rota.dica': 'Pick a stop',
     'rota.marco': 'Milestone',
+    'rota.etapa': 'Stage',
     'terminal.resumo': 'summary',
     'terminal.logRotulo': 'Pipeline log (technews.log)',
     'terminal.logLegenda': "The project's real log format. Sample IDs and times.",
@@ -152,7 +154,13 @@ export function urlEquivalente(caminho: string, destino: Idioma): string {
 
 export type Tema = 'rodovia' | 'rpg' | 'terminal';
 
-/** Rótulo de uma parada da rota: "KM 0, 1, 2…" na rodovia; no tema rpg, o marco da jornada do jogo, contado a partir de 1. */
+/** Prefixo do rótulo da parada em cada tema próprio (a rodovia usa "KM", igual nos dois idiomas). */
+const prefixoDaParada = { rpg: 'rota.marco', terminal: 'rota.etapa' } as const satisfies Record<Exclude<Tema, 'rodovia'>, ChaveUi>;
+
+/**
+ * Rótulo de uma parada da rota: "KM 0, 1, 2…" na rodovia; nos temas próprios, contado a partir de 1, com o nome do tema
+ * (o marco da jornada no rpg, a etapa do pipeline no terminal).
+ */
 export function rotuloDaParada(i: Idioma, tema: Tema, indice: number): { prefixo: string; numero: number } {
-  return tema === 'rpg' ? { prefixo: t(i, 'rota.marco'), numero: indice + 1 } : { prefixo: 'KM', numero: indice };
+  return tema === 'rodovia' ? { prefixo: 'KM', numero: indice } : { prefixo: t(i, prefixoDaParada[tema]), numero: indice + 1 };
 }

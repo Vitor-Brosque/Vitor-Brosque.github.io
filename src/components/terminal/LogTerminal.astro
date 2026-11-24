@@ -1,5 +1,5 @@
 ---
-import { partesDoLog } from '../../lib/log';
+import LinhaDeLog from './LinhaDeLog.astro';
 import { t, type Idioma } from '../../i18n/ui';
 
 /**
@@ -10,16 +10,11 @@ import { t, type Idioma } from '../../i18n/ui';
  */
 interface Props { idioma: Idioma; linhas: string[]; arquivo?: string }
 const { idioma, linhas, arquivo = 'technews.log' } = Astro.props;
-const partes = linhas.map(partesDoLog);
 ---
-<figure class="log-janela" aria-label={t(idioma, 'terminal.logRotulo')} style={`--n: ${partes.length}`}>
+<figure class="log-janela" aria-label={t(idioma, 'terminal.logRotulo')} style={`--n: ${linhas.length}`}>
   <div class="janela-barra" aria-hidden="true"><i></i><i></i><i></i><span>{arquivo}</span></div>
-  <pre class="log"><code>{partes.map((p, i) => (
-    <span class="log-linha" style={`--i: ${i}`}>{
-      p.tipo === 'comando' ? <><span class="log-prompt" aria-hidden="true">$ </span>{p.comando}</>
-      : p.tipo === 'log' ? <>{p.data && <span class="log-data">{p.data} | </span>}<span class:list={['log-nivel', `log-nivel--${p.nivel.toLowerCase()}`]}>{p.nivel}</span> | {p.mensagem}</>
-      : p.texto
-    }{i === partes.length - 1 && <span class="cursor-bloco" aria-hidden="true"></span>}</span>
+  <pre class="log"><code>{linhas.map((linha, i) => (
+    <span class="log-linha" style={`--i: ${i}`}><LinhaDeLog linha={linha} />{i === linhas.length - 1 && <span class="cursor-bloco" aria-hidden="true"></span>}</span>
   ))}</code></pre>
   <figcaption class="log-legenda">{t(idioma, 'terminal.logLegenda')}</figcaption>
 </figure>
@@ -29,11 +24,6 @@ const partes = linhas.map(partesDoLog);
   .log code { all: unset; display: block; }
   /* Linha longa quebra dentro da janela (com recuo nas continuações), sem rolagem horizontal. */
   .log-linha { display: block; padding-left: 2ch; text-indent: -2ch; overflow-wrap: anywhere; }
-  .log-prompt { color: var(--verde); }
-  .log-data { color: var(--mute); }
-  .log-nivel--info { color: var(--verde); }
-  .log-nivel--warning { color: var(--ambar); }
-  .log-nivel--error { color: var(--vermelho); }
   .cursor-bloco { display: inline-block; width: 0.62em; height: 1.1em; margin-left: 0.35ch; vertical-align: -0.2em; background: var(--verde); }
   .log-legenda { padding: 9px 16px 10px; border-top: 1px solid var(--line); font: 400 0.75rem/1.4 var(--fonte-mono); color: var(--mute); }
   @media (prefers-reduced-motion: no-preference) {

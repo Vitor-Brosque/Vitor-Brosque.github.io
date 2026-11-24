@@ -61,7 +61,18 @@ const projetos = defineCollection({
       rota: z.object({
         titulo: z.string(),
         paradas: z
-          .array(z.object({ titulo: z.string(), texto: z.string(), curto: z.string().optional(), midia: midia(image).optional() }))
+          .array(
+            z.object({
+              titulo: z.string(),
+              texto: z.string(),
+              curto: z.string().optional(),
+              midia: midia(image).optional(),
+              /** Tema terminal: a contagem da etapa na execução de teste (texto curto, em mono sob o título da placa). */
+              contagem: z.string().optional(),
+              /** Tema terminal: uma linha no formato real do log, sem a data, mostrada como saída no painel da etapa. */
+              log: z.string().optional(),
+            }),
+          )
           .min(2)
           .max(6),
       }),

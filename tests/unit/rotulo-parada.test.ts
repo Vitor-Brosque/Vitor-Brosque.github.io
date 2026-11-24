@@ -10,4 +10,8 @@ describe('rotuloDaParada', () => {
     expect(rotuloDaParada('pt', 'rpg', 0)).toEqual({ prefixo: 'Marco', numero: 1 });
     expect(rotuloDaParada('en', 'rpg', 4)).toEqual({ prefixo: 'Milestone', numero: 5 });
   });
+  it('no tema terminal é a etapa do pipeline, contada a partir de 1', () => {
+    expect(rotuloDaParada('pt', 'terminal', 0)).toEqual({ prefixo: 'Etapa', numero: 1 });
+    expect(rotuloDaParada('en', 'terminal', 2)).toEqual({ prefixo: 'Stage', numero: 3 });
+  });
 });
