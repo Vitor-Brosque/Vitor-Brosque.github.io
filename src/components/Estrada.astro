@@ -128,6 +128,8 @@ const pausar = t(idioma, 'animacoes.pausar');
     .estrada-carro :global(.carrinho) { animation: quicar-estrada 0.26s steps(2) infinite; }
     /* Pulinho de 3 px (um pixel do jogo) da lanterna na trilha, só com movimento permitido. */
     .estrada-lanterna :global(.lanterna) { animation: pular-trilha 0.5s steps(1) infinite; }
+    /* Na pausa da página a lanterna fica parada no chão (a regra geral só a congelaria no meio do pulinho). */
+    :global(html[data-pausado]) .estrada-lanterna :global(.lanterna) { animation: none; }
     @keyframes pular-trilha { 50% { translate: 0 -3px; } }
     @keyframes quicar-estrada { 50% { translate: 0 -1px; } }
   }

@@ -15,12 +15,7 @@ async function telaCheia(page: Page, video: Locator) {
       });
     }
     const cs = getComputedStyle(el);
-    const b = el.getBoundingClientRect();
-    const caixa = b.width / b.height;
-    const proporcao = el.videoWidth / el.videoHeight;
-    // Com "cover", só uma parte do vídeo fica à vista; com "contain", ele cabe inteiro.
-    const visivel = cs.objectFit === 'cover' ? Math.min(caixa / proporcao, proporcao / caixa) : 1;
-    const r = { telaCheia: document.fullscreenElement === el, objectFit: cs.objectFit, visivel: Math.round(visivel * 100) };
+    const r = { telaCheia: document.fullscreenElement === el, objectFit: cs.objectFit };
     await document.exitFullscreen();
     return r;
   });
@@ -34,8 +29,8 @@ test.describe('vídeo em tela cheia', () => {
       const video = page.locator(`video[data-video]:has(source[src$="${nome}"])`).first();
       const r = await telaCheia(page, video);
       expect(r.telaCheia).toBe(true);
+      // Com "contain" o vídeo cabe inteiro na tela (com "cover" o do celular mostrava só 24%).
       expect(r.objectFit).toBe('contain');
-      expect(r.visivel).toBe(100);
     });
   }
 });
@@ -55,7 +50,9 @@ test.describe('botão de tela cheia', () => {
   });
   test('na vitrine da home também, em inglês', async ({ page }) => {
     await page.goto('/en/');
-    const botao = page.locator('#projetos [data-vitrine] [data-video-tela-cheia]').first();
+    const botao = page.locator('#projetos [data-vitrine] [data-painel][data-ativa] [data-video-tela-cheia]').first();
+    await botao.scrollIntoViewIfNeeded();
+    await expect(botao).toBeVisible();
     await expect(botao).toHaveAttribute('aria-label', 'View video full screen');
     expect(await page.locator('#projetos [data-vitrine] [data-video-tela-cheia]').count()).toBe(await page.locator('#projetos [data-vitrine] video').count());
   });
@@ -101,4 +98,22 @@ test.describe('imagem ampliada', () => {
       expect(m.sobraH).toBeLessThanOrEqual(0);
     });
   }
+});
+
+test.describe('tela cheia com movimento reduzido', () => {
+  test.use({ reducedMotion: 'reduce' });
+  test('em tela cheia o vídeo ganha os controles nativos; ao sair, volta sem eles', async ({ page }) => {
+    await page.goto('/projetos/rodoviariaos/');
+    const figura = page.locator('.funcs .moldura:has(video[data-video])').first();
+    const video = figura.locator('video');
+    await figura.scrollIntoViewIfNeeded();
+    // Fora da vitrine o script tirou os controles (o botão próprio de tocar assume).
+    await expect(video).not.toHaveAttribute('controls');
+    await figura.locator('[data-video-tela-cheia]').click();
+    await expect.poll(() => page.evaluate(() => document.fullscreenElement?.tagName ?? '')).toBe('VIDEO');
+    await expect(video).toHaveAttribute('controls', '');
+    await page.evaluate(() => document.exitFullscreen());
+    await expect.poll(() => page.evaluate(() => document.fullscreenElement === null)).toBe(true);
+    await expect(video).not.toHaveAttribute('controls');
+  });
 });

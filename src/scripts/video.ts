@@ -3,11 +3,40 @@ import { movimentoReduzido } from './movimento';
 import { deveTocar, type EstadoVideo } from './video-estado';
 
 type VideoComPrefixo = HTMLVideoElement & { webkitEnterFullscreen?: () => void };
+type DocumentoComPrefixo = Document & { webkitFullscreenElement?: Element | null };
 
-/** Botão de tela cheia de todos os vídeos (inclusive os da vitrine): aparece só onde o navegador tem a API. */
+/**
+ * Botão de tela cheia de todos os vídeos (inclusive os da vitrine): aparece só onde o navegador tem a API.
+ * Em tela cheia o vídeo ganha os controles nativos (fora da vitrine o script tirou os controles, e o botão de tocar fica
+ * fora do elemento em tela cheia: com movimento reduzido o vídeo não toca sozinho e não haveria como iniciá-lo). Ao sair,
+ * volta ao estado de antes.
+ */
 aoCarregarPagina(() => {
   const botoes = [...document.querySelectorAll<HTMLButtonElement>('[data-video-tela-cheia]')];
   const limpezas: Array<() => void> = [];
+  /** Vídeo em tela cheia agora e se ele já tinha controles antes de entrar. */
+  let emTelaCheia: { v: HTMLVideoElement; tinhaControles: boolean } | null = null;
+  const sair = () => {
+    if (!emTelaCheia) return;
+    if (!emTelaCheia.tinhaControles) emTelaCheia.v.removeAttribute('controls');
+    emTelaCheia = null;
+  };
+  const aoMudarTelaCheia = () => {
+    const doc = document as DocumentoComPrefixo;
+    const el = doc.fullscreenElement ?? doc.webkitFullscreenElement ?? null;
+    if (emTelaCheia && emTelaCheia.v !== el) sair();
+    if (el instanceof HTMLVideoElement && el.matches('video[data-video]') && !emTelaCheia) {
+      emTelaCheia = { v: el, tinhaControles: el.hasAttribute('controls') };
+      el.setAttribute('controls', '');
+    }
+  };
+  document.addEventListener('fullscreenchange', aoMudarTelaCheia);
+  document.addEventListener('webkitfullscreenchange', aoMudarTelaCheia);
+  limpezas.push(() => {
+    document.removeEventListener('fullscreenchange', aoMudarTelaCheia);
+    document.removeEventListener('webkitfullscreenchange', aoMudarTelaCheia);
+    sair();
+  });
   for (const b of botoes) {
     const v = b.parentElement?.querySelector<VideoComPrefixo>('video');
     if (!v) continue;

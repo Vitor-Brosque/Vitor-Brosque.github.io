@@ -387,8 +387,9 @@ const vitrine = modo === 'loop' && !compacta;
   .rota--terminal .km { color: var(--mute); letter-spacing: 0.04em; }
   .rota--terminal .num { font-weight: 700; }
   .rota--terminal .placa-titulo { font-family: var(--fonte-mono); font-weight: 700; font-stretch: normal; font-size: 0.95rem; letter-spacing: -0.02em; }
-  /* Seis etapas no cartão da home: o nome em corpo menor, para "PostgreSQL" caber inteiro na caixa. */
-  .rota--compacta.rota--terminal .placa-titulo { font-size: 0.62rem; letter-spacing: -0.02em; }
+  /* Seis etapas no cartão da home: só "Etapa n" à vista (o nome não cabe sem encolher a letra abaixo de 11 px);
+     o nome continua no HTML para o leitor de tela. */
+  .rota--compacta.rota--terminal .placa-titulo { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   /* Caixas de terminal: borda de 1 px, cantos quase retos; a ativa fica com a borda e o rótulo em verde, sem brilho. */
   /* Borda de 1 px com 1 px a mais de respiro: a placa mede o mesmo que a de 2 px (o cartão da home não muda de altura). */
   .rota--terminal .placa-corpo { border-width: 1px; padding: 11px 13px 13px; border-radius: var(--raio); background: var(--bg); }
@@ -439,7 +440,10 @@ const vitrine = modo === 'loop' && !compacta;
   @media (max-width: 899px) {
     /* Celular: seis caixas só com o rótulo; menos respiro para "Etapa n" caber. */
     .rota--terminal.rota--vitrine .placa-corpo { padding: 6px 2px; text-align: center; }
-    .rota--terminal.rota--vitrine .km { font-size: 0.66rem; letter-spacing: 0; }
+    .rota--terminal.rota--vitrine .km { font-size: 0.7rem; letter-spacing: 0; }
+    /* No celular a janela cresce com as linhas (elas quebram mais); os painéis ficam todos na mesma célula, então a
+       altura é a do painel mais alto e não pula entre as etapas. */
+    .execucao-log { height: auto; }
     .rota--terminal .vitrine-painel { gap: 14px; }
   }
   @media (min-width: 900px) {

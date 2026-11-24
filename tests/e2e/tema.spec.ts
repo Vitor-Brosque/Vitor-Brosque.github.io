@@ -198,12 +198,14 @@ test.describe('rota com movimento reduzido', () => {
     expect(await page.evaluate(() => window.scrollY)).toBe(y);
     const acesos = () => rota.locator('.marco[data-aceso]').count();
     expect(await acesos()).toBeGreaterThan(0);
-    // A pausa da rota para a lanterna.
+    // A pausa da rota para o veículo: mais que uma parada inteira (4 s) depois, ele segue na mesma parada e no mesmo lugar.
     const pausa = rota.locator('[data-rota-pausa]');
     await pausa.click();
     await expect(pausa).toHaveText('Continuar');
     const parada = await pos();
-    await page.waitForTimeout(1500);
+    const ativaNaPausa = await ativa();
+    await page.waitForTimeout(6000);
+    expect(await ativa()).toBe(ativaNaPausa);
     expect(await pos()).toBe(parada);
     // Clicar na última parada leva o veículo até ela.
     await rota.locator('[data-placa-botao]').nth(n - 1).click();
@@ -485,6 +487,11 @@ test('a "Situação atual" fica só no TechNews, entre os detalhes técnicos e o
     await page.goto(caminho);
     await expect(page.locator('#situacao')).toHaveCount(0);
   }
+  // RodoviariaOS e Life RPG continuam com os números onde estavam: os quatro do RodoviariaOS no "Em resumo"; o Life RPG
+  // não tem números (nem no "Em resumo", nem numa "Situação atual").
   await page.goto('/projetos/rodoviariaos/');
+  await expect(page.locator('.em-resumo .numeros dt')).toHaveCount(4);
   await expect(page.locator('.em-resumo .numeros dt').first()).toBeVisible();
+  await page.goto('/projetos/life-rpg/');
+  await expect(page.locator('.numeros')).toHaveCount(0);
 });
