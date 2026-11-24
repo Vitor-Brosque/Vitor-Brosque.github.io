@@ -106,7 +106,7 @@ test.describe('com movimento reduzido', () => {
 
   test('o carro da rota grande anda de placa em placa', async ({ page }) => {
     await page.goto('/');
-    const rota = page.locator('#projetos [data-rota][data-modo="loop"]');
+    const rota = page.locator('#projetos [data-rota]');
     test.setTimeout(90_000);
     await rota.scrollIntoViewIfNeeded();
     // Observa a cada quadro, dentro da página, até ver a sequência inteira: o carro parado sob uma placa,
@@ -151,7 +151,7 @@ test.describe('com movimento reduzido', () => {
   test('a rota grande troca a parada sozinha, a pausa segura, a placa leva à parada e nenhum vídeo toca', async ({ page }) => {
     test.setTimeout(90_000);
     await page.goto('/');
-    const seletor = '#projetos [data-rota][data-modo="loop"]';
+    const seletor = '#projetos [data-rota]';
     const rota = page.locator(seletor);
     await rota.scrollIntoViewIfNeeded();
     const inicial = await indiceAtivo(page, seletor);
@@ -180,7 +180,7 @@ test.describe('com movimento reduzido', () => {
 
   test('o vídeo que a pessoa iniciou continua tocando ao a rota sair e voltar à tela', async ({ page }) => {
     await page.goto('/');
-    const rota = page.locator('#projetos [data-rota][data-modo="loop"]');
+    const rota = page.locator('#projetos [data-rota]');
     await rota.scrollIntoViewIfNeeded();
     const video = rota.locator('[data-painel]').first().locator('video');
     await page.waitForTimeout(500);
@@ -197,7 +197,6 @@ test.describe('com movimento reduzido', () => {
   test('no estudo de caso a rota é a mesma da home: anda sozinha, com o painel da parada ativa embaixo', async ({ page }) => {
     await page.goto('/projetos/rodoviariaos/');
     const rota = page.locator('main [data-rota]');
-    await expect(rota).toHaveAttribute('data-modo', 'loop');
     await expect(rota).not.toHaveAttribute('data-estatico');
     await expect(page.locator('.pin-spacer')).toHaveCount(0);
     await rota.scrollIntoViewIfNeeded();
@@ -282,7 +281,7 @@ test.describe('com movimento permitido', () => {
   test('o botão de pausa para tudo e troca o texto', async ({ page }) => {
     test.setTimeout(90_000);
     await page.goto('/');
-    const rota = page.locator('#projetos [data-rota][data-modo="loop"]');
+    const rota = page.locator('#projetos [data-rota]');
     await rota.scrollIntoViewIfNeeded();
     const pos = () => rota.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--pos'));
     const rodando = () =>
@@ -312,7 +311,7 @@ test.describe('com movimento permitido', () => {
   });
 
   test.describe('rota grande da home', () => {
-    const seletor = '#projetos [data-rota][data-modo="loop"]';
+    const seletor = '#projetos [data-rota]';
 
     test('troca sozinha de parada e mostra o painel dela', async ({ page }) => {
       test.setTimeout(60_000);
@@ -501,7 +500,7 @@ for (const modo of ['reduce', 'no-preference'] as const) {
     test.use({ reducedMotion: modo });
 
     const desloc = (page: Page) => page.locator('[data-estrada]').first().evaluate((el) => (el as HTMLElement).style.getPropertyValue('--desloc'));
-    const seletorRota = '#projetos [data-rota][data-modo="loop"]';
+    const seletorRota = '#projetos [data-rota]';
     const pos = (page: Page) => page.locator(seletorRota).evaluate((el) => (el as HTMLElement).style.getPropertyValue('--pos'));
 
     test('o botão da estrada para a rua e o carro da rota; Continuar na rota retoma os dois', async ({ page }) => {
@@ -590,7 +589,7 @@ for (const modo of ['reduce', 'no-preference'] as const) {
     test.setTimeout(30_000);
     await page.emulateMedia({ reducedMotion: modo });
     await page.goto('/');
-    const rota = page.locator('#projetos [data-rota][data-modo="loop"]');
+    const rota = page.locator('#projetos [data-rota]');
     await rota.evaluate((el) => {
       const w = window as unknown as { __marcas: Array<[number, boolean]> };
       w.__marcas = [];

@@ -93,7 +93,7 @@ const jsonLd = {
 
     <section class="secao wrap" aria-labelledby="rota">
       <h2 id="rota" class="revelar">{d.rota.titulo}</h2>
-      <div class="caso-rota"><Rota titulo={d.rota.titulo} paradas={d.rota.paradas} modo={d.rota.modo} idioma={idioma} tema={tema} execucao={terminal && d.logDoTopo?.[0] ? { arquivo: ARQUIVO_DO_LOG, comando: d.logDoTopo[0] } : undefined} /></div>
+      <div class="caso-rota"><Rota titulo={d.rota.titulo} paradas={d.rota.paradas} idioma={idioma} tema={tema} execucao={terminal && d.logDoTopo?.[0] ? { arquivo: ARQUIVO_DO_LOG, comando: d.logDoTopo[0] } : undefined} /></div>
     </section>
 
     {d.funcionalidades.length > 0 && (

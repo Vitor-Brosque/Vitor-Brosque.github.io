@@ -31,7 +31,7 @@ test('navegação pelo ClientRouter mantém as rotas e o idioma funcionando', as
   await page.goBack();
   await expect(page).toHaveURL(/\/$/);
   // O fim do estudo de caso também tem uma rota em loop (o cartão do TechNews): a da home é a da seção de projetos.
-  const loop = page.locator('#projetos [data-rota][data-modo="loop"]').first();
+  const loop = page.locator('#projetos [data-rota]').first();
   await loop.scrollIntoViewIfNeeded();
   const pos = () => loop.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--pos'));
   await expect.poll(pos, { timeout: 8000 }).not.toBe('');

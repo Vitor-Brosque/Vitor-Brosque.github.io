@@ -1,5 +1,3 @@
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { aoCarregarPagina } from './ciclo';
 import { movimentoReduzido } from './movimento';
 import { aoMudarPausa, definirPausa, estaPausado } from './pausa';
@@ -7,7 +5,6 @@ import {
   LOOP,
   TEMPOS_GRANDE,
   UNIDADE_MS,
-  estadoDaRolagem,
   estadoDoLoop,
   fracaoDoCarro,
   inicioDaParada,
@@ -15,8 +12,6 @@ import {
   type EstadoRota,
   type TemposDoLoop,
 } from './rota-estado';
-
-gsap.registerPlugin(ScrollTrigger);
 
 /** Ao clicar numa placa, o carro anda até ela nesse tempo. */
 const IDA_MS = 600;
@@ -328,79 +323,26 @@ function vitrineViva(rota: Rota, loop: Loop, pausar: () => void, reduzido: boole
   return () => limpezas.forEach((f) => f());
 }
 
-/** Estudo de caso com movimento: presa no desktop, guiada pela rolagem no celular. */
-function rolagemAndando(rota: Rota): () => void {
-  const n = rota.placas.length;
-  const atualizar = (st: ScrollTrigger) => rota.aplicar(estadoDaRolagem(st.progress, n));
-  const mm = gsap.matchMedia();
-  mm.add('(min-width: 900px)', () => {
-    ScrollTrigger.create({
-      trigger: rota.raiz,
-      pin: true,
-      start: 'top top+=80',
-      end: () => `+=${Math.round(n * window.innerHeight * 0.6)}`,
-      scrub: 0.4,
-      onUpdate: atualizar,
-    });
-    rota.aplicar(estadoDaRolagem(0, n));
-  });
-  mm.add('(max-width: 899px)', () => {
-    const gatilho = ScrollTrigger.create({
-      trigger: rota.raiz,
-      start: 'top 60%',
-      end: 'bottom 60%',
-      scrub: 0.3,
-      onUpdate: atualizar,
-      onRefresh: atualizar,
-    });
-    atualizar(gatilho);
-  });
-  return () => mm.revert();
-}
-
-/** Estudo de caso com movimento reduzido: lista com tudo visível; acende a placa que cruza o meio da janela. */
-function rolagemEstatica(rota: Rota): () => void {
-  rota.raiz.setAttribute('data-estatico', '');
-  rota.acender(0);
-  if (!('IntersectionObserver' in window)) return () => {};
-  const cruzando = new Set<HTMLElement>();
-  const obs = new IntersectionObserver(
-    (entradas) => {
-      for (const e of entradas) {
-        if (e.isIntersecting) cruzando.add(e.target as HTMLElement);
-        else cruzando.delete(e.target as HTMLElement);
-      }
-      // Se nenhuma cruza o meio, fica acesa a última que cruzou.
-      const acesa = rota.placas.findLast((p) => cruzando.has(p));
-      if (acesa) rota.acender(rota.placas.indexOf(acesa));
-    },
-    { rootMargin: '-45% 0px -45% 0px' },
-  );
-  rota.placas.forEach((p) => obs.observe(p));
-  return () => obs.disconnect();
-}
-
 aoCarregarPagina(() => {
   const raizes = [...document.querySelectorAll<HTMLElement>('[data-rota]')];
   if (raizes.length === 0) return;
   const reduzido = movimentoReduzido();
   const limpezas: Array<() => void> = [];
 
-  // A pausa é da página (pausa.ts): os botões dela trocam o texto lá; aqui as rotas em loop só mostram o estado.
-  const marcarPausa = (pausado: boolean) => raizes.forEach((r) => r.dataset.modo === 'loop' && r.toggleAttribute('data-pausada', pausado));
+  // A pausa é da página (pausa.ts): os botões dela trocam o texto lá; aqui as rotas só mostram o estado.
+  const marcarPausa = (pausado: boolean) => raizes.forEach((r) => r.toggleAttribute('data-pausada', pausado));
   marcarPausa(estaPausado());
   limpezas.push(aoMudarPausa(marcarPausa));
 
   for (const raiz of raizes) {
     const rota = new Rota(raiz);
     limpezas.push(() => rota.desligar());
-    if (raiz.dataset.modo === 'loop') {
-      const grande = rota.paineis.length > 0;
-      // O carro anda nos dois modos (exceção escolhida à regra dos dois modos); quique, tracejado correndo e placa subindo ficam no CSS só com movimento.
-      const loop = loopAndando(rota, grande ? TEMPOS_GRANDE : LOOP);
-      limpezas.push(() => loop.limpar());
-      if (grande) limpezas.push(vitrineViva(rota, loop, () => definirPausa(true), reduzido));
-    } else limpezas.push(reduzido ? rolagemEstatica(rota) : rolagemAndando(rota));
+    // Toda rota anda sozinha (a da home, a compacta dos cartões e a dos estudos de caso), nos dois modos de movimento
+    // (exceção escolhida à regra dos dois modos); quique, tracejado correndo e placa subindo ficam no CSS só com movimento.
+    const grande = rota.paineis.length > 0;
+    const loop = loopAndando(rota, grande ? TEMPOS_GRANDE : LOOP);
+    limpezas.push(() => loop.limpar());
+    if (grande) limpezas.push(vitrineViva(rota, loop, () => definirPausa(true), reduzido));
   }
   return () => limpezas.forEach((f) => f());
 });

@@ -34,7 +34,6 @@ problema: |-
 
   E para comprar um carro ou dar preço a ele, a pesquisa era abrir a FIPE e os anúncios, um por um.
 rota:
-  modo: loop
   titulo: A rota de um lead
   paradas:
     - titulo: O lead chega

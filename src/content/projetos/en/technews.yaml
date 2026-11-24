@@ -39,7 +39,6 @@ problema: |-
 
   It is also my data engineering lab: each step is built so I understand the reason behind every decision.
 rota:
-  modo: loop
   titulo: From the sources to the morning read
   paradas:
     - titulo: Sources

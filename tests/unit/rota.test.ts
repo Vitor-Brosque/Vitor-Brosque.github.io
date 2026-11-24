@@ -1,40 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { LOOP, TEMPOS_GRANDE, UNIDADE_MS, estadoDaRolagem, estadoDoLoop, fracaoDoCarro, inicioDaParada, unidadesDoLoop } from '../../src/scripts/rota-estado';
-
-describe('estadoDaRolagem', () => {
-  it('começa parado na primeira placa', () => {
-    expect(estadoDaRolagem(0, 5)).toEqual({ ativa: 0, u: 0, andando: false });
-  });
-  it('termina parado na última placa', () => {
-    expect(estadoDaRolagem(1, 5)).toEqual({ ativa: 4, u: 4, andando: false });
-  });
-  it('fica parado na placa durante 60% do trecho', () => {
-    expect(estadoDaRolagem(0.11, 5)).toEqual({ ativa: 0, u: 0, andando: false });
-  });
-  it('anda entre placas no fim do trecho e troca a ativa na metade do caminho', () => {
-    const indo = estadoDaRolagem(0.15, 5);
-    expect(indo.andando).toBe(true);
-    expect(indo.u).toBeGreaterThan(0);
-    expect(indo.u).toBeLessThan(1);
-    expect(indo.ativa).toBe(0);
-    expect(estadoDaRolagem(0.19, 5).ativa).toBe(1);
-  });
-  it('u nunca volta para trás', () => {
-    let anterior = -Infinity;
-    for (let p = 0; p <= 1.0001; p += 0.005) {
-      const { u } = estadoDaRolagem(p, 4);
-      expect(u).toBeGreaterThanOrEqual(anterior);
-      anterior = u;
-    }
-  });
-  it('com uma placa só fica nela', () => {
-    expect(estadoDaRolagem(0.7, 1)).toMatchObject({ ativa: 0, u: 0 });
-  });
-  it('limita progresso fora de 0..1', () => {
-    expect(estadoDaRolagem(-3, 3)).toEqual(estadoDaRolagem(0, 3));
-    expect(estadoDaRolagem(7, 3)).toEqual(estadoDaRolagem(1, 3));
-  });
-});
+import { LOOP, TEMPOS_GRANDE, UNIDADE_MS, estadoDoLoop, fracaoDoCarro, inicioDaParada, unidadesDoLoop } from '../../src/scripts/rota-estado';
 
 describe('estadoDoLoop', () => {
   it('começa antes da entrada, sem placa acesa', () => {

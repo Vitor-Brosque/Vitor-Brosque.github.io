@@ -39,7 +39,6 @@ problema: |-
 
   Ele também é o meu laboratório de engenharia de dados: cada etapa é construída para eu entender o porquê de cada decisão.
 rota:
-  modo: loop
   titulo: Das fontes à leitura da manhã
   paradas:
     - titulo: Fontes

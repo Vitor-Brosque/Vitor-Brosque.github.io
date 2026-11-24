@@ -40,7 +40,6 @@ problema: |-
 
   Uso no PC desde novembro de 2026. O app foi feito para celular e PC desde o começo, por isso precisava funcionar sem internet e manter os dois em sincronia. O celular é o próximo passo.
 rota:
-  modo: loop
   titulo: A rota de uma mudança
   paradas:
     - titulo: Você marca no celular

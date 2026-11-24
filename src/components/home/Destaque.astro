@@ -20,7 +20,7 @@ const slug = slugDe(projeto.id);
     <div class="revelar"><p class="rotulo">{t(idioma, 'destaque.orgulho')}</p><p>{d.resumo.orgulho}</p></div>
   </div>
   <div class="destaque-rota revelar">
-    <Rota titulo={d.rota.titulo} paradas={d.rota.paradas} modo="loop" idioma={idioma} />
+    <Rota titulo={d.rota.titulo} paradas={d.rota.paradas} idioma={idioma} />
   </div>
   <a class="botao botao--sinal destaque-cta" href={urlDoProjeto(idioma, slug)}>{t(idioma, 'card.verCaso')} <span class="seta" aria-hidden="true">→</span></a>
 </section>

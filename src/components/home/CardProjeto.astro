@@ -23,7 +23,7 @@ const rpg = d.tema === 'rpg';
     {usaCapa && d.capa?.imagem ? (
       <Picture src={d.capa.imagem} alt="" formats={['avif', 'webp']} widths={[480, 780]} sizes="(min-width: 900px) 34vw, 92vw" />
     ) : (
-      <Rota titulo={d.rota.titulo} paradas={d.rota.paradas} modo="loop" idioma={idioma} compacta tema={d.tema} />
+      <Rota titulo={d.rota.titulo} paradas={d.rota.paradas} idioma={idioma} compacta tema={d.tema} />
     )}
     {rpg && <div class="card-lanterna" aria-hidden="true"><Lanterna /></div>}
   </div>

@@ -7,20 +7,8 @@ export interface EstadoRota {
   andando: boolean;
 }
 
-const PARADO = 0.6;
 const suave = (t: number) => t * t * (3 - 2 * t);
 const limitar = (v: number, a: number, b: number) => Math.min(Math.max(v, a), b);
-
-/** Rolagem (estudo de caso): o progresso de 0 a 1 leva o carro da primeira à última placa, parando em cada uma. */
-export function estadoDaRolagem(progresso: number, total: number): EstadoRota {
-  if (total <= 1) return { ativa: 0, u: 0, andando: false };
-  const p = limitar(progresso, 0, 1);
-  const trecho = Math.min(total - 1, Math.floor(p * total));
-  const local = p * total - trecho;
-  if (trecho === total - 1 || local <= PARADO) return { ativa: trecho, u: trecho, andando: false };
-  const t = (local - PARADO) / (1 - PARADO);
-  return { ativa: t < 0.5 ? trecho : trecho + 1, u: trecho + suave(t), andando: true };
-}
 
 /** Tempos do loop, em unidades: entrada, parada em cada placa, trecho entre placas e saída. */
 export interface TemposDoLoop {
