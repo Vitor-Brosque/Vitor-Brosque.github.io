@@ -1,7 +1,7 @@
 titulo: RodoviariaOS
 ordem: 1
 destaque: true
-frase: CRM, financeiro e assistente com IA para a revenda de carros da minha família.
+frase: O sistema que não deixa lead se perder e mostra quanto cada carro deu de lucro, na revenda da minha família.
 status: producao
 statusTexto: Em produção · código fechado
 statusDetalhe: >-
@@ -15,100 +15,129 @@ links:
 cartao: capa
 capa:
   imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
-  alt: Painel do dia do RodoviariaOS com resumo, tarefas, alertas, estoque e financeiro, com dados inventados
+  alt: Painel do dia do RodoviariaOS com resumo, pendências, estoque e financeiro do mês, na loja de demonstração, com dados inventados
 emResumo: >-
-  Sistema que a revenda da minha família usa todos os dias. Desde julho de 2026 ele recebeu cerca de 1.000 leads e, no mês de pico, 2,6 mil mensagens de WhatsApp. Fiz tudo sozinho, do banco de dados às telas, com mais de 1.400 testes automáticos da API. O CRM, o WhatsApp e o estoque estão em uso; o financeiro, o assistente com IA e o radar de compra estão prontos e entrando em uso.
+  Sistema que a revenda da minha família usa todos os dias para não perder cliente. Desde julho de 2026 ele recebeu cerca de 1.000 leads e registrou perto de 11 mil mensagens de WhatsApp. Para cada lead, guarda de onde ele veio, qual carro quer e quando chamar de novo. Para cada carro, soma compra, preparação, impostos e comissão e mostra o lucro. Fiz tudo sozinho. O CRM, o WhatsApp e o estoque estão em uso; o financeiro, o assistente com IA e o radar de mercado estão prontos e entrando em uso.
 resumo:
   problema: >-
-    Centenas de leads chegando pelo WhatsApp e por anúncios. O vendedor se perdia nas conversas,
-    e cada sócio fazia a conta dos próprios carros à mão.
+    O vendedor recebia o lead e perdia o fio: não sabia de onde ele veio, qual carro queria, quão interessado estava nem quando chamar de novo. E ninguém sabia dizer quanto cada carro tinha dado de lucro.
   construi: >-
-    Um sistema que reconhece cada cliente, monta a fila de quem precisa de resposta e calcula o
-    resultado de cada carro, com o financeiro e um assistente prontos para entrar em uso.
+    Um sistema que guarda a origem, o carro e o interesse de cada lead, diz quem chamar agora e traz de volta quem sumiu. E que junta todos os ganhos e gastos de cada carro para mostrar o lucro.
   orgulho: >-
-    Cada sócio vê só os números dos próprios carros. O sistema foi feito para não perder nem repetir mensagens de clientes. E a IA ajuda sem ter acesso aos dados da loja.
+    O lead de anúncio chega já ligado ao carro certo, sem ninguém digitar. Cada sócio vê só os números dos próprios carros. E nenhuma mensagem sai para o cliente sem o vendedor revisar.
 problema: |-
   Antes de programar, eu trabalhava no balcão da Rodoviária Veículos, a revenda da minha família. Cuidava dos anúncios, do estoque e do atendimento pelo WhatsApp.
 
-  O gargalo era sempre o mesmo. Os leads chegavam aos montes, a maioria pelo WhatsApp, e o vendedor não sabia quem estava esperando resposta, quem já tinha sido atendido e quem tinha esfriado. Também não dava para saber qual anúncio trazia venda.
+  O vendedor recebia o lead e não conseguia acompanhar. Não dava para saber de onde ele tinha vindo, qual carro queria, quão interessado estava nem quando era hora de chamar de novo. Quem não respondia na hora sumia, e quando chegava um carro que servia para a pessoa ninguém lembrava dela.
 
-  No financeiro, a loja tem mais de um sócio, e cada um é dono de carros diferentes. Cada sócio precisa ver o custo e o resultado dos próprios carros, mas não os do outro. Isso era resolvido com planilha e conversa.
+  No dinheiro era parecido. Ninguém sabia dizer, carro a carro, quanto tinha entrado e quanto tinha saído: compra, manutenção, limpeza, imposto, comissão, retorno do financiamento. A loja tem mais de um sócio, cada um dono de carros diferentes, e a conta era feita em planilha e conversa.
+
+  E para comprar um carro ou dar preço a ele, a pesquisa era abrir a FIPE e os anúncios, um por um.
 rota:
   titulo: A rota de um lead
   paradas:
     - titulo: O lead chega
-      curto: WhatsApp, anúncio da Meta ou site.
+      curto: Já com a origem e o carro do anúncio.
       texto: >-
-        Pelo WhatsApp, por um anúncio da Meta de clique para o WhatsApp ou pelo formulário do site.
-        A mensagem entra por um webhook assinado e é gravada antes de ser processada.
-    - titulo: Quem é essa pessoa
-      curto: Reconhece a pessoa, sem duplicar.
-      texto: >-
-        O telefone normalizado e uma camada de identidade ligam lead, cliente e fornecedor à mesma
-        pessoa, sem duplicar. A origem do contato fica registrada.
-    - titulo: Fila por próxima ação
-      curto: Responder, Primeiro contato, Tentativas, Negociação.
-      texto: >-
-        Cada lead cai numa fila só, nesta ordem: Responder, Primeiro contato, Tentativas e Negociação.
-        A cadência conta só as tentativas realmente feitas e sugere a mensagem. O sistema nunca
-        envia nada sozinho.
+        Pelo WhatsApp, por um anúncio da Meta ou pelo site da loja. O sistema lê de qual anúncio a pessoa veio e já liga o lead ao carro anunciado, sem ninguém digitar. O vendedor com menos atendimentos em aberto recebe o lead.
       midia:
-        imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
-        alt: Painel do dia mostrando leads esperando resposta e leads novos sem resposta
-    - titulo: Negociação
-      curto: A origem do lead é registrada e não pode ser alterada depois.
+        video: /media/rodoviariaos/do-whatsapp-a-fila.mp4
+        imagem: ../../../assets/projetos/rodoviariaos/do-whatsapp-a-fila.png
+        proporcao: 8/5
+        alt: Uma mensagem de anúncio chega pelo WhatsApp, o lead aparece na fila e o vendedor responde com uma mensagem pronta, na loja de demonstração
+    - titulo: O que ele quer
+      curto: Carro de interesse, troca e temperatura.
       texto: >-
-        Para abrir uma negociação, a origem do lead precisa estar registrada. A partir daí ela não pode mais ser alterada e segue até a venda.
+        A ficha do lead guarda a origem, o carro de interesse, se ele tem carro para dar na troca e a temperatura, que o vendedor marca. A IA pode sugerir a temperatura, citando o trecho da conversa. Se outro cliente se interessar pelo carro que entrou na troca, abre-se um lead novo para ele.
+      midia:
+        imagem: ../../../assets/projetos/rodoviariaos/conversa-lead-de-anuncio.png
+        alt: Conversa de um lead que veio de anúncio, com a origem, o anúncio e o carro de interesse ao lado, com dados inventados
+    - titulo: Quem chamar agora
+      curto: Uma fila só, por próxima ação.
+      texto: >-
+        Cada lead cai numa fila só, nesta ordem: Responder, Primeiro contato, Tentativas e Negociação. Quem espera há mais tempo vem primeiro, e o placar do dia mostra quanto tempo a loja levou para responder.
+      midia:
+        imagem: ../../../assets/projetos/rodoviariaos/filas.png
+        alt: Filas do CRM por próxima ação, com o placar do dia e o tempo de espera de cada lead, com dados inventados
+    - titulo: Quando ele some
+      curto: A mensagem de retomada já vem escrita.
+      texto: >-
+        Se o cliente para de responder, o sistema marca a próxima tentativa e sugere a mensagem. O vendedor revisa e envia: nada sai sozinho. Só contam as tentativas realmente feitas.
+      midia:
+        imagem: ../../../assets/projetos/rodoviariaos/mensagem-sugerida.png
+        alt: Fila de tentativas do dia com a mensagem pronta da quarta tentativa para o vendedor revisar, com dados inventados
+    - titulo: Resgate
+      curto: Por tempo ou pelo carro de interesse.
+      texto: >-
+        Todo dia o sistema devolve à fila leads que ficaram em silêncio. A ficha de cada carro mostra os leads que combinam com ele e a temperatura de cada um. Quando um lead é retomado, o sistema mostra a FIPE atual e carros parecidos mais baratos.
+      midia:
+        imagem: ../../../assets/projetos/rodoviariaos/interessados.png
+        alt: Ficha de um carro com a lista de leads interessados e a temperatura de cada um, com dados inventados
+    - titulo: Da negociação à venda
+      curto: Sinal, troca e financiamento, com a origem guardada.
+      texto: >-
+        A negociação é montada como acontece no balcão: sinal, carro na troca, PIX e financiamento. A origem do lead é registrada e não pode ser alterada depois, então a venda aponta para o anúncio que a trouxe.
       midia:
         video: /media/rodoviariaos/whatsapp-negociacao-celular.mp4
         imagem: ../../../assets/projetos/rodoviariaos/whatsapp-negociacao-celular.png
         proporcao: 780/1688
         moldura: celular
         alt: Conversa de WhatsApp virando negociação no RodoviariaOS, com dados inventados
-    - titulo: Venda atribuída
-      curto: Vendas por origem, campanha e carro.
-      texto: >-
-        Os relatórios cruzam leads, negociações e vendas por origem, campanha, anúncio e carro,
-        com o custo por lead.
 funcionalidades:
-  - titulo: Painel do dia
+  - titulo: Lucro de cada carro
     texto: >-
-      O que pede ação hoje num resumo só: tarefas, contas vencidas, leads sem resposta e carros
-      parados.
-    midia:
-      imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
-      alt: Painel do dia com resumo, tarefas, alertas, estoque e financeiro, com dados inventados
-  - titulo: Mesmo carro, dois sócios
-    texto: >-
-      O dono do carro vê custo e margem. O outro sócio vê só o catálogo. A regra vale nas telas,
-      na API e no banco.
-    midia:
-      imagem: ../../../assets/projetos/rodoviariaos/dois-socios.png
-      video: /media/rodoviariaos/dois-socios.mp4
-      alt: O mesmo carro visto por dois sócios, um com custo e margem e outro só com o catálogo
-  - titulo: Resultado por carro
-    texto: >-
-      Preço de venda menos o custo real do carro: aquisição, despesas, comissão, garantia e
-      tributos. O resultado fica Provisório até tudo ser realizado.
+      Preço de venda menos tudo o que o carro custou: compra, manutenção, limpeza, documentação, comissão, garantia e impostos. Entra também o que veio junto com a venda, como o retorno do financiamento. O número fica Provisório até tudo ser pago e recebido.
     midia:
       imagem: ../../../assets/projetos/rodoviariaos/resultado-por-carro.png
-      alt: Tela de resultado por carro com venda, aquisição, despesas e resultado, com dados inventados
+      alt: Resultado por carro da loja de demonstração, com venda, aquisição, despesas, comissão, retorno e resultado de cada um, com dados inventados
+  - titulo: O dossiê do carro
+    texto: >-
+      Cada carro tem a sua ficha: quanto custou, cada despesa com data, categoria e fornecedor, os documentos e o lucro previsto antes mesmo de vender.
+    midia:
+      imagem: ../../../assets/projetos/rodoviariaos/ficha-do-carro.png
+      alt: Ficha de um carro com custo de aquisição, despesas por categoria, preço anunciado e margem estimada, com dados inventados
+  - titulo: Para onde o dinheiro vai
+    texto: >-
+      Receitas e despesas do mês por categoria: venda de carro, retorno de financiamento, compra, oficina, limpeza, impostos, aluguel. E o acerto entre os sócios quando um deles paga uma conta da loja.
+    midia:
+      imagem: ../../../assets/projetos/rodoviariaos/dre-do-mes.png
+      alt: Resultado do mês por categoria, com receitas e despesas da loja de demonstração, com dados inventados
+  - titulo: O extrato do banco, conferido
+    texto: >-
+      O extrato é importado, o sistema sugere a categoria de cada linha com base no que já aprendeu e aponta o lançamento que bate. Extrato repetido é barrado antes de virar lançamento em dobro.
+    midia:
+      video: /media/rodoviariaos/extrato-e-conciliacao.mp4
+      imagem: ../../../assets/projetos/rodoviariaos/extrato-e-conciliacao.png
+      proporcao: 8/5
+      alt: Importação de um extrato, sugestões de categoria aceitas e uma linha conciliada com o lançamento sugerido, na loja de demonstração
+  - titulo: Radar de mercado
+    texto: >-
+      Anúncios de carros parecidos comparados com a mediana do mercado, corrigida pela quilometragem. Preço baixo demais vira "conferir" e nunca some da lista. Na ficha do carro, a tabela FIPE fica ao lado do preço anunciado.
+    midia:
+      imagem: ../../../assets/projetos/rodoviariaos/radar-de-compra.png
+      alt: Lista de anúncios do mercado com os selos de oportunidade, de conferir e de saiu do ar, com dados inventados
+  - titulo: Mesmo carro, dois sócios
+    texto: >-
+      O dono do carro vê custo e margem. O outro sócio vê só o catálogo. A regra vale nas telas, na API e no banco.
+    midia:
+      video: /media/rodoviariaos/dois-socios.mp4
+      imagem: ../../../assets/projetos/rodoviariaos/dois-socios.png
+      proporcao: 8/5
+      alt: A mesma ficha de carro aberta pelo dono, com custo e resultado, e pelo outro sócio, só com catálogo e preço, na loja de demonstração
   - titulo: Assistente
     texto: >-
-      Responde perguntas sobre estoque, leads e financeiro, e só registra algo depois de um
-      "confirmo".
+      Responde perguntas sobre estoque, leads e financeiro, respeita o que cada sócio pode ver e só registra algo depois de um "confirmo".
     midia:
       video: /media/rodoviariaos/assistente.mp4
       imagem: ../../../assets/projetos/rodoviariaos/assistente.png
-      proporcao: 4/5
-      alt: Assistente do RodoviariaOS respondendo uma consulta e pedindo confirmação, com dados inventados
-  - titulo: Radar de compra
+      proporcao: 8/5
+      alt: O assistente responde sobre carros parados, recusa mostrar o custo de um carro de outro sócio e lança uma despesa depois do confirmo, na loja de demonstração
+  - titulo: Painel do dia
     texto: >-
-      Anúncios de carros parecidos comparados com a mediana do mercado, corrigida pela
-      quilometragem. Desconto grande demais vira "conferir" e nunca some.
+      O que pede ação hoje num resumo só: tarefas, contas vencidas, leads sem resposta e carros parados.
     midia:
-      imagem: ../../../assets/projetos/rodoviariaos/radar-de-compra.png
-      alt: Lista de anúncios com selos de oportunidade e de conferir, com dados inventados
+      imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
+      alt: Painel do dia com resumo, tarefas, alertas, estoque e financeiro, na loja de demonstração, com dados inventados
   - titulo: Ocultar valores
     texto: Um clique esconde todos os valores da tela, para quando tem cliente no balcão.
     midia:
@@ -273,12 +302,11 @@ decisoes:
     deixeiDeLado: O CI/CD automático. Como o código é fechado, preferi controle humano, com um roteiro escrito para cada rodada.
 numeros:
   - { valor: "~1.000", rotulo: "leads recebidos desde julho de 2026" }
-  - { valor: "~400", rotulo: "leads no mês de pico (setembro)" }
-  - { valor: "~2,6 mil", rotulo: "mensagens de WhatsApp recebidas no mês de pico" }
-  - { valor: "1.400+", rotulo: "testes de API contra PostgreSQL real, mais 150+ no front" }
+  - { valor: "~11 mil", rotulo: "mensagens de WhatsApp registradas, de agosto a novembro de 2026" }
+  - { valor: "36", rotulo: "carros no estoque, acompanhados pelo sistema" }
+  - { valor: "1.400+", rotulo: "testes automáticos da API, rodando num banco de dados de verdade" }
 numerosFonte: >-
-  Lidos no banco de produção em 23/11/2026. Leads e mensagens vêm do CRM em uso. O financeiro e o
-  assistente ainda não têm volume real.
+  Lidos no banco de produção em 23/11/2026. Leads, mensagens e estoque vêm dos módulos em uso. O financeiro e o assistente ainda não têm volume real.
 proximos:
   - Colocar o financeiro e o assistente em uso diário na loja.
   - Publicar a extensão do radar de compra e conferir com os portais reais.
@@ -286,5 +314,4 @@ proximos:
   - Preparar o sistema para outras revendas.
 seo:
   descricao: >-
-    Estudo de caso do RodoviariaOS: CRM, financeiro e IA para uma revenda, com isolamento por RLS no
-    PostgreSQL e ingestão confiável do WhatsApp.
+    Estudo de caso do RodoviariaOS: o sistema que acompanha cada lead até a venda e mostra o lucro de cada carro numa revenda, com PostgreSQL e WhatsApp.

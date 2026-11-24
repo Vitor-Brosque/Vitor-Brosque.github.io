@@ -1,7 +1,7 @@
 titulo: RodoviariaOS
 ordem: 1
 destaque: true
-frase: CRM, finance and an AI assistant for my family's car dealership.
+frase: The system that keeps leads from slipping away and shows how much each car made, at my family's car dealership.
 status: producao
 statusTexto: In production · closed source
 statusDetalhe: >-
@@ -15,100 +15,131 @@ links:
 cartao: capa
 capa:
   imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
-  alt: RodoviariaOS daily dashboard with summary, tasks, alerts, inventory and finance, using made-up data
+  alt: RodoviariaOS daily dashboard with summary, pending items, inventory and the month's finances, in the demo store, with made-up data
 emResumo: >-
-  The system my family's dealership uses every day. Since July 2026 it has received about 1,000 leads and, in the peak month, 2,600 WhatsApp messages. I built all of it myself, from the database to the screens, with more than 1,400 automated API tests. CRM, WhatsApp and inventory are in use; finance, the AI assistant and the purchase radar are built and being rolled out.
+  The system my family's car dealership uses every day so it doesn't lose customers. Since July 2026 it has received about 1,000 leads and logged close to 11,000 WhatsApp messages. For each lead, it keeps where they came from, which car they want and when to call again. For each car, it adds up purchase, preparation, taxes and commission and shows the profit. I built all of it on my own. The CRM, WhatsApp and inventory are in use; finance, the AI assistant and the market radar are built and being rolled out.
 resumo:
   problema: >-
-    Hundreds of leads coming in through WhatsApp and ads. The salesperson got lost in the conversations,
-    and each partner worked out the numbers for their own cars by hand.
+    The salesperson got the lead and lost the thread: no way to tell where it came from, which car they wanted, how interested they were or when to call again. And nobody could say how much each car had made.
   construi: >-
-    A system that recognizes each customer, builds the queue of who needs an answer and calculates
-    the result of each car, with finance and an assistant ready to go live.
+    A system that keeps the source, the car and the interest of every lead, says who to call now and brings back the ones who went quiet. And that puts together every gain and cost of each car to show the profit.
   orgulho: >-
-    Each partner sees only the numbers for their own cars. The system is built not to lose or repeat customer messages. And the AI helps without having access to the store's data.
+    A lead from an ad arrives already linked to the right car, with nobody typing. Each partner sees only the numbers for their own cars. And no message goes out to a customer before the salesperson reviews it.
 problema: |-
   Before I wrote code, I worked the counter at Rodoviária Veículos, my family's car dealership. I took care of the ads, the inventory and customer service on WhatsApp.
 
-  The bottleneck was always the same. Leads came in by the hundreds, mostly through WhatsApp, and the salesperson couldn't tell who was waiting for an answer, who had already been helped and who had gone cold. There was also no way to know which ad actually led to a sale.
+  The salesperson got the lead and couldn't keep up with it. There was no way to tell where it had come from, which car the person wanted, how interested they were or when it was time to call again. Anyone who didn't answer right away disappeared, and when a car that suited them arrived, nobody remembered them.
 
-  On the finance side, the dealership has more than one partner, and each one owns different cars. Each partner needs to see the cost and result of their own cars, but not the other's. That was handled with spreadsheets and conversation.
+  Money was similar. Nobody could say, car by car, how much had come in and how much had gone out: purchase, repairs, cleaning, taxes, commission, the bank's financing commission. The dealership has more than one partner, each owning different cars, and the math was done in spreadsheets and conversations.
+
+  And to buy a car or price one, market research meant opening FIPE, Brazil's reference price table, and the listings, one by one.
 rota:
   titulo: The route of a lead
   paradas:
-    - titulo: A lead arrives
-      curto: WhatsApp, a Meta ad or the website.
+    - titulo: The lead arrives
+      curto: Already with its source and the car from the ad.
       texto: >-
-        Through WhatsApp, a Meta click-to-WhatsApp ad or the website form. The message comes in
-        through a signed webhook and is stored before it is processed.
-    - titulo: Who is this person
-      curto: Recognizes the person, without duplicates.
-      texto: >-
-        A normalized phone number and an identity layer link lead, customer and supplier to the same
-        person, without duplicates. The origin of the contact is recorded.
-    - titulo: Queue by next action
-      curto: Reply, First contact, Follow-ups, Negotiation.
-      texto: >-
-        Each lead lands in exactly one queue, in this order: Reply, First contact, Follow-ups and
-        Negotiation. The cadence counts only attempts actually made and suggests the message. The
-        system never sends anything on its own.
+        Through WhatsApp, a Meta ad or the dealership's website. The system reads which ad the person came from and links the lead to the advertised car, with nobody typing. The salesperson with the fewest open leads gets it.
       midia:
-        imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
-        alt: Daily dashboard showing leads waiting for an answer and new unanswered leads
-    - titulo: Negotiation
-      curto: The lead's origin is recorded and can't be changed later.
+        video: /media/rodoviariaos/do-whatsapp-a-fila.mp4
+        imagem: ../../../assets/projetos/rodoviariaos/do-whatsapp-a-fila.png
+        proporcao: 8/5
+        alt: An ad message arrives on WhatsApp, the lead shows up in the queue and the salesperson answers with a ready-made message, in the demo store
+    - titulo: What they want
+      curto: Car of interest, trade-in and temperature.
       texto: >-
-        To open a negotiation, the lead's origin must be on record. From then on it can't be changed, and it carries through to the sale.
+        The lead's record keeps the source, the car of interest, whether they have a car to trade in, and the temperature, which the salesperson sets. The AI can suggest the temperature, quoting the part of the conversation it used. If another customer gets interested in the trade-in car, a new lead is opened for them.
+      midia:
+        imagem: ../../../assets/projetos/rodoviariaos/conversa-lead-de-anuncio.png
+        alt: Conversation with a lead that came from an ad, with the source, the ad and the car of interest on the side, with made-up data
+    - titulo: Who to call now
+      curto: One queue, by next action.
+      texto: >-
+        Every lead lands in a single queue, in this order: Reply, First contact, Attempts and Negotiation. Whoever has waited longest comes first, and the day's scoreboard shows how long the store took to answer.
+      midia:
+        imagem: ../../../assets/projetos/rodoviariaos/filas.png
+        alt: CRM queues by next action, with the day's scoreboard and how long each lead has waited, with made-up data
+    - titulo: When they go quiet
+      curto: The follow-up message is already written.
+      texto: >-
+        If the customer stops answering, the system schedules the next attempt and suggests the message. The salesperson reviews and sends it: nothing goes out by itself. Only attempts that were actually made count.
+      midia:
+        imagem: ../../../assets/projetos/rodoviariaos/mensagem-sugerida.png
+        alt: The day's attempts queue with the ready-made message for the fourth attempt for the salesperson to review, with made-up data
+    - titulo: Rescue
+      curto: By time or by the car of interest.
+      texto: >-
+        Every day the system puts leads that went silent back in the queue. Each car's record shows the leads that match it and how warm each one is. When a lead is picked up again, the system shows the current FIPE price and similar cars that cost less.
+      midia:
+        imagem: ../../../assets/projetos/rodoviariaos/interessados.png
+        alt: A car's record with the list of interested leads and the temperature of each one, with made-up data
+    - titulo: From negotiation to sale
+      curto: Deposit, trade-in and financing, with the source kept.
+      texto: >-
+        The negotiation is built the way it happens at the counter: deposit, trade-in, PIX and financing. The lead's source is recorded and can't be changed afterwards, so the sale points to the ad that brought it.
       midia:
         video: /media/rodoviariaos/whatsapp-negociacao-celular.mp4
         imagem: ../../../assets/projetos/rodoviariaos/whatsapp-negociacao-celular.png
         proporcao: 780/1688
         moldura: celular
         alt: A WhatsApp conversation turning into a negotiation in RodoviariaOS, using made-up data
-    - titulo: Attributed sale
-      curto: Sales by origin, campaign and car.
-      texto: >-
-        Reports cross leads, negotiations and sales by origin, campaign, ad and car, with cost per
-        lead.
 funcionalidades:
+  - titulo: Profit per car
+    texto: >-
+      Sale price minus everything the car cost: purchase, repairs, cleaning, paperwork, commission, warranty and taxes. What came in with the sale counts too, such as the bank's financing commission. The number stays Provisional until everything is paid and received.
+    midia:
+      imagem: ../../../assets/projetos/rodoviariaos/resultado-por-carro.png
+      alt: Profit per car in the demo store, with sale, purchase, expenses, commission, financing commission and result for each one, with made-up data
+  - titulo: The car's file
+    texto: >-
+      Each car has its own record: what it cost, every expense with date, category and supplier, the documents and the expected profit even before it sells.
+    midia:
+      imagem: ../../../assets/projetos/rodoviariaos/ficha-do-carro.png
+      alt: A car's record with purchase cost, expenses by category, asking price and estimated margin, with made-up data
+  - titulo: Where the money goes
+    texto: >-
+      The month's income and expenses by category: car sales, financing commission, purchases, repairs, cleaning, taxes, rent. And the settlement between partners when one of them pays a store bill.
+    midia:
+      imagem: ../../../assets/projetos/rodoviariaos/dre-do-mes.png
+      alt: The month's result by category, with the demo store's income and expenses, with made-up data
+  - titulo: The bank statement, checked
+    texto: >-
+      The statement is imported, the system suggests a category for each line based on what it has learned and points to the entry that matches. A repeated statement is caught before it becomes a duplicate entry.
+    midia:
+      video: /media/rodoviariaos/extrato-e-conciliacao.mp4
+      imagem: ../../../assets/projetos/rodoviariaos/extrato-e-conciliacao.png
+      proporcao: 8/5
+      alt: A statement being imported, category suggestions accepted and a line matched with the suggested entry, in the demo store
+  - titulo: Market radar
+    texto: >-
+      Listings of similar cars compared with the market median, adjusted for mileage. A price that is too low becomes "check" and never disappears from the list. On the car's record, the FIPE price table sits next to the asking price.
+    midia:
+      imagem: ../../../assets/projetos/rodoviariaos/radar-de-compra.png
+      alt: List of market listings with the opportunity, check and taken-down badges, with made-up data
+  - titulo: Same car, two partners
+    texto: >-
+      The car's owner sees cost and margin. The other partner sees only the catalog. The rule holds
+      in the screens, the API and the database.
+    midia:
+      video: /media/rodoviariaos/dois-socios.mp4
+      imagem: ../../../assets/projetos/rodoviariaos/dois-socios.png
+      proporcao: 8/5
+      alt: The same car record opened by its owner, with cost and result, and by the other partner, with only the catalog and the price, in the demo store
+  - titulo: Assistant
+    texto: >-
+      Answers questions about inventory, leads and finance, respects what each partner is allowed to see and only records something after a "confirm".
+    midia:
+      video: /media/rodoviariaos/assistente.mp4
+      imagem: ../../../assets/projetos/rodoviariaos/assistente.png
+      proporcao: 8/5
+      alt: The assistant answers about cars that are not selling, refuses to show the cost of another partner's car and records an expense after the confirmation, in the demo store
   - titulo: Daily dashboard
     texto: >-
       What needs action today in a single summary: tasks, overdue bills, unanswered leads and cars
       sitting too long.
     midia:
       imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
-      alt: Daily dashboard with summary, tasks, alerts, inventory and finance, using made-up data
-  - titulo: Same car, two partners
-    texto: >-
-      The car's owner sees cost and margin. The other partner sees only the catalog. The rule holds
-      in the screens, the API and the database.
-    midia:
-      imagem: ../../../assets/projetos/rodoviariaos/dois-socios.png
-      video: /media/rodoviariaos/dois-socios.mp4
-      alt: The same car seen by two partners, one with cost and margin and the other with only the catalog
-  - titulo: Result per car
-    texto: >-
-      Sale price minus the car's real cost: acquisition, expenses, commission, warranty and taxes.
-      The result stays Provisional until everything is settled.
-    midia:
-      imagem: ../../../assets/projetos/rodoviariaos/resultado-por-carro.png
-      alt: Result per car screen with sale, acquisition, expenses and result, using made-up data
-  - titulo: Assistant
-    texto: >-
-      Answers questions about inventory, leads and finance, and only records something after a
-      "confirm".
-    midia:
-      video: /media/rodoviariaos/assistente.mp4
-      imagem: ../../../assets/projetos/rodoviariaos/assistente.png
-      proporcao: 4/5
-      alt: The RodoviariaOS assistant answering a question and asking for confirmation, using made-up data
-  - titulo: Purchase radar
-    texto: >-
-      Listings of similar cars compared with the market median, adjusted for mileage. A discount
-      that's too big is flagged to check, never hidden.
-    midia:
-      imagem: ../../../assets/projetos/rodoviariaos/radar-de-compra.png
-      alt: List of car listings with opportunity and check badges, using made-up data
+      alt: Daily dashboard with summary, tasks, alerts, inventory and finances, in the demo store, with made-up data
   - titulo: Hide values
     texto: One click hides every amount on screen, for when there's a customer at the counter.
     midia:
@@ -220,12 +251,11 @@ decisoes:
     deixeiDeLado: Automated CI/CD. Because the code is closed, I chose human control, with a written runbook for every release.
 numeros:
   - { valor: "~1,000", rotulo: "leads received since July 2026" }
-  - { valor: "~400", rotulo: "leads in the peak month (September)" }
-  - { valor: "~2,600", rotulo: "WhatsApp messages received in the peak month" }
-  - { valor: "1,400+", rotulo: "API tests against a real PostgreSQL, plus 150+ on the front end" }
+  - { valor: "~11,000", rotulo: "WhatsApp messages logged, August to November 2026" }
+  - { valor: "36", rotulo: "cars in inventory, tracked by the system" }
+  - { valor: "1,400+", rotulo: "automated API tests, running on a real database" }
 numerosFonte: >-
-  Read from the production database on Nov 23, 2026. Leads and messages come from the CRM in use.
-  Finance and the assistant don't have real volume yet.
+  Read from the production database on Nov 23, 2026. Leads, messages and inventory come from the modules in use. Finance and the assistant have no real volume yet.
 proximos:
   - Put finance and the assistant into daily use at the dealership.
   - Publish the purchase radar extension and check it against the real listing sites.
@@ -233,5 +263,4 @@ proximos:
   - Get the system ready for other dealerships.
 seo:
   descricao: >-
-    RodoviariaOS case study: CRM, finance and AI for a car dealership, with PostgreSQL row-level
-    security and reliable WhatsApp ingestion.
+    RodoviariaOS case study: the system that follows every lead to the sale and shows the profit of each car at a dealership, built on PostgreSQL and WhatsApp.
