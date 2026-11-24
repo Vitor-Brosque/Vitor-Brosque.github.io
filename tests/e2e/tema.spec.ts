@@ -173,10 +173,7 @@ test('na home só o cartão do Life RPG tem a moldura do jogo e a lanterna', asy
 test.describe('rota com movimento reduzido', () => {
   test.use({ reducedMotion: 'reduce' });
 
-  for (const { caminho, veiculo } of [
-    { caminho: '/projetos/life-rpg/', veiculo: '.lanterna' },
-    { caminho: '/projetos/technews/', veiculo: '.cursor-rota' },
-  ]) {
+  for (const { caminho, veiculo } of [{ caminho: '/projetos/technews/', veiculo: '.cursor-rota' }]) {
   test(`${caminho}: o veículo anda com a rolagem e a parada ativa troca`, async ({ page }) => {
     await page.goto(caminho);
     const rota = page.locator('[data-rota][data-modo="rolagem"]');
@@ -203,6 +200,55 @@ test.describe('rota com movimento reduzido', () => {
     expect(await page.locator('.cursor-rota, .cursor-bloco').evaluateAll((cs) => cs.every((c) => getComputedStyle(c).opacity === '1'))).toBe(true);
   });
   }
+
+  // A rota do Life RPG anda sozinha, como a rota grande da home (modo loop), também com movimento reduzido.
+  test('no Life RPG a lanterna muda de marco sozinha, sem rolar; a pausa para; clicar num marco leva a lanterna até ele', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.goto('/projetos/life-rpg/');
+    const rota = page.locator('[data-rota]').filter({ has: page.locator('.lanterna') });
+    await expect(rota).toHaveAttribute('data-modo', 'loop');
+    await expect(rota).not.toHaveAttribute('data-estatico');
+    await rota.scrollIntoViewIfNeeded();
+    const y = await page.evaluate(() => window.scrollY);
+    const lanterna = rota.locator('.carro .lanterna');
+    await expect(lanterna).toBeVisible();
+    const ativa = () => rota.locator('.placa').evaluateAll((ps) => ps.findIndex((p) => p.hasAttribute('data-ativa')));
+    const pos = () => rota.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--pos'));
+    // Observa um marco, espera, observa outro: a lanterna andou sozinha.
+    await expect.poll(ativa, { timeout: 5_000 }).toBeGreaterThanOrEqual(0);
+    const primeira = await ativa();
+    await expect.poll(ativa, { timeout: 8_000 }).not.toBe(primeira);
+    expect(await page.evaluate(() => window.scrollY)).toBe(y);
+    const acesos = () => rota.locator('.marco[data-aceso]').count();
+    expect(await acesos()).toBeGreaterThan(0);
+    // A pausa da rota para a lanterna.
+    const pausa = rota.locator('[data-rota-pausa]');
+    await pausa.click();
+    await expect(pausa).toHaveText('Continuar');
+    const parada = await pos();
+    await page.waitForTimeout(1500);
+    expect(await pos()).toBe(parada);
+    // Clicar no último marco leva a lanterna até ele.
+    await rota.locator('[data-placa-botao]').nth(4).click();
+    await expect.poll(ativa).toBe(4);
+    await expect.poll(acesos).toBe(5);
+    // Chama no primeiro quadro, sem loop.
+    expect(await page.locator('.lanterna .quadro-2').evaluateAll((qs) => qs.every((q) => getComputedStyle(q).visibility === 'hidden'))).toBe(true);
+  });
+
+  test('no Life RPG a lanterna fica sobre a trilha, parada no primeiro quadro', async ({ page }) => {
+    await page.goto('/projetos/life-rpg/');
+    const trilha = page.locator('[data-estrada]');
+    await trilha.scrollIntoViewIfNeeded();
+    const lanterna = trilha.locator('.estrada-lanterna .lanterna');
+    await expect(lanterna).toBeVisible();
+    const caixa = (await lanterna.boundingBox())!;
+    const faixa = (await trilha.boundingBox())!;
+    expect(caixa.y).toBeGreaterThanOrEqual(faixa.y - 1);
+    expect(caixa.y + caixa.height).toBeLessThanOrEqual(faixa.y + faixa.height + 1);
+    expect(caixa.width).toBe(48);
+    expect(await lanterna.evaluate((l) => l.getAnimations({ subtree: true }).length)).toBe(0);
+  });
 
   test('no RodoviariaOS a rota continua a lista estática, sem veículo', async ({ page }) => {
     await page.goto('/projetos/rodoviariaos/');

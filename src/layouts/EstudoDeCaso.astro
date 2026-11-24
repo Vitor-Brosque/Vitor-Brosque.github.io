@@ -93,7 +93,7 @@ const jsonLd = {
 
     <section class="secao wrap" aria-labelledby="rota">
       <h2 id="rota" class="revelar">{d.rota.titulo}</h2>
-      <div class="caso-rota"><Rota titulo={d.rota.titulo} paradas={d.rota.paradas} modo="rolagem" idioma={idioma} tema={tema} execucao={terminal && d.logDoTopo?.[0] ? { arquivo: ARQUIVO_DO_LOG, comando: d.logDoTopo[0] } : undefined} /></div>
+      <div class="caso-rota"><Rota titulo={d.rota.titulo} paradas={d.rota.paradas} modo={d.rota.modo} idioma={idioma} tema={tema} execucao={terminal && d.logDoTopo?.[0] ? { arquivo: ARQUIVO_DO_LOG, comando: d.logDoTopo[0] } : undefined} /></div>
     </section>
 
     {d.funcionalidades.length > 0 && (
@@ -261,5 +261,7 @@ const jsonLd = {
   main[data-tema='terminal'] .proximos li::before { content: '[ ]' / ''; width: auto; height: auto; margin: 0; background: none; font-family: var(--fonte-mono); color: var(--verde); white-space: pre; }
   .caso-status { margin-top: 14px; max-width: 60ch; font: 400 0.86rem/1.55 var(--fonte-mono); color: var(--mute); }
   .caso-status::before { content: '# ' / ''; color: var(--verde); }
+  /* Rota em loop no estudo de caso: o título já está no h2 da seção; no topo da rota fica só a dica, o "ao vivo" e a pausa. */
+  .caso-rota :global(.rota-titulo > .rotulo) { display: none; }
 </style>
 <script>import '../scripts/leitura';</script>

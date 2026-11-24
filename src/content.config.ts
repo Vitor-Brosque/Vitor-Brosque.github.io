@@ -59,6 +59,11 @@ const projetos = defineCollection({
       resumo: z.object({ problema: z.string(), construi: z.string(), orgulho: z.string() }),
       problema: z.string(),
       rota: z.object({
+        /**
+         * Como a rota do estudo de caso anda: `rolagem` (guiada pela rolagem, presa no desktop) ou `loop` (anda sozinha,
+         * de parada em parada, como a rota grande da home, com as paradas como botões e o painel embaixo).
+         */
+        modo: z.enum(['loop', 'rolagem']).default('rolagem'),
         titulo: z.string(),
         paradas: z
           .array(

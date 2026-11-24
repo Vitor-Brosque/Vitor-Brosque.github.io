@@ -34,6 +34,7 @@ problema: |-
 
   I have used it on my PC since November 2026. The app was built for phone and PC from the start, which is why it had to work offline and keep both in sync. The phone is the next step.
 rota:
+  modo: loop
   titulo: The route of a change
   paradas:
     - titulo: You tap on your phone
