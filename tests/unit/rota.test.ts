@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { estadoDaRolagem, estadoDoLoop, fracaoDoCarro, unidadesDoLoop } from '../../src/scripts/rota-estado';
+import { LOOP, estadoDaRolagem, estadoDoLoop, fracaoDoCarro, inicioDaParada, unidadesDoLoop } from '../../src/scripts/rota-estado';
 
 describe('estadoDaRolagem', () => {
   it('começa parado na primeira placa', () => {
@@ -89,5 +89,56 @@ describe('fracaoDoCarro', () => {
   });
   it('sem placas fica no meio', () => {
     expect(fracaoDoCarro(2, [], 0.05)).toBe(0.5);
+  });
+});
+
+describe('tempos do loop', () => {
+  const longos = { entrada: 0.7, parada: 7000 / 1500, trecho: 0.6, saida: 0.7 };
+  it('aceita tempos diferentes do padrão', () => {
+    expect(unidadesDoLoop(6, longos)).toBeCloseTo(0.7 + 6 * (7000 / 1500) + 5 * 0.6 + 0.7);
+    expect(unidadesDoLoop(6)).toBeCloseTo(unidadesDoLoop(6, LOOP));
+  });
+  it('com tempos longos também para em todas as placas, na ordem', () => {
+    const paradas: number[] = [];
+    for (let p = 0; p <= 1; p += 0.0005) {
+      const e = estadoDoLoop(p, 6, longos);
+      if (!e.andando && paradas[paradas.length - 1] !== e.u) paradas.push(e.u);
+    }
+    expect(paradas).toEqual([0, 1, 2, 3, 4, 5]);
+  });
+  it('a parada longa ocupa mais da volta que a padrão', () => {
+    // Em unidades de tempo, de uma placa à seguinte: a parada mais o trecho.
+    const fatia = (t?: typeof longos) => (inicioDaParada(1, 6, t) - inicioDaParada(0, 6, t)) * unidadesDoLoop(6, t);
+    expect(fatia(longos)).toBeCloseTo(7000 / 1500 + 0.6, 4);
+    expect(fatia()).toBeCloseTo(1.6, 4);
+    // Pouco depois do início da parada 0, com a parada longa o carro ainda está nela.
+    expect(estadoDoLoop(inicioDaParada(0, 6, longos) + 0.1, 6, longos)).toEqual({ ativa: 0, u: 0, andando: false });
+  });
+});
+
+describe('inicioDaParada', () => {
+  it('a parada 0 começa logo depois da entrada', () => {
+    expect(inicioDaParada(0, 5)).toBeCloseTo(LOOP.entrada / unidadesDoLoop(5), 6);
+  });
+  for (const [nome, tempos] of [
+    ['padrão', undefined],
+    ['longos', { entrada: 0.7, parada: 7000 / 1500, trecho: 0.6, saida: 0.7 }],
+    ['estranhos', { entrada: 0.3, parada: 2.2, trecho: 1.1, saida: 0.4 }],
+  ] as const) {
+    it(`no início de cada parada o carro está parado nela (tempos ${nome})`, () => {
+      for (const total of [1, 4, 6]) {
+        for (let i = 0; i < total; i++) {
+          expect(estadoDoLoop(inicioDaParada(i, total, tempos), total, tempos)).toEqual({ ativa: i, u: i, andando: false });
+        }
+      }
+    });
+  }
+  it('cresce com a parada e fica dentro de 0..1', () => {
+    const inicios = [0, 1, 2, 3, 4, 5].map((i) => inicioDaParada(i, 6));
+    inicios.forEach((v, i) => {
+      expect(v).toBeGreaterThan(0);
+      expect(v).toBeLessThan(1);
+      if (i) expect(v).toBeGreaterThan(inicios[i - 1]);
+    });
   });
 });
