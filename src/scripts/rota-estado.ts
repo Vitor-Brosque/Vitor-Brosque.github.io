@@ -23,36 +23,50 @@ export function estadoDaRolagem(progresso: number, total: number): EstadoRota {
 }
 
 /** Tempos do loop, em unidades: entrada, parada em cada placa, trecho entre placas e saída. */
-export const LOOP = { entrada: 0.7, parada: 1, trecho: 0.6, saida: 0.7 } as const;
+export interface TemposDoLoop {
+  entrada: number;
+  parada: number;
+  trecho: number;
+  saida: number;
+}
+export const LOOP: Readonly<TemposDoLoop> = { entrada: 0.7, parada: 1, trecho: 0.6, saida: 0.7 };
 
-export function unidadesDoLoop(total: number): number {
+export function unidadesDoLoop(total: number, tempos: TemposDoLoop = LOOP): number {
   const n = Math.max(total, 1);
-  return LOOP.entrada + n * LOOP.parada + (n - 1) * LOOP.trecho + LOOP.saida;
+  return tempos.entrada + n * tempos.parada + (n - 1) * tempos.trecho + tempos.saida;
 }
 
 /** Loop (home): o carro entra por um lado, para em cada placa e sai pelo outro. O progresso de 0 a 1 é uma volta. */
-export function estadoDoLoop(progresso: number, total: number): EstadoRota {
+export function estadoDoLoop(progresso: number, total: number, tempos: TemposDoLoop = LOOP): EstadoRota {
   const n = Math.max(total, 1);
-  let t = limitar(progresso, 0, 1) * unidadesDoLoop(n);
-  if (t < LOOP.entrada) {
-    const f = t / LOOP.entrada;
+  let t = limitar(progresso, 0, 1) * unidadesDoLoop(n, tempos);
+  if (t < tempos.entrada) {
+    const f = t / tempos.entrada;
     const u = -1 + (1 - (1 - f) * (1 - f));
     return { ativa: u > -0.5 ? 0 : -1, u, andando: true };
   }
-  t -= LOOP.entrada;
+  t -= tempos.entrada;
   for (let i = 0; i < n; i++) {
-    if (t < LOOP.parada) return { ativa: i, u: i, andando: false };
-    t -= LOOP.parada;
+    if (t < tempos.parada) return { ativa: i, u: i, andando: false };
+    t -= tempos.parada;
     if (i === n - 1) break;
-    if (t < LOOP.trecho) {
-      const f = suave(t / LOOP.trecho);
+    if (t < tempos.trecho) {
+      const f = suave(t / tempos.trecho);
       return { ativa: f < 0.5 ? i : i + 1, u: i + f, andando: true };
     }
-    t -= LOOP.trecho;
+    t -= tempos.trecho;
   }
-  const f = Math.min(t / LOOP.saida, 1);
+  const f = Math.min(t / tempos.saida, 1);
   const u = n - 1 + f * f;
   return { ativa: u < n - 0.5 ? n - 1 : -1, u, andando: true };
+}
+
+/** Progresso (0 a 1) em que o carro chega à placa `i` e para nela. Um fio de folga evita cair no fim do trecho anterior por arredondamento. */
+export function inicioDaParada(i: number, total: number, tempos: TemposDoLoop = LOOP): number {
+  const n = Math.max(total, 1);
+  const k = limitar(Math.round(i), 0, n - 1);
+  const folga = Math.min(1e-6, tempos.parada / 2);
+  return (tempos.entrada + k * (tempos.parada + tempos.trecho) + folga) / unidadesDoLoop(n, tempos);
 }
 
 /** Converte `u` na fração (0 a 1) ao longo do asfalto, usando os centros medidos das placas. A margem deixa o carro sair inteiro. */

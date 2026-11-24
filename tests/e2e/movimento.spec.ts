@@ -49,6 +49,17 @@ const textosDaContagem = (page: Page) => page.evaluate(() => (window as unknown 
 const indiceAtivo = (page: Page, seletor: string) =>
   page.locator(seletor).first().locator('.placa').evaluateAll((ps) => ps.findIndex((p) => p.hasAttribute('data-ativa')));
 
+/** Índice do único painel da vitrine que está à vista (-1 se nenhum ou mais de um). */
+const painelVisivel = (page: Page, seletor: string) =>
+  page
+    .locator(seletor)
+    .first()
+    .locator('[data-painel]')
+    .evaluateAll((ps) => {
+      const vistos = ps.flatMap((p, i) => (getComputedStyle(p).visibility === 'visible' && !(p as HTMLElement).inert ? [i] : []));
+      return vistos.length === 1 ? vistos[0] : -1;
+    });
+
 test.describe('com movimento reduzido', () => {
   test.use({ reducedMotion: 'reduce' });
 
@@ -86,18 +97,28 @@ test.describe('com movimento reduzido', () => {
       .toBe(0);
   });
 
-  test('a rota em loop troca o KM em destaque sozinha e o botão de pausa segura a troca', async ({ page }) => {
+  test('a rota grande troca a parada sozinha, a pausa segura, a placa leva à parada e nenhum vídeo toca', async ({ page }) => {
+    test.setTimeout(45_000);
     await page.goto('/');
     const seletor = '#projetos [data-rota][data-modo="loop"]';
-    await page.locator(seletor).scrollIntoViewIfNeeded();
+    const rota = page.locator(seletor);
+    await rota.scrollIntoViewIfNeeded();
     const inicial = await indiceAtivo(page, seletor);
-    await expect.poll(() => indiceAtivo(page, seletor), { timeout: 8000 }).not.toBe(inicial);
-    const pausa = page.locator(`${seletor} [data-rota-pausa]`);
+    await expect.poll(() => indiceAtivo(page, seletor), { timeout: 12_000 }).not.toBe(inicial);
+    expect(await painelVisivel(page, seletor)).toBe(await indiceAtivo(page, seletor));
+    const pausa = rota.locator('[data-rota-pausa]');
     await pausa.click();
     await expect(pausa).toHaveText('Continuar');
     const pausado = await indiceAtivo(page, seletor);
-    await page.waitForTimeout(3500);
+    await page.waitForTimeout(8000);
     expect(await indiceAtivo(page, seletor)).toBe(pausado);
+    await rota.locator('[data-placa-botao]').nth(3).click();
+    await expect(rota.locator('.placa').nth(3)).toHaveAttribute('data-ativa', '');
+    await expect.poll(() => painelVisivel(page, seletor)).toBe(3);
+    await rota.locator('[data-placa-botao]').nth(5).click();
+    await expect.poll(() => painelVisivel(page, seletor)).toBe(5);
+    await page.waitForTimeout(800);
+    expect(await page.$$eval('video', (vs) => vs.filter((v) => !(v as HTMLVideoElement).paused).length)).toBe(0);
   });
 
   test('no estudo de caso o KM em destaque acompanha a rolagem', async ({ page }) => {
@@ -138,10 +159,10 @@ test.describe('com movimento reduzido', () => {
 test.describe('com movimento permitido', () => {
   test.use({ reducedMotion: 'no-preference' });
 
-  test('o carro percorre a rota inteira e todas as placas acendem', async ({ page }) => {
+  test('o carro percorre a rota compacta inteira e todas as placas acendem', async ({ page }) => {
     test.setTimeout(60_000);
     await page.goto('/');
-    const rota = page.locator('#projetos [data-rota][data-modo="loop"]');
+    const rota = page.locator('[data-rota].rota--compacta').first();
     await rota.scrollIntoViewIfNeeded();
     await expect(rota).not.toHaveAttribute('data-estatico');
     // Observa a cada quadro, dentro da página, até ver o carro antes da entrada, depois da saída e todas as placas acesas.
@@ -200,6 +221,51 @@ test.describe('com movimento permitido', () => {
     await pausa.click();
     await expect(pausa).toHaveText('Pausar');
     await expect.poll(pos, { timeout: 5000 }).not.toBe(parado);
+  });
+
+  test.describe('rota grande da home', () => {
+    const seletor = '#projetos [data-rota][data-modo="loop"]';
+
+    test('troca sozinha de parada e mostra o painel dela', async ({ page }) => {
+      await page.goto('/');
+      await page.locator(seletor).scrollIntoViewIfNeeded();
+      // No começo o carro ainda entra (nenhuma placa acesa ou a primeira); o painel à vista é o da primeira parada.
+      expect([-1, 0]).toContain(await indiceAtivo(page, seletor));
+      expect(await painelVisivel(page, seletor)).toBe(0);
+      await expect.poll(() => indiceAtivo(page, seletor), { timeout: 12_000 }).toBe(1);
+      await expect.poll(() => painelVisivel(page, seletor)).toBe(1);
+    });
+
+    test('a placa clicada mostra o painel dela, pausa e o carro para sob ela, sem mudar a altura', async ({ page }) => {
+      await page.goto('/');
+      const rota = page.locator(seletor);
+      await rota.scrollIntoViewIfNeeded();
+      const altura = () => rota.evaluate((el) => Math.round(el.getBoundingClientRect().height));
+      const antes = await altura();
+      await rota.locator('[data-placa-botao]').nth(3).click();
+      await expect.poll(() => painelVisivel(page, seletor)).toBe(3);
+      await expect(rota.locator('[data-placa-botao]').nth(3)).toHaveAttribute('aria-current', 'step');
+      await expect(rota.locator('[data-rota-pausa]')).toHaveText('Continuar');
+      await expect(rota).not.toHaveAttribute('data-andando', '', { timeout: 2000 });
+      const [carro, placa] = await Promise.all([rota.locator('.carro').boundingBox(), rota.locator('.placa').nth(3).boundingBox()]);
+      const centro = carro!.x + carro!.width / 2;
+      expect(centro).toBeGreaterThan(placa!.x);
+      expect(centro).toBeLessThan(placa!.x + placa!.width);
+      await page.waitForTimeout(1500);
+      expect(await indiceAtivo(page, seletor)).toBe(3);
+      expect(await altura()).toBe(antes);
+    });
+
+    test('o vídeo da parada ativa tem controles e está tocando', async ({ page }) => {
+      await page.goto('/');
+      const rota = page.locator(seletor);
+      await rota.scrollIntoViewIfNeeded();
+      const video = rota.locator('[data-painel]').first().locator('video');
+      await expect(video).toHaveJSProperty('controls', true);
+      await expect.poll(() => video.evaluate((v) => !(v as HTMLVideoElement).paused), { timeout: 5000 }).toBe(true);
+      // Os vídeos das outras paradas ficam parados.
+      expect(await rota.locator('[data-painel]:not([data-ativa]) video').evaluateAll((vs) => vs.filter((v) => !(v as HTMLVideoElement).paused).length)).toBe(0);
+    });
   });
 
   /** Fixa a entrada dos números: 'escondidos' segura o início do fade (opacidade 0), 'visiveis' tira a entrada. */

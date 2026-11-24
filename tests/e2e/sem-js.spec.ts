@@ -8,6 +8,10 @@ test('a home é legível sem JavaScript', async ({ page }) => {
   expect(await page.locator('.revelar').count()).toBeGreaterThan(0);
   const escondidos = await page.$$eval('.revelar', (els) => els.filter((e) => getComputedStyle(e).opacity !== '1').length);
   expect(escondidos).toBe(0);
+  // A vitrine da rota mostra as seis paradas, uma embaixo da outra.
+  const textos = page.locator('#projetos .vitrine .rota-detalhe-texto');
+  expect(await textos.count()).toBe(6);
+  for (let i = 0; i < 6; i++) await expect(textos.nth(i)).toBeVisible();
 });
 
 test('o estudo de caso é legível sem JavaScript', async ({ page }) => {

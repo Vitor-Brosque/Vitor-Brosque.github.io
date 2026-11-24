@@ -3,7 +3,8 @@ import { movimentoReduzido } from './movimento';
 import { deveTocar, type EstadoVideo } from './video-estado';
 
 aoCarregarPagina(() => {
-  const videos = [...document.querySelectorAll<HTMLVideoElement>('video[data-video]')];
+  // Os vídeos da vitrine da rota ficam com os controles nativos e quem decide quando tocam é rota.ts (só o da parada ativa).
+  const videos = [...document.querySelectorAll<HTMLVideoElement>('video[data-video]')].filter((v) => !v.closest('[data-vitrine]'));
   if (videos.length === 0) return;
   const reduzido = movimentoReduzido();
   const estados = new Map<HTMLVideoElement, EstadoVideo>();

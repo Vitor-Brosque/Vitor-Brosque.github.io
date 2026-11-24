@@ -24,7 +24,8 @@ const poster = midia.video && midia.imagem ? await getImage({ src: midia.imagem,
 <figure class:list={['moldura', `moldura--${midia.moldura}`, classe]}>
   <div class="moldura-tela">
     {midia.moldura === 'navegador' && <div class="moldura-barra" aria-hidden="true"><i></i><i></i><i></i></div>}
-    <div class="moldura-midia" style={`aspect-ratio: ${proporcao}`}>
+    {/* --ar: a proporção como número, para quem precisa caber a mídia inteira numa área (os painéis da rota). */}
+    <div class="moldura-midia" style={`aspect-ratio: ${proporcao}; --ar: ${proporcao.replace('/', ' / ')}`}>
       {midia.video ? (
         <>
           <video data-video controls muted loop playsinline preload={poster ? 'none' : 'metadata'} poster={poster?.src} aria-label={midia.alt}>
