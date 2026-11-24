@@ -5,7 +5,7 @@ frase: O sistema que não deixa lead se perder e mostra quanto cada carro deu de
 status: producao
 statusTexto: Em produção · código fechado
 statusDetalhe: >-
-  CRM, WhatsApp e estoque em uso todos os dias. Financeiro, assistente e radar de compra
+  CRM, WhatsApp e estoque em uso todos os dias. Financeiro, assistente e radar de mercado
   prontos e testados, entrando em uso.
 papel: Tudo, do banco de dados à interface, sozinho
 periodo: Desde julho de 2026
@@ -310,7 +310,7 @@ numerosFonte: >-
   Lidos no banco de produção em 23/11/2026. Leads, mensagens e estoque vêm dos módulos em uso. O financeiro e o assistente ainda não têm volume real.
 proximos:
   - Colocar o financeiro e o assistente em uso diário na loja.
-  - Publicar a extensão do radar de compra e conferir com os portais reais.
+  - Publicar a extensão do radar de mercado e conferir com os portais reais.
   - Enviar as conversões de volta para a Meta, para medir melhor os anúncios.
   - Preparar o sistema para outras revendas.
 seo:

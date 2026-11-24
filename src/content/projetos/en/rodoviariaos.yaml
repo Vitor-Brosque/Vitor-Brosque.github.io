@@ -5,7 +5,7 @@ frase: The system that keeps leads from slipping away and shows how much each ca
 status: producao
 statusTexto: In production · closed source
 statusDetalhe: >-
-  CRM, WhatsApp and inventory are in daily use. Finance, the assistant and the purchase radar are
+  CRM, WhatsApp and inventory are in daily use. Finance, the assistant and the market radar are
   built and tested, and are being rolled out.
 papel: Everything, from the database to the UI, on my own
 periodo: Since July 2026
@@ -259,7 +259,7 @@ numerosFonte: >-
   Read from the production database on Nov 23, 2026. Leads, messages and inventory come from the modules in use. Finance and the assistant have no real volume yet.
 proximos:
   - Put finance and the assistant into daily use at the dealership.
-  - Publish the purchase radar extension and check it against the real listing sites.
+  - Publish the market radar extension and check it against the real listing sites.
   - Send conversions back to Meta to measure ads more accurately.
   - Get the system ready for other dealerships.
 seo:
