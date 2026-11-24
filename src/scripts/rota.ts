@@ -90,7 +90,9 @@ class Rota {
     this.raiz.style.setProperty('--feito', Math.min(Math.max(f, 0), 1).toFixed(4));
   }
 
-  acender(ativa: number) {
+  acender(estadoAtiva: number) {
+    // Na rota grande, com o carro fora da rota (entrando ou saindo) o painel da última parada continua à mostra: a placa dele fica acesa.
+    const ativa = estadoAtiva < 0 && this.paineis.length > 0 ? this.painel : estadoAtiva;
     this.placas.forEach((p, i) => p.toggleAttribute('data-ativa', i === ativa));
     this.botoes.forEach((b, i) => (i === ativa ? b.setAttribute('aria-current', 'step') : b.removeAttribute('aria-current')));
     if (ativa >= 0) this.mostrarPainel(ativa);
@@ -302,7 +304,9 @@ function vitrineViva(rota: Rota, loop: Loop, pausar: () => void, reduzido: boole
   }
   // Foco de teclado (não o de um clique) dentro da rota segura a troca.
   ouvir(rota.raiz, 'focusin', (ev) => {
-    foco = (ev.target as Element).matches(':focus-visible');
+    // O botão de pausa não segura: quem aperta "Continuar" pelo teclado fica com o foco nele e a rota precisa andar.
+    const alvo = ev.target as Element;
+    foco = !alvo.closest('[data-rota-pausa]') && alvo.matches(':focus-visible');
     segurar();
   });
   ouvir(rota.raiz, 'focusout', (ev) => {
@@ -313,18 +317,47 @@ function vitrineViva(rota: Rota, loop: Loop, pausar: () => void, reduzido: boole
   const videos = rota.paineis.map((p) => p.querySelector<HTMLVideoElement>('video'));
   let visivel = false;
   const tocarDoInicio = new Set<HTMLVideoElement>();
+  // A escolha da pessoa (play ou pausa nos controles do vídeo) vale até a parada trocar.
+  // Para distinguir da do script, cada play/pause que o script pede fica anotado até o evento chegar.
+  const escolha = new Map<HTMLVideoElement, 'tocar' | 'pausar'>();
+  const pedido = new Map<HTMLVideoElement, 'play' | 'pause'>();
+  const tocarPeloScript = (v: HTMLVideoElement) => {
+    if (!v.paused) return;
+    pedido.set(v, 'play');
+    v.play().catch(() => pedido.delete(v));
+  };
+  const pausarPeloScript = (v: HTMLVideoElement) => {
+    if (v.paused) return;
+    pedido.set(v, 'pause');
+    v.pause();
+  };
+  for (const v of videos) {
+    if (!v) continue;
+    ouvir(v, 'play', () => {
+      if (pedido.get(v) === 'play') return void pedido.delete(v);
+      escolha.set(v, 'tocar');
+      tocarDoInicio.delete(v);
+    });
+    ouvir(v, 'pause', () => {
+      if (pedido.get(v) === 'pause') return void pedido.delete(v);
+      if (v.ended) return;
+      escolha.set(v, 'pausar');
+      tocarDoInicio.delete(v);
+    });
+  }
   const sincronizarVideos = () => {
     videos.forEach((v, i) => {
       if (!v) return;
-      if (i === rota.painel && visivel && !reduzido) {
+      const e = escolha.get(v);
+      const tocar = i === rota.painel && visivel && (e === 'tocar' || (e !== 'pausar' && !reduzido));
+      if (tocar) {
         if (tocarDoInicio.delete(v)) v.currentTime = 0;
-        if (v.paused) void v.play().catch(() => undefined);
-      } else if (!v.paused) {
-        v.pause();
-      }
+        tocarPeloScript(v);
+      } else pausarPeloScript(v);
     });
   };
   rota.aoTrocarPainel = (i) => {
+    escolha.clear();
     const v = videos[i];
     if (v) tocarDoInicio.add(v);
     sincronizarVideos();

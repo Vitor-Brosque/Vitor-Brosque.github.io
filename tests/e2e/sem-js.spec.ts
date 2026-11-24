@@ -12,6 +12,8 @@ test('a home é legível sem JavaScript', async ({ page }) => {
   const textos = page.locator('#projetos .vitrine .rota-detalhe-texto');
   expect(await textos.count()).toBe(6);
   for (let i = 0; i < 6; i++) await expect(textos.nth(i)).toBeVisible();
+  // A dica de clicar numa parada só faz sentido com script.
+  await expect(page.locator('#projetos .rota-dica')).toBeHidden();
 });
 
 test('o estudo de caso é legível sem JavaScript', async ({ page }) => {

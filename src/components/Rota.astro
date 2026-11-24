@@ -26,7 +26,10 @@ const vitrine = modo === 'loop' && !compacta;
 >
   {vitrine && (
     <div class="rota-topo">
-      <span class="rotulo">{titulo}</span>
+      <div class="rota-titulo">
+        <span class="rotulo">{titulo}</span>
+        <span class="rota-dica">{t(idioma, 'rota.dica')}</span>
+      </div>
       <div class="rota-controles">
         <span class="rotulo rotulo--sinal ao-vivo" aria-hidden="true"><i class="ponto-vivo"></i>{t(idioma, 'rota.aoVivo')}</span>
         <button type="button" class="rota-pausa" data-rota-pausa data-pausar={t(idioma, 'rota.pausar')} data-continuar={t(idioma, 'rota.continuar')}>{t(idioma, 'rota.pausar')}</button>
@@ -92,6 +95,9 @@ const vitrine = modo === 'loop' && !compacta;
   .rota--compacta { background: transparent; border: 0; padding: 0; }
   .rota-topo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 12px; margin-bottom: 14px; }
   .rota-topo > * { white-space: nowrap; }
+  .rota-titulo { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+  .rota-dica { font: 500 0.72rem/1.2 var(--fonte-mono); letter-spacing: 0.04em; color: var(--mute); }
+  :global(html:not(.js)) .rota-dica { display: none; }
   .rota-controles { display: flex; align-items: center; gap: 12px; margin-left: auto; }
   .ao-vivo { display: inline-flex; align-items: center; gap: 7px; transition: color 0.3s; }
   .ponto-vivo { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 3px rgb(245 184 0 / 0.18); transition: box-shadow 0.3s; }
