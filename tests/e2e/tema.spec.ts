@@ -1,18 +1,26 @@
 import { expect, test, type Page } from '@playwright/test';
 
-/** A Pixelify Sans, no peso 400 (o único usado), já carregou de fato na página. */
-const pixelifyCarregada = (page: Page) =>
-  page.evaluate(async () => {
-    await document.fonts.ready;
-    return document.fonts.check('400 16px "Pixelify Sans"') && [...document.fonts].some((f) => f.family.replace(/"/g, '') === 'Pixelify Sans' && f.status === 'loaded');
-  });
+/** A fonte `familia` já carregou de fato na página, no peso pedido (a pilha declarada no CSS não prova isso). */
+const fonteCarregada = (page: Page, familia: string, peso: number) =>
+  page.evaluate(
+    async ([familia, peso]) => {
+      await document.fonts.ready;
+      return (
+        document.fonts.check(`${peso} 16px "${familia}"`) &&
+        [...document.fonts].some((f) => f.family.replace(/"/g, '') === familia && String(f.weight) === String(peso) && f.status === 'loaded')
+      );
+    },
+    [familia, peso] as const,
+  );
+const pixelifyCarregada = (page: Page) => fonteCarregada(page, 'Pixelify Sans', 400);
 
-// Tema por projeto: só a página do Life RPG tem a cara do jogo.
+// Tema por projeto: o Life RPG tem a cara do jogo, o TechNews a do terminal; o RodoviariaOS fica com a rodovia.
 const casos = [
-  { caminho: '/projetos/life-rpg/', tema: 'rpg' },
-  { caminho: '/en/projects/life-rpg/', tema: 'rpg' },
-  { caminho: '/projetos/rodoviariaos/', tema: 'rodovia' },
-  { caminho: '/projetos/technews/', tema: 'rodovia' },
+  { caminho: '/projetos/life-rpg/', tema: 'rpg', fonte: 'Pixelify Sans', peso: 400 },
+  { caminho: '/en/projects/life-rpg/', tema: 'rpg', fonte: 'Pixelify Sans', peso: 400 },
+  { caminho: '/projetos/technews/', tema: 'terminal', fonte: 'JetBrains Mono', peso: 700 },
+  { caminho: '/en/projects/technews/', tema: 'terminal', fonte: 'JetBrains Mono', peso: 700 },
+  { caminho: '/projetos/rodoviariaos/', tema: 'rodovia', fonte: null, peso: 0 },
 ] as const;
 
 for (const c of casos) {
@@ -20,23 +28,24 @@ for (const c of casos) {
     await page.goto(c.caminho);
     await expect(page.locator('main')).toHaveAttribute('data-tema', c.tema);
     const fonte = await page.locator('h1').evaluate((h) => getComputedStyle(h).fontFamily);
-    if (c.tema === 'rpg') {
-      expect(fonte).toMatch(/Pixelify Sans/);
-      // A pilha declarada não prova que a fonte chegou: confere que a Pixelify carregou no peso do título (400).
-      await expect.poll(() => pixelifyCarregada(page)).toBe(true);
-    } else expect(fonte).not.toMatch(/Pixelify/);
+    if (c.fonte) {
+      expect(fonte.split(',')[0]).toMatch(c.fonte);
+      await expect.poll(() => fonteCarregada(page, c.fonte, c.peso)).toBe(true);
+    } else expect(fonte).not.toMatch(/Pixelify|JetBrains/);
   });
 }
 
-test('no Life RPG a leitura enche a barra de XP; nas outras páginas não há barra', async ({ page }) => {
-  await page.goto('/projetos/life-rpg/');
-  const cheio = () => page.locator('[data-xp]').evaluate((el) => parseFloat((el as HTMLElement).style.getPropertyValue('--xp')) || 0);
-  expect(await cheio()).toBe(0);
-  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-  await expect.poll(cheio).toBeGreaterThan(0);
-  await page.goto('/projetos/rodoviariaos/');
-  await expect(page.locator('[data-xp]')).toHaveCount(0);
-});
+for (const caminho of ['/projetos/life-rpg/', '/projetos/technews/']) {
+  test(`${caminho}: a leitura enche a barra do tema; no RodoviariaOS não há barra`, async ({ page }) => {
+    await page.goto(caminho);
+    const cheio = () => page.locator('[data-leitura]').evaluate((el) => parseFloat((el as HTMLElement).style.getPropertyValue('--lido')) || 0);
+    expect(await cheio()).toBe(0);
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await expect.poll(cheio).toBeGreaterThan(0);
+    await page.goto('/projetos/rodoviariaos/');
+    await expect(page.locator('[data-leitura]')).toHaveCount(0);
+  });
+}
 
 // A rota: no Life RPG as paradas são marcos da jornada; no RodoviariaOS continuam os KM.
 const rotulos = [

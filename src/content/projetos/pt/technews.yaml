@@ -9,6 +9,7 @@ stack: [Python, PostgreSQL, psycopg 3, httpx, trafilatura, API do Hacker News]
 links:
   codigo: https://github.com/Vitor-Brosque/TechNews
 cartao: rota
+tema: terminal
 emResumo: >-
   Pipeline em Python que busca no Hacker News as notícias do dia anterior, descarta o que vem
   incompleto ou repetido, extrai o texto da página original e grava no PostgreSQL sem duplicar.

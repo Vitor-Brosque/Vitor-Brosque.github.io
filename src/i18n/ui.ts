@@ -20,6 +20,7 @@ export const ui = {
     'rota.continuar': 'Continuar',
     'rota.dica': 'Escolha uma parada',
     'rota.marco': 'Marco',
+    'terminal.resumo': 'resumo',
     'animacoes.pausar': 'Pausar animações',
     'animacoes.continuar': 'Continuar animações',
     'midia.tocar': 'Tocar vídeo',
@@ -75,6 +76,7 @@ export const ui = {
     'rota.continuar': 'Resume',
     'rota.dica': 'Pick a stop',
     'rota.marco': 'Milestone',
+    'terminal.resumo': 'summary',
     'animacoes.pausar': 'Pause animations',
     'animacoes.continuar': 'Resume animations',
     'midia.tocar': 'Play video',
@@ -144,7 +146,7 @@ export function urlEquivalente(caminho: string, destino: Idioma): string {
   return urlDaHome(destino);
 }
 
-export type Tema = 'rodovia' | 'rpg';
+export type Tema = 'rodovia' | 'rpg' | 'terminal';
 
 /** Rótulo de uma parada da rota: "KM 0, 1, 2…" na rodovia; no tema rpg, o marco da jornada do jogo, contado a partir de 1. */
 export function rotuloDaParada(i: Idioma, tema: Tema, indice: number): { prefixo: string; numero: number } {

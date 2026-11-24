@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fracaoDeLeitura, larguraDaBarra } from '../../src/scripts/xp-calculo';
+import { fracaoDeLeitura, larguraDaBarra } from '../../src/scripts/leitura-calculo';
 
 describe('fracaoDeLeitura', () => {
   it('vai de 0 no topo a 1 no fim da página', () => {

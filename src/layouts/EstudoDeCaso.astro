@@ -14,6 +14,9 @@ import { t, urlDaHome, urlDoProjeto, type Idioma } from '../i18n/ui';
 import '@fontsource/pixelify-sans/latin-400.css';
 import '../styles/tema-rpg.css';
 import pixelify400 from '@fontsource/pixelify-sans/files/pixelify-sans-latin-400-normal.woff2?url';
+import '../styles/tema-terminal.css';
+import mono400 from '@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2?url';
+import mono700 from '@fontsource/jetbrains-mono/files/jetbrains-mono-latin-700-normal.woff2?url';
 
 interface Props { projeto: Projeto; proximo: Projeto; idioma: Idioma }
 const { projeto, proximo, idioma } = Astro.props;
@@ -24,6 +27,9 @@ const capa = d.capa && d.capa.moldura === 'navegador' ? { ...d.capa, proporcao: 
 const site = Astro.site ?? new URL('https://vitor-brosque.github.io');
 const tema = d.tema;
 const rpg = tema === 'rpg';
+const terminal = tema === 'terminal';
+/** Fontes da primeira dobra a pré-carregar por tema (o título não troca de fonte depois de aparecer). */
+const fontesDoTema: Record<typeof tema, string[]> = { rodovia: [], rpg: [pixelify400], terminal: [mono700, mono400] };
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'CreativeWork',
@@ -34,10 +40,11 @@ const jsonLd = {
   author: { '@type': 'Person', name: 'Vitor Brosque', url: site.href },
 };
 ---
-<Base titulo={`${d.titulo} · Vitor Brosque`} descricao={d.seo.descricao} idioma={idioma} imagemOg={d.capa?.imagem} altOg={d.capa?.alt} jsonLd={jsonLd} fontes={rpg ? [pixelify400] : []}>
+<Base titulo={`${d.titulo} · Vitor Brosque`} descricao={d.seo.descricao} idioma={idioma} imagemOg={d.capa?.imagem} altOg={d.capa?.alt} jsonLd={jsonLd} fontes={fontesDoTema[tema]}>
   <main id="conteudo" data-tema={tema}>
-    {/* No tema rpg a leitura enche a barra de XP do jogo, presa ao pé da navegação (xp.ts; sem JS não aparece). */}
-    {rpg && <div class="xp" data-xp aria-hidden="true"><span class="xp-cheio"></span></div>}
+    {/* Nos temas próprios a leitura enche uma barra presa ao pé da navegação (a de XP no rpg, a de progresso no terminal;
+        leitura.ts; sem JS não aparece). */}
+    {tema !== 'rodovia' && <div class="leitura" data-leitura aria-hidden="true"><span class="leitura-cheio"></span></div>}
     <header class="wrap caso-topo">
       <a class="voltar" data-entrada style="--ordem: 0" href={urlDaHome(idioma, 'projetos')}>← {t(idioma, 'caso.voltar')}</a>
       <p class="rotulo rotulo--sinal" data-entrada style="--ordem: 0">{d.statusTexto}</p>
@@ -58,6 +65,7 @@ const jsonLd = {
 
     <section class="wrap em-resumo-secao" aria-labelledby="em-resumo">
       <div class="em-resumo" data-entrada style="--ordem: 5">
+        {terminal && <div class="janela-barra" aria-hidden="true"><i></i><i></i><i></i><span>{t(idioma, 'terminal.resumo')}</span></div>}
         <h2 id="em-resumo" class="em-resumo-titulo">{t(idioma, 'caso.emResumo')}</h2>
         <p class="em-resumo-texto" set:html={textoRico(d.emResumo)} />
         {d.numeros.length > 0 && (
@@ -188,11 +196,18 @@ const jsonLd = {
   .proximo-frase { color: var(--ink-2); }
   @media (max-width: 639px) { .ficha { grid-template-columns: minmax(0, 1fr); } }
 
+  /* Barra de leitura dos temas próprios: blocos de --bloco px (com --vao de folga) em --leitura-cor sobre --leitura-trilho.
+     O tamanho do bloco é lido também por leitura.ts. */
+  .leitura { --bloco: 18px; --vao: 3px; position: fixed; z-index: 51; left: 0; right: 0; top: calc(var(--altura-nav) - 6px); height: 6px; background: var(--leitura-trilho); pointer-events: none; }
+  .leitura-cheio { display: block; height: 100%; width: var(--lido, 0px); background: repeating-linear-gradient(90deg, var(--leitura-cor) 0 calc(var(--bloco) - var(--vao)), transparent calc(var(--bloco) - var(--vao)) var(--bloco)); }
+  :global(html:not(.js)) .leitura { display: none; }
+  @media print { .leitura { display: none; } }
+  main[data-tema='rpg'] { --leitura-trilho: var(--contorno); --leitura-cor: var(--signal); }
+  /* Terminal: barra de progresso em blocos verdes estreitos, com os blocos vazios marcados de leve no trilho. */
+  main[data-tema='terminal'] { --leitura-cor: var(--signal); --leitura-trilho: repeating-linear-gradient(90deg, var(--line) 0 6px, var(--bg) 6px 8px); }
+  main[data-tema='terminal'] .leitura { --bloco: 8px; --vao: 2px; height: 5px; top: calc(var(--altura-nav) - 5px); }
+
   /* Tema rpg (as cores, a fonte e a parede ficam em tema-rpg.css). */
-  .xp { position: fixed; z-index: 51; left: 0; right: 0; top: calc(var(--altura-nav) - 6px); height: 6px; background: var(--contorno); pointer-events: none; }
-  .xp-cheio { display: block; height: 100%; width: var(--xp, 0px); background: repeating-linear-gradient(90deg, var(--signal) 0 15px, transparent 15px 18px); }
-  :global(html:not(.js)) .xp { display: none; }
-  @media print { .xp { display: none; } }
   main[data-tema='rpg'] .voltar { font-family: var(--fonte-pixel); }
   /* Cena do jogo: à direita do título no desktop (fora do fluxo, sem empurrar nada); no celular, logo abaixo dele. */
   main[data-tema='rpg'] .caso-topo { position: relative; }
@@ -216,5 +231,17 @@ const jsonLd = {
   main[data-tema='rpg'] .proximo strong { font-family: var(--fonte-pixel); font-weight: 400; font-stretch: normal; color: var(--signal); }
   main[data-tema='rpg'] .funcs h3 { color: var(--ink); }
   main[data-tema='rpg'] .proximos li::before { height: 6px; width: 6px; margin-top: 0.6em; }
+
+  /* Tema terminal (as cores e a fonte ficam em tema-terminal.css). */
+  /* "Em resumo" vira uma janela de terminal: a barra de título no lugar do título visível (que fica para o leitor de tela). */
+  main[data-tema='terminal'] .em-resumo { padding: 0 0 clamp(20px, 3vw, 30px); background: var(--bg-2); border: 1px solid var(--line-2); border-radius: var(--raio); overflow: hidden; }
+  main[data-tema='terminal'] .em-resumo > :not(.janela-barra) { margin-inline: clamp(18px, 3vw, 30px); }
+  main[data-tema='terminal'] .em-resumo-titulo { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  main[data-tema='terminal'] .em-resumo-texto { margin-top: clamp(16px, 2.4vw, 22px); }
+  main[data-tema='terminal'] .numeros { gap: 14px 24px; padding-top: 18px; border-top: 1px dashed var(--line-2); }
+  main[data-tema='terminal'] .numeros dt { font-family: var(--fonte-mono); font-weight: 700; font-stretch: normal; letter-spacing: -0.03em; color: var(--verde); }
+  main[data-tema='terminal'] .numeros-fonte { color: var(--mute); }
+  main[data-tema='terminal'] .proximo { border-radius: var(--raio); }
+  main[data-tema='terminal'] .proximo strong { font-family: var(--fonte-mono); font-weight: 700; font-stretch: normal; letter-spacing: -0.03em; }
 </style>
-<script>import '../scripts/xp';</script>
+<script>import '../scripts/leitura';</script>

@@ -50,8 +50,8 @@ const projetos = defineCollection({
       stack: z.array(z.string()).min(1),
       links: z.object({ codigo: z.url().optional(), vitrine: z.url().optional() }).default({}),
       cartao: z.enum(['capa', 'rota']).default('capa'),
-      /** Cara da página: `rodovia` (asfalto, placas de KM e o carrinho) ou `rpg` (a cara do jogo, só no Life RPG). */
-      tema: z.enum(['rodovia', 'rpg']).default('rodovia'),
+      /** Cara da página: `rodovia` (asfalto, placas de KM e o carrinho), `rpg` (a cara do jogo, no Life RPG) ou `terminal` (o pipeline rodando, no TechNews). */
+      tema: z.enum(['rodovia', 'rpg', 'terminal']).default('rodovia'),
       capa: midia(image).optional(),
       emResumo: z.string(),
       resumo: z.object({ problema: z.string(), construi: z.string(), orgulho: z.string() }),

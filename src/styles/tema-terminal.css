@@ -1,0 +1,85 @@
+/* Tema "terminal": a cara do TechNews (o pipeline rodando), só dentro do <main data-tema="terminal"> do estudo de caso.
+   Fundo quase preto puxado para o verde, verde de terminal para o que deu certo e para o destaque, âmbar para WARNING,
+   vermelho claro só na palavra ERROR. Cantos quase retos, bordas de 1 px, sem brilho nem linhas de varredura.
+   JetBrains Mono (que o site já carrega) em títulos, rótulos, botões, log e números; texto corrido na fonte do site.
+   Todo seletor começa por main[data-tema='terminal'] para vencer as regras dos componentes. */
+
+main[data-tema='terminal'] {
+  /* Tokens do site, redefinidos. */
+  --bg: #0a0d0a;
+  --bg-2: #0f140f;
+  --surface: #131a13;
+  --line: #1f2a1f;
+  --line-2: #2c3b2c;
+  --ink: #d7e3d4;
+  --ink-2: #b5c4b1;
+  --mute: #8a9c86;
+  --dim: #8a9c86;
+  --signal: #7ee787;
+  --signal-hover: #a7f0ad;
+  --signal-fundo: #122012;
+  --ok: #7ee787;
+  --asfalto: #070a07;
+  --estrada: #0f140f;
+  --raio: 2px;
+
+  /* Tokens do terminal. */
+  --verde: #7ee787;
+  --ambar: #e3b341;
+  --vermelho: #ff7b72;
+  --verde-fundo: #122012;
+
+  display: block;
+  color: var(--ink);
+}
+
+/* Fora do <main> só o necessário para a página não ter duas cores de fundo: corpo e navegação chapados no quase preto. */
+body:has(main[data-tema='terminal']) { background: #0a0d0a; }
+body:has(main[data-tema='terminal']) .nav { background: #0a0d0a; backdrop-filter: none; border-bottom-color: #1f2a1f; }
+body:has(main[data-tema='terminal']) .nav::after { display: none; }
+
+/* Mono nos títulos, rótulos e botões. */
+main[data-tema='terminal'] :is(h1, h2, h3, .rotulo, .botao, .resumo-titulo, .voltar) {
+  font-family: var(--fonte-mono);
+  font-stretch: normal;
+  letter-spacing: -0.01em;
+}
+main[data-tema='terminal'] :is(h1, h2) { font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; }
+main[data-tema='terminal'] h1 { font-size: clamp(2.1rem, 8.4vw, 3rem); }
+@media (min-width: 640px) { main[data-tema='terminal'] h1 { font-size: clamp(2.6rem, 6vw, 4.25rem); } }
+main[data-tema='terminal'] h2 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); }
+/* O prompt verde na frente de cada título de seção (fora do texto lido pelo leitor de tela). */
+main[data-tema='terminal'] h2::before { content: '$ ' / ''; color: var(--verde); }
+main[data-tema='terminal'] h3 { font-weight: 700; letter-spacing: -0.02em; }
+main[data-tema='terminal'] .rotulo { letter-spacing: 0.06em; }
+main[data-tema='terminal'] .voltar { font-size: 0.85rem; }
+
+main[data-tema='terminal'] code { border-radius: var(--raio); background: var(--surface); border-color: var(--line-2); color: var(--verde); }
+main[data-tema='terminal'] .chips li { border-radius: var(--raio); background: var(--bg-2); border-color: var(--line-2); color: var(--ink-2); }
+
+/* Botões: o principal verde com texto quase preto; o secundário só com a borda. */
+main[data-tema='terminal'] .botao { font-weight: 700; font-size: 0.95rem; border: 1px solid var(--line-2); border-radius: var(--raio); padding: 11px 16px; color: var(--ink); }
+main[data-tema='terminal'] .botao:hover { border-color: var(--verde); background: var(--bg-2); }
+main[data-tema='terminal'] .botao--sinal { background: var(--verde); border-color: var(--verde); color: #0a0d0a; }
+main[data-tema='terminal'] .botao--sinal:hover { background: var(--signal-hover); border-color: var(--signal-hover); }
+main[data-tema='terminal'] :focus-visible { outline-color: var(--verde); border-radius: var(--raio); }
+
+/* Janela de terminal: borda de 1 px e uma barra de título com o nome do arquivo. Usada no "Em resumo" e no log do topo. */
+main[data-tema='terminal'] .janela-barra {
+  display: flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 12px;
+  background: var(--surface); border-bottom: 1px solid var(--line-2);
+  font: 400 0.78rem/1 var(--fonte-mono); color: var(--mute);
+}
+main[data-tema='terminal'] .janela-barra i { width: 8px; height: 8px; border-radius: 1px; background: var(--line-2); }
+main[data-tema='terminal'] .janela-barra span { margin-left: 8px; }
+
+/* Molduras das telas e painéis: cantos quase retos, sem sombra difusa. */
+main[data-tema='terminal'] .moldura-tela { border-radius: var(--raio); box-shadow: none; border-color: var(--line-2); }
+main[data-tema='terminal'] .moldura.moldura--celular .moldura-tela { border: 6px solid var(--surface); border-radius: var(--raio); }
+main[data-tema='terminal'] .moldura-barra { background: var(--surface); border-bottom-color: var(--line-2); }
+main[data-tema='terminal'] .moldura-barra i { border-radius: 1px; }
+
+/* Mapa de arquitetura: só as cores do tema. */
+main[data-tema='terminal'] .mapa-tracejado { stroke: var(--line-2); }
+main[data-tema='terminal'] .mapa-no.is-destaque rect { stroke: #3f7a45; }
+main[data-tema='terminal'] .mapa-rotulo { font-family: var(--fonte-mono); font-weight: 700; font-stretch: normal; }
