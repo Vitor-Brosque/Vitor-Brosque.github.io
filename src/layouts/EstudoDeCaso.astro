@@ -253,5 +253,8 @@ const jsonLd = {
     main[data-tema='terminal'] .caso-topo > .voltar { justify-self: start; }
     main[data-tema='terminal'] .caso-topo > .caso-log { grid-column: 2; grid-row: 1 / span 7; margin-top: 8px; }
   }
+  /* Próximos passos como caixas de tarefa por fazer: `[ ]` em mono, posto por CSS (o texto não muda). */
+  main[data-tema='terminal'] .proximos { font-size: 1rem; }
+  main[data-tema='terminal'] .proximos li::before { content: '[ ]' / ''; width: auto; height: auto; margin: 0; background: none; font-family: var(--fonte-mono); color: var(--verde); white-space: pre; }
 </style>
 <script>import '../scripts/leitura';</script>

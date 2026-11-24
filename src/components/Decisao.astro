@@ -11,8 +11,10 @@ interface Props {
 }
 const { idioma, decisao, tema = 'rodovia' } = Astro.props;
 const rpg = tema === 'rpg';
+/** Cada tema próprio tem o seu cartão: a missão do jogo (rpg) ou o bloco de terminal (terminal). */
+const variante = { rodovia: null, rpg: 'missao', terminal: 'terminal' }[tema];
 ---
-<details class:list={['decisao', 'recolhivel', 'revelar', { 'decisao--missao': rpg }]}>
+<details class:list={['decisao', 'recolhivel', 'revelar', variante && `decisao--${variante}`]}>
   <summary>
     <span class="resumo-titulo">{rpg && <span class="missao-icone" set:html={spriteInline(agora, 'icone')} />}{decisao.titulo}</span>
     <span class="resumo-texto">{decisao.resumo}</span>
@@ -44,4 +46,15 @@ const rpg = tema === 'rpg';
   }
   .decisao--missao .corpo p { max-width: var(--medida); }
   .decisao--missao .corpo .rotulo { color: var(--tinta-suave); }
+
+  /* Bloco de terminal (tema terminal): título em mono com um marcador verde; aberto, o conteúdo vem como saída
+     (fundo um pouco mais claro e a borda esquerda verde). */
+  .decisao--terminal { border: 1px solid var(--line-2); border-radius: var(--raio); }
+  .decisao--terminal .resumo-titulo { font-size: 1.02rem; font-weight: 700; letter-spacing: -0.02em; }
+  .decisao--terminal .resumo-titulo::before { content: '▸ ' / ''; color: var(--verde); }
+  .decisao--terminal .corpo {
+    max-width: none; margin: 0 clamp(12px, 2.4vw, 20px) clamp(14px, 2.4vw, 18px); padding: 4px clamp(14px, 2.4vw, 20px) 16px;
+    background: var(--surface); border-left: 2px solid var(--verde); border-radius: var(--raio);
+  }
+  .decisao--terminal .corpo p { max-width: var(--medida); }
 </style>

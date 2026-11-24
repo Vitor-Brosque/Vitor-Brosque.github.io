@@ -315,3 +315,32 @@ test('na rota do TechNews as três primeiras etapas trazem a contagem da execuç
     ]);
   }
 });
+
+test('na home só o cartão do TechNews tem a moldura do terminal, com o cursor e "Etapa n" na rota compacta', async ({ page }) => {
+  await page.goto('/');
+  const cartao = page.locator('.card--terminal');
+  await expect(cartao).toHaveCount(1);
+  await expect(cartao.locator('h3')).toHaveText('TechNews');
+  await expect(cartao.locator('.rota .placa .km').first()).toHaveText('Etapa 1');
+  await expect(cartao.locator('.carro .cursor-rota')).toHaveCount(1);
+  await expect(cartao.locator('.carrinho')).toHaveCount(0);
+  await cartao.scrollIntoViewIfNeeded();
+  expect((await cartao.locator('h3').evaluate((h) => getComputedStyle(h).fontFamily)).split(',')[0]).toMatch(/JetBrains Mono/);
+  await expect.poll(() => fonteCarregada(page, 'JetBrains Mono', 700)).toBe(true);
+  // A rota grande da home (RodoviariaOS) continua com KM e o carrinho.
+  await expect(page.locator('#projetos .rota--vitrine .km').first()).toHaveText('KM 0');
+  await expect(page.locator('.card:not(.card--terminal) .cursor-rota')).toHaveCount(0);
+});
+
+test('no TechNews as decisões são blocos de terminal e os próximos passos, caixas por fazer', async ({ page }) => {
+  await page.goto('/projetos/technews/');
+  const decisoes = page.locator('details.decisao');
+  expect(await decisoes.count()).toBeGreaterThan(0);
+  expect(await decisoes.evaluateAll((ds) => ds.every((d) => d.classList.contains('decisao--terminal')))).toBe(true);
+  await decisoes.first().locator('summary').click();
+  await expect(decisoes.first().locator('.corpo')).toBeVisible();
+  const marca = await page.locator('.proximos li').first().evaluate((li) => getComputedStyle(li, '::before').content);
+  expect(marca).toContain('[ ]');
+  await page.goto('/projetos/rodoviariaos/');
+  await expect(page.locator('details.decisao--terminal')).toHaveCount(0);
+});

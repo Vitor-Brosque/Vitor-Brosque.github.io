@@ -83,3 +83,4 @@ main[data-tema='terminal'] .moldura-barra i { border-radius: 1px; }
 main[data-tema='terminal'] .mapa-tracejado { stroke: var(--line-2); }
 main[data-tema='terminal'] .mapa-no.is-destaque rect { stroke: #3f7a45; }
 main[data-tema='terminal'] .mapa-rotulo { font-family: var(--fonte-mono); font-weight: 700; font-stretch: normal; }
+main[data-tema='terminal'] .resumo-icone { border-radius: var(--raio); }

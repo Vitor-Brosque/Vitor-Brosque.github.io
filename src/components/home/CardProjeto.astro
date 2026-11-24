@@ -12,15 +12,18 @@ const { idioma, projeto, numero } = Astro.props;
 const d = projeto.data;
 const slug = slugDe(projeto.id);
 const usaCapa = d.cartao === 'capa' && d.capa?.imagem;
-/** Cartão do projeto com tema rpg (Life RPG): moldura em pixels do jogo, título na fonte pixel e a lanterna num canto da imagem. */
+/**
+ * Cartão de projeto com tema próprio: o do Life RPG (moldura em pixels do jogo, fonte pixel e a lanterna num canto da imagem)
+ * e o do TechNews (moldura de terminal, título em mono e a rota compacta com o cursor e "Etapa n").
+ */
 const rpg = d.tema === 'rpg';
 ---
-<article class:list={['card', 'revelar', { 'card--rpg': rpg }]}>
+<article class:list={['card', 'revelar', d.tema !== 'rodovia' && `card--${d.tema}`]}>
   <div class:list={['card-midia', { 'card-midia--rota': !usaCapa }]}>
     {usaCapa && d.capa?.imagem ? (
       <Picture src={d.capa.imagem} alt="" formats={['avif', 'webp']} widths={[480, 780]} sizes="(min-width: 900px) 34vw, 92vw" />
     ) : (
-      <Rota titulo={d.rota.titulo} paradas={d.rota.paradas} modo="loop" idioma={idioma} compacta />
+      <Rota titulo={d.rota.titulo} paradas={d.rota.paradas} modo="loop" idioma={idioma} compacta tema={d.tema} />
     )}
     {rpg && <div class="card-lanterna" aria-hidden="true"><Lanterna /></div>}
   </div>
@@ -88,4 +91,16 @@ const rpg = d.tema === 'rpg';
     background: var(--rpg-pedra);
     box-shadow: var(--rpg-moldura), inset var(--px) var(--px) 0 var(--rpg-pedra-clara), inset calc(-1 * var(--px)) calc(-1 * var(--px)) 0 var(--rpg-noite-2);
   }
+
+  /* Tema terminal (TechNews): a home fica fora do <main data-tema="terminal">, então as cores do tema vêm declaradas aqui,
+     uma vez, com os mesmos nomes (a rota compacta usa os mesmos tokens da página). Borda de 1 px e cantos quase retos. */
+  .card--terminal {
+    --bg: #0a0d0a; --bg-2: #0f140f; --surface: #131a13; --line: #1f2a1f; --line-2: #2c3b2c;
+    --ink: #d7e3d4; --ink-2: #b5c4b1; --mute: #8a9c86; --signal: #7ee787; --signal-hover: #a7f0ad; --signal-fundo: #122012;
+    --verde: #7ee787; --ambar: #e3b341; --verde-fundo: #122012; --asfalto: #070a07; --raio: 2px;
+    background: var(--bg-2); border-color: var(--line-2); color: var(--ink);
+  }
+  .card--terminal:hover, .card--terminal:focus-within { border-color: var(--verde); box-shadow: none; }
+  .card--terminal .card-midia { background: var(--bg); }
+  .card--terminal h3 { font-family: var(--fonte-mono); font-weight: 700; font-stretch: normal; letter-spacing: -0.03em; line-height: calc(1.45rem * 1.15); }
 </style>
