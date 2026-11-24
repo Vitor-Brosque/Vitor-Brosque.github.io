@@ -26,19 +26,27 @@ const tr = textosHome[idioma].trajetoria;
   </div>
 </section>
 <style>
-  .traj { --prog: 1; position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 22px; margin-top: 32px; }
+  /* A pista e o vão até o texto são variáveis: a bolinha de cada marco se posiciona a partir delas, sem número mágico. */
+  .traj { --prog: 1; --pista: 40px; --vao: 22px; --carro: 44px; position: relative; display: grid; grid-template-columns: var(--pista) minmax(0, 1fr); gap: var(--vao); margin-top: 32px; }
   :global(.js) .traj:not([data-estatico]) { --prog: 0; }
+  /* A pista ocupa a altura da lista de marcos: começa no primeiro e termina no fim do último. */
   .traj-estrada { position: relative; border-radius: 4px; background: var(--asfalto); }
   .traj-estrada::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; margin-left: -1.5px; background: repeating-linear-gradient(180deg, rgb(245 184 0 / 0.35) 0 18px, transparent 18px 30px); }
   .traj-preenchida { position: absolute; inset: 0; background: rgb(245 184 0 / 0.18); transform-origin: top; scale: 1 var(--prog); }
-  .traj-carro { position: absolute; left: 50%; top: calc(var(--prog) * 100%); width: 44px; height: 24px; rotate: 90deg; translate: -50% -50%; }
+  /* O carro (deitado, ocupa --carro na vertical) vai de encostado no topo a encostado no fim da pista, sem sair dela. */
+  .traj-carro { position: absolute; left: 50%; top: calc(var(--carro) / 2 + var(--prog) * (100% - var(--carro))); width: var(--carro); height: 24px; rotate: 90deg; translate: -50% -50%; }
   .traj[data-estatico] .traj-carro, :global(html:not(.js)) .traj-carro { display: none; }
   .traj-marcos { display: grid; gap: 34px; margin: 0; padding: 0; list-style: none; }
-  .traj-marco { position: relative; max-width: 70ch; }
-  .traj-marco::before { content: ''; position: absolute; left: -51px; top: 4px; width: 12px; height: 12px; border-radius: 50%; border: 3px solid var(--line-2); background: var(--bg); transition: border-color 0.3s, background-color 0.3s; }
-  .traj-marco[data-alcancado]::before,
-  :global(html:not(.js)) .traj-marco::before { border-color: var(--signal); background: var(--signal); }
-  .traj-marco h3 { margin-top: 4px; font-size: 1.2rem; }
+  .traj-marco { max-width: 70ch; }
+  .traj-marco h3 { position: relative; margin-top: 6px; font-size: 1.2rem; }
+  /* Bolinha no centro da pista (meia pista mais o vão, para a esquerda) e na altura da primeira linha do título. */
+  .traj-marco h3::before {
+    content: ''; position: absolute; box-sizing: border-box; left: calc(-1 * (var(--vao) + var(--pista) / 2)); top: 0.5lh;
+    width: 18px; height: 18px; translate: -50% -50%; border-radius: 50%; border: 3px solid var(--line-2); background: var(--bg);
+    transition: border-color 0.3s, background-color 0.3s;
+  }
+  .traj-marco[data-alcancado] h3::before,
+  :global(html:not(.js)) .traj-marco h3::before { border-color: var(--signal); background: var(--signal); }
   .traj-texto { margin-top: 6px; color: var(--ink-2); }
 </style>
 <script>import '../../scripts/trajetoria';</script>
