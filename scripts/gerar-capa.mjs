@@ -4,7 +4,7 @@
 //   saida:    padrão src/assets/projetos/<pasta do vídeo>/<nome do vídeo>.png
 // Exemplo: npm run capa -- public/media/rodoviariaos/assistente.mp4 60%
 import { chromium } from '@playwright/test';
-import { existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { basename, dirname, extname, join, resolve } from 'node:path';
 
 const [video, instante = '5%', saidaArg] = process.argv.slice(2);
@@ -23,7 +23,21 @@ try {
   const page = await browser.newPage();
   // Serve o vídeo e uma página vazia da mesma origem, para o quadro poder ser exportado.
   await page.route(`${ORIGEM}/`, (r) => r.fulfill({ contentType: 'text/html', body: '<!doctype html><title>capa</title>' }));
-  await page.route(`${ORIGEM}/video`, (r) => r.fulfill({ contentType: 'video/mp4', path: resolve(video) }));
+  // Atende pedidos de trecho (Range): sem isso o navegador não consegue pular para o instante pedido
+  // e a capa sai sempre com o primeiro quadro.
+  const bytes = readFileSync(resolve(video));
+  await page.route(`${ORIGEM}/video`, (r) => {
+    const faixa = /bytes=(\d*)-(\d*)/.exec(r.request().headers()['range'] ?? '');
+    if (!faixa) return r.fulfill({ contentType: 'video/mp4', body: bytes, headers: { 'accept-ranges': 'bytes' } });
+    const ini = faixa[1] ? parseInt(faixa[1], 10) : 0;
+    const fim = faixa[2] ? Math.min(parseInt(faixa[2], 10), bytes.length - 1) : bytes.length - 1;
+    return r.fulfill({
+      status: 206,
+      contentType: 'video/mp4',
+      body: bytes.subarray(ini, fim + 1),
+      headers: { 'accept-ranges': 'bytes', 'content-range': `bytes ${ini}-${fim}/${bytes.length}` },
+    });
+  });
   await page.goto(`${ORIGEM}/`);
   const r = await page.evaluate(
     async ({ instante }) => {
