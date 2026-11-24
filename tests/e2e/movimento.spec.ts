@@ -155,8 +155,8 @@ test.describe('com movimento reduzido', () => {
     const rota = page.locator(seletor);
     await rota.scrollIntoViewIfNeeded();
     const inicial = await indiceAtivo(page, seletor);
-    // 4 s por parada: a troca chega em menos de 8 s.
-    await expect.poll(() => indiceAtivo(page, seletor), { timeout: 8_000 }).not.toBe(inicial);
+    // 4 s por parada (o tempo exato é provado no teste de tempos da rota, no fim deste arquivo).
+    await expect.poll(() => indiceAtivo(page, seletor), { timeout: 15_000 }).not.toBe(inicial);
     expect(await painelVisivel(page, seletor)).toBe(await indiceAtivo(page, seletor));
     const pausa = rota.locator('[data-rota-pausa]');
     await pausa.click();
@@ -322,7 +322,7 @@ test.describe('com movimento permitido', () => {
       // No começo o carro ainda entra (nenhuma placa acesa ou a primeira); o painel à vista é o da primeira parada.
       expect([-1, 0]).toContain(await indiceAtivo(page, seletor));
       expect(await painelVisivel(page, seletor)).toBe(0);
-      await expect.poll(() => indiceAtivo(page, seletor), { timeout: 8_000 }).toBe(1);
+      await expect.poll(() => indiceAtivo(page, seletor), { timeout: 15_000 }).toBe(1);
       await expect.poll(() => painelVisivel(page, seletor)).toBe(1);
     });
 
@@ -405,8 +405,8 @@ test.describe('com movimento permitido', () => {
       await rota.scrollIntoViewIfNeeded();
       const andando = () => rota.evaluate((el) => el.hasAttribute('data-andando'));
       // Espera a entrada acabar, o carro parar na primeira placa e sair para o próximo trecho.
-      await expect.poll(andando, { timeout: 8_000 }).toBe(false);
-      await expect.poll(andando, { timeout: 8_000 }).toBe(true);
+      await expect.poll(andando, { timeout: 15_000 }).toBe(false);
+      await expect.poll(andando, { timeout: 15_000 }).toBe(true);
       const caixa = (await rota.locator('.vitrine').boundingBox())!;
       await page.mouse.move(caixa.x + caixa.width / 2, caixa.y + caixa.height / 2);
       await expect.poll(andando, { timeout: 5000 }).toBe(false);

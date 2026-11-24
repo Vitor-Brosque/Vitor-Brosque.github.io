@@ -328,34 +328,28 @@ function vitrineViva(rota: Rota, loop: Loop, pausar: () => void, reduzido: boole
   return () => limpezas.forEach((f) => f());
 }
 
-/**
- * Estudo de caso: presa no desktop, guiada pela rolagem no celular. Com movimento reduzido (só no tema rpg, ver abaixo)
- * a posição segue a rolagem direto (`scrub: true`), sem suavização que continue andando depois de a rolagem parar.
- */
-function rolagemAndando(rota: Rota, reduzido = false): () => void {
+/** Estudo de caso com movimento: presa no desktop, guiada pela rolagem no celular. */
+function rolagemAndando(rota: Rota): () => void {
   const n = rota.placas.length;
   const atualizar = (st: ScrollTrigger) => rota.aplicar(estadoDaRolagem(st.progress, n));
   const mm = gsap.matchMedia();
   mm.add('(min-width: 900px)', () => {
-    // Rota presa: o CSS do tema rpg usa o atributo para saber qual elemento é o quadro da parada ativa.
-    rota.raiz.setAttribute('data-presa', '');
     ScrollTrigger.create({
       trigger: rota.raiz,
       pin: true,
       start: 'top top+=80',
       end: () => `+=${Math.round(n * window.innerHeight * 0.6)}`,
-      scrub: reduzido ? true : 0.4,
+      scrub: 0.4,
       onUpdate: atualizar,
     });
     rota.aplicar(estadoDaRolagem(0, n));
-    return () => rota.raiz.removeAttribute('data-presa');
   });
   mm.add('(max-width: 899px)', () => {
     const gatilho = ScrollTrigger.create({
       trigger: rota.raiz,
       start: 'top 60%',
       end: 'bottom 60%',
-      scrub: reduzido ? true : 0.3,
+      scrub: 0.3,
       onUpdate: atualizar,
       onRefresh: atualizar,
     });
@@ -406,13 +400,7 @@ aoCarregarPagina(() => {
       const loop = loopAndando(rota, grande ? TEMPOS_GRANDE : LOOP);
       limpezas.push(() => loop.limpar());
       if (grande) limpezas.push(vitrineViva(rota, loop, () => definirPausa(true), reduzido));
-    } else {
-      // Exceção escolhida à regra dos dois modos: nos temas próprios (o rpg do Life RPG, o terminal do TechNews) o veículo
-      // percorre a rota também com movimento reduzido, como o carro da rota da home. Quem marca é a própria rota
-      // (data-anda-sempre, posto por Rota.astro). Loops, pulinho e deslocamentos de painel continuam só no CSS com movimento.
-      const andaSempre = raiz.hasAttribute('data-anda-sempre');
-      limpezas.push(reduzido && !andaSempre ? rolagemEstatica(rota) : rolagemAndando(rota, reduzido));
-    }
+    } else limpezas.push(reduzido ? rolagemEstatica(rota) : rolagemAndando(rota));
   }
   return () => limpezas.forEach((f) => f());
 });

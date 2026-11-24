@@ -3,7 +3,6 @@ ordem: 3
 frase: Pipeline em Python que reúne as notícias de tecnologia dos temas que eu acompanho, para eu ler o que importa toda manhã.
 status: desenvolvimento
 statusTexto: Em desenvolvimento · código aberto
-statusDetalhe: Hoje ele coleta do Hacker News e grava no PostgreSQL. Estou escolhendo as próximas fontes e criando os coletores e os fallbacks.
 papel: Projeto pessoal e de estudo, sozinho
 periodo: "2026"
 stack: [Python, PostgreSQL, psycopg 3, httpx, trafilatura, API do Hacker News]
@@ -19,12 +18,10 @@ logDoTopo:
   - "2026-11-23 10:12:11,870 | WARNING | FALHA_DOWNLOAD | ID=46013412 | URL=https://…"
   - "2026-11-23 10:13:40,002 | INFO | RESUMO_INGESTAO | INSERIDAS=… | DUPLICADAS=… | REJEITADAS=…"
 emResumo: >-
-  Tem portal e notícia demais, e eu me perdia nas novidades de tecnologia. O TechNews é o que estou
-  construindo para resolver isso: reunir as notícias dos temas que eu acompanho e me entregar um
-  resumo toda manhã. A primeira parte já funciona: ele busca no Hacker News as notícias do dia
-  anterior, descarta o que vem incompleto ou repetido, extrai o texto da página original e grava no
-  PostgreSQL sem duplicar. Numa execução de teste em 23/11/2026, coletou 81 notícias e extraiu o
-  texto de 70 delas (86%).
+  Tem portal e notícia demais, e eu me perdia nas novidades de tecnologia. O TechNews foi desenhado
+  para resolver isso: reúne as notícias dos temas que eu acompanho, passa por uma IA que filtra,
+  classifica e resume, e me entrega tudo numa tela para ler toda manhã. O que eu gostar, eu salvo. O
+  resto sai sozinho depois de um prazo.
 resumo:
   problema: >-
     Tem portal e notícia demais. Eu me perdia nas novidades de tecnologia e queria ler só o que
@@ -38,44 +35,47 @@ resumo:
 problema: |-
   Acompanhar tecnologia virou um problema de volume. São vários portais e muita notícia por dia, e eu ficava perdido, sem saber o que valia a leitura.
 
-  O TechNews é a minha resposta. A ideia é buscar as notícias dos temas que eu acompanho, guardar no banco, passar por uma IA que filtra, classifica e resume, e me mostrar o resultado numa tela, para eu ler toda manhã. O que eu gostar, eu salvo. O que eu não salvar tem prazo para ser apagado quando chegarem as novas.
+  O TechNews é a minha resposta, e foi desenhado assim: busca as notícias dos temas que eu acompanho, guarda no banco, passa por uma IA que filtra, classifica e resume, e me mostra o resultado numa tela, para eu ler toda manhã. O que eu gostar, eu salvo. O que eu não salvar tem prazo para ser apagado quando chegam as novas.
 
-  O projeto está no começo. Hoje existe a primeira parte: a coleta no Hacker News, a validação, a extração do texto e a gravação no PostgreSQL. Agora estou decidindo as próximas fontes e criando os coletores que alimentam o banco, com fallback para quando uma fonte falhar.
-
-  Ele também é o meu laboratório de engenharia de dados. O código é pequeno de propósito: cada etapa foi construída para eu entender o porquê de cada decisão.
+  Ele também é o meu laboratório de engenharia de dados: cada etapa é construída para eu entender o porquê de cada decisão.
 rota:
-  titulo: Da API ao banco
+  modo: loop
+  titulo: Das fontes à leitura da manhã
   paradas:
-    - titulo: Coleta
-      contagem: 102 resultados
-      curto: Hacker News, dia anterior.
+    - titulo: Fontes
+      curto: Portais e APIs dos temas que eu acompanho.
       texto: >-
-        Consulta a API de busca do Hacker News atrás das notícias do dia anterior, no fuso de São
-        Paulo, sobre 10 temas em 4 áreas: linguagens, IA, dados e DevOps.
-    - titulo: Validação
-      contagem: 81 notícias
+        As notícias vêm de portais e APIs de tecnologia, sempre dos temas que eu acompanho. Cada fonte
+        tem o seu coletor, e um fallback assume quando uma fonte falha.
+    - titulo: Coleta
+      curto: Notícias do dia anterior.
+      texto: >-
+        Cada coletor busca as notícias do dia anterior, no fuso de São Paulo. O do Hacker News consulta
+        a API de busca sobre 10 temas em 4 áreas: linguagens, IA, dados e DevOps. O que vem sem título
+        ou sem URL, ou repetido entre temas, é descartado e registrado no log.
       log: "WARNING | SEM_URL_OU_TITULO | ID = 46012907"
-      curto: Título e URL.
-      texto: Descarta o que vem sem título ou sem URL e registra cada descarte no log.
     - titulo: Extração
-      contagem: 70 com texto
-      log: "INFO | EXTRACAO_OK | ID = 46013377"
-      curto: Texto da página.
+      curto: Texto da página original.
       texto: >-
         Baixa a página original e extrai o texto com o trafilatura. Falha no download ou na extração
         é registrada, e a notícia é pulada.
+      log: "INFO | EXTRACAO_OK | ID = 46013377"
     - titulo: PostgreSQL
-      log: "INFO | POSTGRES_CONECTADO | DB = …"
-      curto: Sem duplicar.
+      curto: Grava sem duplicar.
       texto: >-
         Grava com `INSERT ... ON CONFLICT (fonte, id_externo) DO NOTHING RETURNING id`. Se não voltou
-        id, era duplicada.
-    - titulo: Resumo
+        id, era duplicada. No fim, um log diz quantas notícias foram inseridas, quantas eram
+        duplicadas e quantas foram rejeitadas.
       log: "INFO | RESUMO_INGESTAO | INSERIDAS=… | DUPLICADAS=… | REJEITADAS=…"
-      curto: Inseridas, duplicadas, rejeitadas.
+    - titulo: IA
+      curto: Filtra, classifica e resume.
       texto: >-
-        No fim, um log diz quantas notícias foram inseridas, quantas eram duplicadas e quantas foram
-        rejeitadas.
+        As notícias guardadas no banco passam por uma IA, que filtra, classifica e resume cada uma.
+    - titulo: Leitura da manhã
+      curto: Salvar o que eu gostar.
+      texto: >-
+        O resultado aparece numa tela, para eu ler as novidades toda manhã, de forma concisa. O que eu
+        gostar, eu salvo. O que eu não salvar tem prazo para ser apagado quando chegam as novas.
 decisoes:
   - titulo: Idempotência no banco
     resumo: >-
@@ -122,6 +122,10 @@ numeros:
 numerosFonte: >-
   Execução das etapas de coleta, validação e extração em 23/11/2026, com as notícias de 22/11/2026,
   sem gravar no banco.
+situacao: |-
+  O projeto está no começo. Hoje existe a primeira parte do fluxo: a coleta no Hacker News, a validação, a extração do texto e a gravação no PostgreSQL. Numa execução de teste em 23/11/2026, ele coletou 81 notícias e extraiu o texto de 70 delas (86%).
+
+  Agora estou decidindo as próximas fontes e criando os coletores que alimentam o banco, com os fallbacks. A IA e a tela de leitura já estão desenhadas e vêm em seguida.
 proximos:
   - Adicionar as próximas fontes, com fallback para quando uma falhar.
   - Passar as notícias por uma IA que filtra, classifica e resume.

@@ -72,9 +72,7 @@ const projetos = defineCollection({
               texto: z.string(),
               curto: z.string().optional(),
               midia: midia(image).optional(),
-              /** Tema terminal: a contagem da etapa na execução de teste (texto curto, em mono sob o título da placa). */
-              contagem: z.string().optional(),
-              /** Tema terminal: uma linha no formato real do log, sem a data, mostrada como saída no painel da etapa. */
+              /** Tema terminal: a linha de log da etapa, no formato real e sem a data, na janela da execução do painel. */
               log: z.string().optional(),
             }),
           )
@@ -95,6 +93,11 @@ const projetos = defineCollection({
       numeros: z.array(z.object({ valor: z.string(), rotulo: z.string() })).default([]),
       numerosFonte: z.string().optional(),
       proximos: z.array(z.string()).default([]),
+      /**
+       * Onde o projeto está hoje (parágrafos). Quando existe, a página ganha a seção "Situação atual" depois dos detalhes
+       * técnicos, e os números (`numeros`, `numerosFonte`) vão para ela em vez do "Em resumo".
+       */
+      situacao: z.string().optional(),
       /** Onde o projeto está hoje, em uma frase (tema rpg: vai sob o estágio "Vila" da faixa de estágios). */
       hoje: z.string().optional(),
       seo: z.object({ descricao: z.string().max(160) }),

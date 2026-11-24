@@ -16,12 +16,12 @@ interface Props {
   /**
    * Tema próprio da página: rpg (Life RPG: a lanterna, a estrada do mapa, placas de pedra e pergaminho) ou terminal
    * (TechNews: o cursor de bloco, a linha do pipeline, caixas de terminal). Nos dois há um nó por parada que acende
-   * quando o veículo passa, e o veículo anda também com movimento reduzido (data-anda-sempre, lido por rota.ts).
+   * quando o veículo passa.
    */
   tema?: Tema;
   /**
-   * Tema terminal, rota presa no desktop: a janela de log ao lado do texto da etapa mostra a execução até ela
-   * (o comando e, de cada etapa já alcançada que tenha `log`, a linha dela). Sem isto, cada etapa mostra só a própria linha.
+   * Tema terminal, rota grande: no painel de cada etapa, uma janela de log com a execução até ela (o comando e, de cada
+   * etapa já alcançada, a linha de log dela, ou um comentário com o texto curto quando a etapa não tem evento de log).
    */
   execucao?: { arquivo: string; comando: string };
 }
@@ -36,7 +36,6 @@ const vitrine = modo === 'loop' && !compacta;
   class:list={['rota', { 'rota--compacta': compacta, 'rota--vitrine': vitrine }, proprio && `rota--${tema}`]}
   data-rota
   data-modo={modo}
-  data-anda-sempre={proprio ? '' : undefined}
   style={`--n: ${paradas.length}`}
   role="group"
   aria-label={titulo}
@@ -61,7 +60,6 @@ const vitrine = modo === 'loop' && !compacta;
             <button type="button" class="placa-corpo" data-placa-botao>
               <span class="km">{rotulo(i).prefixo} {proprio ? <span class="num">{rotulo(i).numero}</span> : rotulo(i).numero}</span>
               <strong class="placa-titulo">{p.titulo}</strong>
-              {p.contagem && <span class="placa-contagem">{p.contagem}</span>}
               {/* No rpg o texto curto sai da lanterna, no balão do painel; a placa fica só com o rótulo e o título. */}
               {!rpg && <span class="placa-texto" set:html={textoRico(p.curto ?? p.texto)} />}
             </button>
@@ -69,7 +67,6 @@ const vitrine = modo === 'loop' && !compacta;
             <div class="placa-corpo">
               <span class="km">{rotulo(i).prefixo} {proprio ? <span class="num">{rotulo(i).numero}</span> : rotulo(i).numero}</span>
               <strong class="placa-titulo">{p.titulo}</strong>
-              {p.contagem && <span class="placa-contagem">{p.contagem}</span>}
             </div>
           )}
           <div class="poste" aria-hidden="true"></div>
@@ -80,22 +77,10 @@ const vitrine = modo === 'loop' && !compacta;
                 <span class="rota-detalhe-km" aria-hidden="true">{rotulo(i).prefixo} {proprio ? <span class="num">{rotulo(i).numero}</span> : rotulo(i).numero}</span>
                 <strong class="rota-detalhe-titulo" aria-hidden="true">{p.titulo}</strong>
                 <p class="rota-detalhe-texto" set:html={textoRico(p.texto)} />
-                {/* Tema terminal: a linha de log da etapa, como saída do pipeline (no desktop no painel da rota presa; no celular e sem JS, no item). */}
-                {p.log && <pre class="saida"><code><LinhaDeLog linha={p.log} /></code></pre>}
               </div>
               {p.midia
                 ? <MolduraMidia midia={p.midia} idioma={idioma} sizes="(min-width: 900px) 40vw, 90vw" />
                 : <span class="rota-detalhe-marco" aria-hidden="true">{proprio ? rotulo(i).numero : `KM ${i}`}</span>}
-              {/* Tema terminal: a execução até esta etapa, numa janela (só aparece na rota presa; o CSS decide). Cada painel já traz no
-                  HTML as linhas até ele, então ao rolar o log vai ganhando linhas sem script. */}
-              {execucao && (
-                <div class="execucao">
-                  <div class="janela-barra" aria-hidden="true"><i></i><i></i><i></i><span>{execucao.arquivo}</span></div>
-                  <pre class="execucao-log"><code><span class="execucao-linha"><LinhaDeLog linha={execucao.comando} /></span>{paradas.slice(0, i + 1).map((q, j) => q.log && (
-                    <span class:list={['execucao-linha', j === i ? 'execucao-linha--atual' : 'execucao-linha--anterior']}><LinhaDeLog linha={q.log} /></span>
-                  ))}</code></pre>
-                </div>
-              )}
             </div>
           )}
         </li>
@@ -119,7 +104,17 @@ const vitrine = modo === 'loop' && !compacta;
           </div>
           {p.midia
             ? <MolduraMidia midia={p.midia} idioma={idioma} sizes="(min-width: 900px) 55vw, 92vw" />
-            : <span class="rota-detalhe-marco" aria-hidden="true">{proprio ? rotulo(i).numero : `KM ${i}`}</span>}
+            : execucao
+              ? (
+                <div class="execucao">
+                  <div class="janela-barra" aria-hidden="true"><i></i><i></i><i></i><span>{execucao.arquivo}</span></div>
+                  {/* A execução até esta etapa: cada painel já traz no HTML as linhas até ele (sem JS, só o comando e a própria linha). */}
+                  <pre class="execucao-log"><code><span class="execucao-linha"><LinhaDeLog linha={execucao.comando} /></span>{paradas.slice(0, i + 1).map((q, j) => (
+                    <span class:list={['execucao-linha', j === i ? 'execucao-linha--atual' : 'execucao-linha--anterior', { 'execucao-linha--comentario': !q.log }]}>{q.log ? <LinhaDeLog linha={q.log} /> : `# ${q.curto ?? q.titulo}`}</span>
+                  ))}</code></pre>
+                </div>
+              )
+              : <span class="rota-detalhe-marco" aria-hidden="true">{proprio ? rotulo(i).numero : `KM ${i}`}</span>}
         </div>
       ))}
     </div>
@@ -392,13 +387,12 @@ const vitrine = modo === 'loop' && !compacta;
   .rota--terminal .km { color: var(--mute); letter-spacing: 0.04em; }
   .rota--terminal .num { font-weight: 700; }
   .rota--terminal .placa-titulo { font-family: var(--fonte-mono); font-weight: 700; font-stretch: normal; font-size: 0.95rem; letter-spacing: -0.02em; }
-  .placa-contagem { display: block; margin-top: 4px; font: 400 0.78rem/1.3 var(--fonte-mono); color: var(--ink-2); }
-  .rota--compacta .placa-contagem { display: none; }
-  .rota--compacta.rota--terminal .placa-titulo { font-size: 0.74rem; }
+  /* Seis etapas no cartão da home: o nome em corpo menor, para "PostgreSQL" caber inteiro na caixa. */
+  .rota--compacta.rota--terminal .placa-titulo { font-size: 0.62rem; letter-spacing: -0.02em; }
   /* Caixas de terminal: borda de 1 px, cantos quase retos; a ativa fica com a borda e o rótulo em verde, sem brilho. */
   /* Borda de 1 px com 1 px a mais de respiro: a placa mede o mesmo que a de 2 px (o cartão da home não muda de altura). */
   .rota--terminal .placa-corpo { border-width: 1px; padding: 11px 13px 13px; border-radius: var(--raio); background: var(--bg); }
-  .rota--compacta.rota--terminal .placa-corpo { padding: 7px; }
+  .rota--compacta.rota--terminal .placa-corpo { padding: 7px 4px; }
   .rota--terminal .placa[data-ativa] .placa-corpo { box-shadow: none; }
   .rota--terminal .poste { width: 1px; margin-left: 20px; background: var(--line-2); }
   /* A linha do pipeline: um fio; o trecho já percorrido fica verde. */
@@ -416,44 +410,41 @@ const vitrine = modo === 'loop' && !compacta;
   .rota--terminal .rota-detalhe-km { letter-spacing: 0.06em; }
   .rota--terminal .rota-detalhe-titulo { font-family: var(--fonte-mono); font-weight: 700; font-stretch: normal; letter-spacing: -0.03em; }
   .rota--terminal .rota-detalhe-marco { font-family: var(--fonte-mono); font-weight: 700; font-stretch: normal; -webkit-text-stroke: 1px var(--line-2); }
-  /* A linha de log da etapa, como saída do pipeline. */
-  .saida { margin: 14px 0 0; padding: 9px 12px; background: var(--bg); border: 1px solid var(--line); border-left: 2px solid var(--verde); border-radius: var(--raio); font: 400 0.8rem/1.55 var(--fonte-mono); color: var(--ink); white-space: normal; overflow-wrap: anywhere; }
-  .saida code { all: unset; }
   @media (prefers-reduced-motion: no-preference) {
     /* O cursor pisca quando está parado numa etapa (andando, fica aceso, como num terminal enquanto se digita). */
     .rota--terminal:not([data-andando]) .cursor-rota { animation: cursor-piscar 1.06s steps(1) infinite; }
     /* Na pausa da página o cursor fica aceso (a regra geral só o congelaria onde estava). */
     :global(html[data-pausado]) .rota--terminal .cursor-rota { opacity: 1 !important; }
   }
+  /* ===== Rota grande (vitrine) no terminal: topo, caixas e, no painel, o texto da etapa ao lado da janela da execução. ===== */
+  .rota--terminal .rota-dica { font-family: var(--fonte-mono); }
+  .rota--terminal .ponto-vivo { border-radius: 1px; box-shadow: none; background: var(--verde); }
+  .rota--terminal .rota-pausa { border-radius: var(--raio); border-color: var(--line-2); color: var(--ink-2); }
+  .rota--terminal .rota-pausa:hover { border-color: var(--verde); color: var(--verde); }
+  .rota--terminal[data-pausada] .rota-pausa { border-color: var(--verde); background: var(--verde-fundo); color: var(--verde); }
+  .rota--terminal button.placa-corpo:hover { border-color: var(--verde); }
+  .rota--terminal .placa-texto { font-size: 0.82rem; }
+  .execucao { margin: 0; background: var(--bg); border: 1px solid var(--line-2); border-radius: var(--raio); overflow: hidden; }
+  /* Altura fixa para as linhas de todas as etapas (com folga para a que quebra): a troca de etapa não mexe no layout. */
+  .execucao-log { margin: 0; height: calc((var(--n) + 3) * 1.6em + 24px); padding: 12px 14px; font: 400 0.8rem/1.6 var(--fonte-mono); color: var(--ink); white-space: normal; overflow: hidden; }
+  .execucao-log code { all: unset; display: block; }
+  .execucao-linha { display: block; padding-left: 2ch; text-indent: -2ch; overflow-wrap: anywhere; }
+  .execucao-linha--anterior { opacity: 0.55; }
+  .execucao-linha--atual { margin-inline: -14px; padding-inline: calc(14px + 2ch) 14px; background: var(--verde-fundo); box-shadow: inset 2px 0 0 var(--verde); }
+  /* Etapa sem evento de log: um comentário de shell com o texto curto dela, que não se confunde com linha de log. */
+  .execucao-linha--comentario { color: var(--mute); font-style: italic; }
+  /* Sem JS a vitrine é a lista de todas as etapas: cada uma mostra só o comando e a própria linha. */
+  :global(html:not(.js)) .execucao-linha--anterior { display: none; }
+  :global(html:not(.js)) .execucao-log { height: auto; }
   @media (max-width: 899px) {
-    .rota--terminal[data-modo='rolagem'] .asfalto::before { background: var(--line-2); left: 50%; width: 2px; margin: 0 0 0 -1px; animation: none; }
-    .rota--terminal[data-modo='rolagem'] .asfalto::after { width: 2px; margin: 0 0 0 -1px; }
-    .rota--terminal[data-modo='rolagem'] .marco { left: 50%; top: calc(var(--c) * 100%); }
-    .rota--terminal[data-modo='rolagem'] .carro { rotate: none; width: 14px; height: 26px; translate: -50% -50%; }
+    /* Celular: seis caixas só com o rótulo; menos respiro para "Etapa n" caber. */
+    .rota--terminal.rota--vitrine .placa-corpo { padding: 6px 2px; text-align: center; }
+    .rota--terminal.rota--vitrine .km { font-size: 0.66rem; letter-spacing: 0; }
+    .rota--terminal .vitrine-painel { gap: 14px; }
   }
-  /* O quadro da etapa é o item inteiro no celular e sem JS (sem rota presa): caixa de 1 px, a ativa em verde, sem brilho. */
-  .rota--terminal.rota[data-modo='rolagem']:not([data-presa]) .placa { border-width: 1px; border-color: var(--line-2); border-radius: var(--raio); background: var(--bg); box-shadow: none; }
-  .rota--terminal.rota[data-modo='rolagem']:not([data-presa]) .placa[data-ativa] { border-color: var(--verde); background: var(--verde-fundo); }
-  :global(html:not(.js)) .rota--terminal.rota[data-modo='rolagem'] .placa:not([data-ativa]) { border-color: var(--line-2); background: var(--bg); box-shadow: none; }
-
-  /* Janela da execução (tema terminal): fora da rota presa ela não aparece. */
-  .execucao { display: none; }
   @media (min-width: 900px) {
-    /* Rota presa no terminal: painel mais baixo, em duas colunas alinhadas ao alto, logo abaixo da linha do pipeline:
-       o texto da etapa à esquerda e, à direita, a janela com a execução até ela. Sem o número grande e sem a saída solta
-       (a linha da etapa está na janela, em destaque). A troca de painel continua só com o fade. */
-    .rota--terminal { --area: 212px; }
-    :global(.js) .rota--terminal.rota[data-modo='rolagem'][data-presa] .rota-detalhe { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; gap: 32px; padding-top: 6px; }
-    :global(.js) .rota--terminal.rota[data-modo='rolagem'][data-presa] .rota-detalhe-marco,
-    :global(.js) .rota--terminal.rota[data-modo='rolagem'][data-presa] .saida { display: none; }
-    :global(.js) .rota--terminal.rota[data-modo='rolagem'][data-presa] .rota-detalhe-texto { font-size: 1.05rem; }
-    :global(.js) .rota--terminal.rota[data-modo='rolagem'][data-presa] .execucao { display: block; background: var(--bg); border: 1px solid var(--line-2); border-radius: var(--raio); overflow: hidden; }
-    /* Altura fixa para as cinco linhas (com folga para as que quebram): a troca de etapa não mexe no layout. */
-    .execucao-log { margin: 0; height: calc(7 * 1.6em + 24px); padding: 12px 14px; font: 400 0.8rem/1.6 var(--fonte-mono); color: var(--ink); white-space: normal; overflow: hidden; }
-    .execucao-log code { all: unset; display: block; }
-    .execucao-linha { display: block; padding-left: 2ch; text-indent: -2ch; overflow-wrap: anywhere; }
-    .execucao-linha--anterior { opacity: 0.55; }
-    .execucao-linha--atual { margin-inline: -14px; padding-inline: calc(14px + 2ch) 14px; background: var(--verde-fundo); box-shadow: inset 2px 0 0 var(--verde); }
+    /* Desktop: texto à esquerda e a janela à direita, alinhados ao alto. */
+    .rota--terminal .vitrine-painel { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
   }
 </style>
 <script>import '../scripts/rota';</script>

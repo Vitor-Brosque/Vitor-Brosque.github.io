@@ -3,7 +3,6 @@ ordem: 3
 frase: A Python pipeline that gathers tech news on the topics I follow, so I can read what matters every morning.
 status: desenvolvimento
 statusTexto: In development · open source
-statusDetalhe: Today it collects from Hacker News and writes to PostgreSQL. I'm choosing the next sources and building the collectors and their fallbacks.
 papel: Personal and study project, on my own
 periodo: "2026"
 stack: [Python, PostgreSQL, psycopg 3, httpx, trafilatura, Hacker News API]
@@ -19,12 +18,10 @@ logDoTopo:
   - "2026-11-23 10:12:11,870 | WARNING | FALHA_DOWNLOAD | ID=46013412 | URL=https://…"
   - "2026-11-23 10:13:40,002 | INFO | RESUMO_INGESTAO | INSERIDAS=… | DUPLICADAS=… | REJEITADAS=…"
 emResumo: >-
-  There are too many sites and too much news, and I kept getting lost in what's new in tech.
-  TechNews is what I'm building to fix that: gather the news on the topics I follow and hand me a
-  summary every morning. The first part already works: it fetches the previous day's stories from
-  Hacker News, drops anything incomplete or repeated, extracts the text of the original page and
-  stores it in PostgreSQL without duplicates. In a test run on Nov 23, 2026, it collected 81
-  stories and extracted the text of 70 of them (86%).
+  There are too many sites and too much news, and I kept getting lost in what's new in tech. TechNews
+  was designed to fix that: it gathers the news on the topics I follow, runs it through an AI that
+  filters, classifies and summarizes, and hands it all to me on a screen to read every morning. What
+  I like, I save. The rest goes away on its own after a set time.
 resumo:
   problema: >-
     There are too many sites and too much news. I kept getting lost in what's new in tech and wanted
@@ -38,42 +35,48 @@ resumo:
 problema: |-
   Keeping up with tech became a volume problem. There are many sites and a lot of news every day, and I kept getting lost, not knowing what was worth reading.
 
-  TechNews is my answer. The idea is to fetch the news on the topics I follow, store it in the database, run it through an AI that filters, classifies and summarizes, and show me the result on a screen, so I can read it every morning. What I like, I save. What I don't save gets deleted after a set time, once newer stories arrive.
+  TechNews is my answer, and this is how it was designed: it fetches the news on the topics I follow, stores it in the database, runs it through an AI that filters, classifies and summarizes, and shows me the result on a screen, so I can read it every morning. What I like, I save. What I don't save gets deleted after a set time, once newer stories arrive.
 
-  The project is at the beginning. Today the first part exists: collecting from Hacker News, validating, extracting the text and writing to PostgreSQL. Right now I'm deciding the next sources and building the collectors that feed the database, with a fallback for when a source fails.
-
-  It is also my data engineering lab. The code is small on purpose: each step was built so I'd understand the reason behind every decision.
+  It is also my data engineering lab: each step is built so I understand the reason behind every decision.
 rota:
-  titulo: From the API to the database
+  modo: loop
+  titulo: From the sources to the morning read
   paradas:
+    - titulo: Sources
+      curto: Sites and APIs on the topics I follow.
+      texto: >-
+        The news comes from tech sites and APIs, always on the topics I follow. Each source has its
+        own collector, and a fallback takes over when a source fails.
     - titulo: Collect
-      contagem: 102 results
-      curto: Hacker News, previous day.
+      curto: The previous day's stories.
       texto: >-
-        Queries the Hacker News search API for the previous day's stories, in São Paulo time, on 10
-        topics across 4 areas: languages, AI, data and DevOps.
-    - titulo: Validate
-      contagem: 81 stories
+        Each collector fetches the previous day's stories, in São Paulo time. The Hacker News one
+        queries the search API on 10 topics across 4 areas: languages, AI, data and DevOps. Anything
+        with no title or URL, or repeated across topics, is dropped and logged.
       log: "WARNING | SEM_URL_OU_TITULO | ID = 46012907"
-      curto: Title and URL.
-      texto: Drops anything without a title or URL and logs every drop.
     - titulo: Extract
-      contagem: 70 with text
+      curto: Text of the original page.
+      texto: >-
+        Downloads the original page and extracts the text with trafilatura. A download or extraction
+        failure is logged, and the story is skipped.
       log: "INFO | EXTRACAO_OK | ID = 46013377"
-      curto: Page text.
-      texto: >-
-        Downloads the original page and extracts the text with trafilatura. A failed download or
-        extraction is logged and the story is skipped.
     - titulo: PostgreSQL
-      log: "INFO | POSTGRES_CONECTADO | DB = …"
-      curto: No duplicates.
+      curto: Stores without duplicates.
       texto: >-
-        Writes with `INSERT ... ON CONFLICT (fonte, id_externo) DO NOTHING RETURNING id`. If no id comes
-        back, it was a duplicate.
-    - titulo: Summary
+        Writes with `INSERT ... ON CONFLICT (fonte, id_externo) DO NOTHING RETURNING id`. If no id
+        comes back, it was a duplicate. At the end, a log line says how many stories were inserted,
+        how many were duplicates and how many were rejected.
       log: "INFO | RESUMO_INGESTAO | INSERIDAS=… | DUPLICADAS=… | REJEITADAS=…"
-      curto: Inserted, duplicates, rejected.
-      texto: At the end, a log line says how many stories were inserted, how many were duplicates and how many were rejected.
+    - titulo: AI
+      curto: Filters, classifies and summarizes.
+      texto: >-
+        The stories stored in the database go through an AI that filters, classifies and summarizes
+        each one.
+    - titulo: Morning read
+      curto: Save what I like.
+      texto: >-
+        The result shows up on a screen, so I can read what's new every morning, concisely. What I
+        like, I save. What I don't save gets deleted after a set time, once newer stories arrive.
 decisoes:
   - titulo: Idempotency in the database
     resumo: >-
@@ -109,6 +112,10 @@ numeros:
 numerosFonte: >-
   Collection, validation and extraction steps run on Nov 23, 2026, with the stories from Nov 22, 2026,
   without writing to the database.
+situacao: |-
+  The project is at the beginning. Today the first part of the flow exists: collecting from Hacker News, validating, extracting the text and writing to PostgreSQL. In a test run on Nov 23, 2026, it collected 81 stories and extracted the text of 70 of them (86%).
+
+  Right now I'm deciding the next sources and building the collectors that feed the database, with their fallbacks. The AI and the reading screen are already designed and come next.
 proximos:
   - Add the next sources, with a fallback for when one fails.
   - Run the stories through an AI that filters, classifies and summarizes.

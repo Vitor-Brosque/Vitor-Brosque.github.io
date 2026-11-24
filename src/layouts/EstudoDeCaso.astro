@@ -53,8 +53,6 @@ const jsonLd = {
       <p class="rotulo rotulo--sinal" data-entrada style="--ordem: 0">{d.statusTexto}</p>
       <h1 transition:name={`titulo-${slug}`}>{d.titulo}</h1>
       {rpg && <div class="caso-cena" data-entrada style="--ordem: 1"><CenaRpg /></div>}
-      {/* Tema terminal: em que pé está o projeto, como um comentário de shell sob o título (só neste tema; nos outros o detalhe fica só na home). */}
-      {terminal && d.statusDetalhe && <p class="caso-status" data-entrada style="--ordem: 1">{d.statusDetalhe}</p>}
       {terminal && d.logDoTopo && <div class="caso-log" data-entrada style="--ordem: 1"><LogTerminal idioma={idioma} linhas={d.logDoTopo} /></div>}
       <p class="caso-frase" data-entrada style="--ordem: 2">{d.frase}</p>
       <dl class="ficha" data-entrada style="--ordem: 3">
@@ -74,12 +72,13 @@ const jsonLd = {
         {terminal && <div class="janela-barra" aria-hidden="true"><i></i><i></i><i></i><span>{t(idioma, 'terminal.resumo')}</span></div>}
         <h2 id="em-resumo" class="em-resumo-titulo">{t(idioma, 'caso.emResumo')}</h2>
         <p class="em-resumo-texto" set:html={textoRico(d.emResumo)} />
-        {d.numeros.length > 0 && (
+        {/* Com a seção "Situação atual", os números vão para ela. */}
+        {!d.situacao && d.numeros.length > 0 && (
           <dl class="numeros">
             {d.numeros.map((n, i) => <div data-entrada style={`--ordem: ${6 + i}`}><dt>{n.valor}</dt><dd>{n.rotulo}</dd></div>)}
           </dl>
         )}
-        {d.numeros.length > 0 && d.numerosFonte && <p class="numeros-fonte">{d.numerosFonte}</p>}
+        {!d.situacao && d.numeros.length > 0 && d.numerosFonte && <p class="numeros-fonte">{d.numerosFonte}</p>}
       </div>
     </section>
 
@@ -139,6 +138,19 @@ const jsonLd = {
       <h3 class="decisoes-titulo revelar">{t(idioma, 'caso.decisoes')}</h3>
       <div class="decisoes">{d.decisoes.map((dec) => <Decisao decisao={dec} idioma={idioma} tema={tema} />)}</div>
     </section>
+
+    {d.situacao && (
+      <section class="secao wrap" aria-labelledby="situacao">
+        <h2 id="situacao" class="revelar">{t(idioma, 'caso.situacao')}</h2>
+        <div class="texto caso-texto revelar">{paragrafos(d.situacao).map((p) => <p set:html={textoRico(p)} />)}</div>
+        {d.numeros.length > 0 && (
+          <div class="situacao-numeros revelar">
+            <dl class="numeros">{d.numeros.map((n) => <div><dt>{n.valor}</dt><dd>{n.rotulo}</dd></div>)}</dl>
+            {d.numerosFonte && <p class="numeros-fonte">{d.numerosFonte}</p>}
+          </div>
+        )}
+      </section>
+    )}
 
     {rpg && d.hoje ? (
       <section class="secao wrap" aria-labelledby="estagios">
@@ -246,9 +258,10 @@ const jsonLd = {
   /* Próximos passos como caixas de tarefa por fazer: `[ ]` em mono, posto por CSS (o texto não muda). */
   main[data-tema='terminal'] .proximos { font-size: 1rem; }
   main[data-tema='terminal'] .proximos li::before { content: '[ ]' / ''; width: auto; height: auto; margin: 0; background: none; font-family: var(--fonte-mono); color: var(--verde); white-space: pre; }
-  .caso-status { margin-top: 14px; max-width: 60ch; font: 400 0.86rem/1.55 var(--fonte-mono); color: var(--mute); }
-  .caso-status::before { content: '# ' / ''; color: var(--verde); }
   /* Rota em loop no estudo de caso: o título já está no h2 da seção; no topo da rota fica só a dica, o "ao vivo" e a pausa. */
   .caso-rota :global(.rota-titulo > .rotulo) { display: none; }
+  /* Situação atual: o texto e, embaixo, os números da execução (no tema terminal, em mono verde, como no resumo). */
+  .situacao-numeros { margin-top: 8px; }
+  main[data-tema='terminal'] .situacao-numeros .numeros { max-width: none; }
 </style>
 <script>import '../scripts/leitura';</script>

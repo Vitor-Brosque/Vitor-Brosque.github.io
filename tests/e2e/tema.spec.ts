@@ -64,12 +64,13 @@ for (const r of rotulos) {
 
 test('na rota do Life RPG quem anda é a lanterna; na do RodoviariaOS, o carrinho', async ({ page }) => {
   await page.goto('/projetos/life-rpg/');
-  await expect(page.locator('[data-rota] .carro .lanterna')).toHaveCount(1);
-  await expect(page.locator('[data-rota] .carro .carrinho')).toHaveCount(0);
-  await expect(page.locator('[data-rota] .marco')).toHaveCount(5);
+  // Só a rota da página (no <main>): o fim da página tem os cartões dos outros projetos, cada um com a sua rota.
+  await expect(page.locator('main [data-rota] .carro .lanterna')).toHaveCount(1);
+  await expect(page.locator('main [data-rota] .carro .carrinho')).toHaveCount(0);
+  await expect(page.locator('main [data-rota] .marco')).toHaveCount(5);
   await page.goto('/projetos/rodoviariaos/');
-  await expect(page.locator('[data-rota] .carro .carrinho')).toHaveCount(1);
-  await expect(page.locator('[data-rota] .marco')).toHaveCount(0);
+  await expect(page.locator('main [data-rota] .carro .carrinho')).toHaveCount(1);
+  await expect(page.locator('main [data-rota] .marco')).toHaveCount(0);
 });
 
 for (const modo of ['reduce', 'no-preference'] as const) {
@@ -173,51 +174,27 @@ test('na home só o cartão do Life RPG tem a moldura do jogo e a lanterna', asy
 test.describe('rota com movimento reduzido', () => {
   test.use({ reducedMotion: 'reduce' });
 
-  for (const { caminho, veiculo } of [{ caminho: '/projetos/technews/', veiculo: '.cursor-rota' }]) {
-  test(`${caminho}: o veículo anda com a rolagem e a parada ativa troca`, async ({ page }) => {
-    await page.goto(caminho);
-    const rota = page.locator('[data-rota][data-modo="rolagem"]');
-    const lanterna = rota.locator(`.carro ${veiculo}`);
-    await expect(rota).not.toHaveAttribute('data-estatico');
-    await expect(page.locator('[data-rota] [data-estatico], [data-rota][data-estatico]')).toHaveCount(0);
-    const topo = await rota.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
-    await page.evaluate((y) => window.scrollTo(0, y - 40), topo);
-    await expect(lanterna).toBeVisible();
-    const pos = () => rota.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--pos'));
-    const ativa = () => rota.locator('.placa').evaluateAll((ps) => ps.findIndex((p) => p.hasAttribute('data-ativa')));
-    await expect.poll(pos).not.toBe('');
-    // Parado numa parada: a posição não muda sozinha (sem suavização que continue andando).
-    const antes = await pos();
-    const placaAntes = await ativa();
-    await page.waitForTimeout(400);
-    expect(await pos()).toBe(antes);
-    await page.evaluate(() => window.scrollBy(0, 900));
-    await expect.poll(pos).not.toBe(antes);
-    await expect.poll(ativa).not.toBe(placaAntes);
-    await expect(lanterna).toBeVisible();
-    // A chama fica no primeiro quadro, o cursor fica aceso e nada fica em loop.
-    expect(await page.locator('.lanterna .quadro-2').evaluateAll((qs) => qs.every((q) => getComputedStyle(q).visibility === 'hidden'))).toBe(true);
-    expect(await page.locator('.cursor-rota, .cursor-bloco').evaluateAll((cs) => cs.every((c) => getComputedStyle(c).opacity === '1'))).toBe(true);
-  });
-  }
-
-  // A rota do Life RPG anda sozinha, como a rota grande da home (modo loop), também com movimento reduzido.
-  test('no Life RPG a lanterna muda de marco sozinha, sem rolar; a pausa para; clicar num marco leva a lanterna até ele', async ({ page }) => {
+  // As rotas do Life RPG e do TechNews andam sozinhas, como a rota grande da home (modo loop), também com movimento reduzido.
+  for (const { caminho, veiculo, n } of [
+    { caminho: '/projetos/life-rpg/', veiculo: '.lanterna', n: 5 },
+    { caminho: '/projetos/technews/', veiculo: '.cursor-rota', n: 6 },
+  ]) {
+  test(`${caminho}: o veículo muda de parada sozinho, sem rolar; a pausa para; clicar numa parada leva o veículo até ela`, async ({ page }) => {
     test.setTimeout(60_000);
-    await page.goto('/projetos/life-rpg/');
-    const rota = page.locator('[data-rota]').filter({ has: page.locator('.lanterna') });
+    await page.goto(caminho);
+    const rota = page.locator('main [data-rota]').filter({ has: page.locator(veiculo) });
     await expect(rota).toHaveAttribute('data-modo', 'loop');
     await expect(rota).not.toHaveAttribute('data-estatico');
     await rota.scrollIntoViewIfNeeded();
     const y = await page.evaluate(() => window.scrollY);
-    const lanterna = rota.locator('.carro .lanterna');
+    const lanterna = rota.locator(`.carro ${veiculo}`);
     await expect(lanterna).toBeVisible();
     const ativa = () => rota.locator('.placa').evaluateAll((ps) => ps.findIndex((p) => p.hasAttribute('data-ativa')));
     const pos = () => rota.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--pos'));
     // Observa um marco, espera, observa outro: a lanterna andou sozinha.
     await expect.poll(ativa, { timeout: 5_000 }).toBeGreaterThanOrEqual(0);
     const primeira = await ativa();
-    await expect.poll(ativa, { timeout: 8_000 }).not.toBe(primeira);
+    await expect.poll(ativa, { timeout: 12_000 }).not.toBe(primeira);
     expect(await page.evaluate(() => window.scrollY)).toBe(y);
     const acesos = () => rota.locator('.marco[data-aceso]').count();
     expect(await acesos()).toBeGreaterThan(0);
@@ -228,13 +205,15 @@ test.describe('rota com movimento reduzido', () => {
     const parada = await pos();
     await page.waitForTimeout(1500);
     expect(await pos()).toBe(parada);
-    // Clicar no último marco leva a lanterna até ele.
-    await rota.locator('[data-placa-botao]').nth(4).click();
-    await expect.poll(ativa).toBe(4);
-    await expect.poll(acesos).toBe(5);
-    // Chama no primeiro quadro, sem loop.
+    // Clicar na última parada leva o veículo até ela.
+    await rota.locator('[data-placa-botao]').nth(n - 1).click();
+    await expect.poll(ativa).toBe(n - 1);
+    await expect.poll(acesos).toBe(n);
+    // Chama no primeiro quadro e cursor aceso, sem loop.
     expect(await page.locator('.lanterna .quadro-2').evaluateAll((qs) => qs.every((q) => getComputedStyle(q).visibility === 'hidden'))).toBe(true);
+    expect(await page.locator('.cursor-rota, .cursor-bloco').evaluateAll((cs) => cs.every((c) => getComputedStyle(c).opacity === '1'))).toBe(true);
   });
+  }
 
   test('no Life RPG a lanterna fica sobre a trilha, parada no primeiro quadro', async ({ page }) => {
     await page.goto('/projetos/life-rpg/');
@@ -395,71 +374,65 @@ for (const modo of ['reduce', 'no-preference'] as const) {
   });
 }
 
+// A rota do TechNews mostra o fluxo inteiro, como foi desenhado: seis etapas com o mesmo peso.
+const etapas = {
+  pt: ['Fontes', 'Coleta', 'Extração', 'PostgreSQL', 'IA', 'Leitura da manhã'],
+  en: ['Sources', 'Collect', 'Extract', 'PostgreSQL', 'AI', 'Morning read'],
+} as const;
 const linhasDasEtapas = [
   'WARNING | SEM_URL_OU_TITULO | ID = 46012907',
   'INFO | EXTRACAO_OK | ID = 46013377',
-  'INFO | POSTGRES_CONECTADO | DB = …',
   'INFO | RESUMO_INGESTAO | INSERIDAS=… | DUPLICADAS=… | REJEITADAS=…',
 ];
-
-test('na rota do TechNews as três primeiras etapas trazem a contagem da execução de teste; as do banco não', async ({ page }) => {
-  for (const [caminho, contagens] of [
-    ['/projetos/technews/', ['102 resultados', '81 notícias', '70 com texto']],
-    ['/en/projects/technews/', ['102 results', '81 stories', '70 with text']],
-  ] as const) {
-    await page.goto(caminho);
-    const placas = page.locator('[data-rota] .placa');
-    await expect(placas).toHaveCount(5);
-    for (let i = 0; i < 3; i++) await expect(placas.nth(i).locator('.placa-contagem')).toHaveText(contagens[i]);
-    for (const i of [3, 4]) await expect(placas.nth(i).locator('.placa-contagem')).toHaveCount(0);
-    // A linha de log de cada etapa, no formato real (Coleta não tem).
-    await expect(placas.locator('.saida')).toHaveText(linhasDasEtapas);
-    // À vista de fato: no desktop as placas da rota presa; no celular cada item, rolando até ele.
-    for (let i = 0; i < 3; i++) {
-      await placas.nth(i).locator('.placa-corpo').scrollIntoViewIfNeeded();
-      await expect(placas.nth(i).locator('.placa-contagem')).toBeVisible();
+for (const js of [true, false]) {
+  test.describe(`rota do TechNews, ${js ? 'com' : 'sem'} JavaScript`, () => {
+    test.use({ javaScriptEnabled: js });
+    for (const [caminho, nomes] of [
+      ['/projetos/technews/', etapas.pt],
+      ['/en/projects/technews/', etapas.en],
+    ] as const) {
+      test(`${caminho}: seis etapas na ordem, sem marca de estado nem contagem`, async ({ page }) => {
+        await page.goto(caminho);
+        const placas = page.locator('main [data-rota] .placa');
+        await expect(placas.locator('.placa-titulo')).toHaveText([...nomes]);
+        await expect(page.locator('main [data-rota] .placa-contagem')).toHaveCount(0);
+        await expect(page.locator('main [data-rota]')).not.toContainText(/\b(pronto|planejado|em andamento|done|planned|in progress)\b/i);
+        // A janela de cada painel: a linha de log da etapa, ou um comentário com o texto curto quando ela não tem evento.
+        const atuais = page.locator('main [data-painel] .execucao-linha--atual');
+        await expect(atuais).toHaveCount(6);
+        const textos = await atuais.allTextContents();
+        expect(textos[1]).toBe(linhasDasEtapas[0]);
+        expect(textos[2]).toBe(linhasDasEtapas[1]);
+        expect(textos[3]).toBe(linhasDasEtapas[2]);
+        for (const i of [0, 4, 5]) expect(textos[i]).toMatch(/^# /);
+        expect(await page.locator('main [data-painel]').nth(5).locator('.execucao-linha--atual .log-nivel').count()).toBe(0);
+      });
     }
-  }
-});
-
-for (const modo of ['reduce', 'no-preference'] as const) {
-  test.describe(`execução da rota do TechNews (${modo === 'reduce' ? 'movimento reduzido' : 'movimento permitido'})`, () => {
-    test.use({ reducedMotion: modo });
-    test('na rota presa a janela mostra a execução até a etapa; no celular cada item mostra só a própria linha', async ({ page }) => {
-      await page.goto('/projetos/technews/');
-      const rota = page.locator('[data-rota][data-modo="rolagem"]');
-      const placas = rota.locator('.placa');
-      const largo = (page.viewportSize()?.width ?? 0) >= 900;
-      if (largo) {
-        await expect(rota).toHaveAttribute('data-presa', '');
-        const topo = await rota.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
-        await page.evaluate((y) => window.scrollTo(0, y - 80), topo);
-        // Rola dentro da rota presa até a etapa 3 acender.
-        for (let k = 0; k < 80 && (await placas.nth(2).getAttribute('data-ativa')) === null; k++) {
-          await page.evaluate(() => window.scrollBy(0, 50));
-          await page.waitForTimeout(60);
-        }
-        await expect(placas.nth(2)).toHaveAttribute('data-ativa', '');
-        const janela = placas.nth(2).locator('.execucao');
-        await expect(janela).toBeVisible();
-        await expect(janela.locator('.execucao-linha')).toHaveText(['$ python scr/main.py', linhasDasEtapas[0], linhasDasEtapas[1]]);
-        await expect(janela.locator('.execucao-linha--atual')).toHaveText(linhasDasEtapas[1]);
-        await expect(janela).not.toContainText('POSTGRES_CONECTADO');
-        await expect(janela).not.toContainText('RESUMO_INGESTAO');
-        // A saída solta não aparece na rota presa (a linha da etapa está na janela).
-        await expect(placas.nth(2).locator('.saida')).toBeHidden();
-      } else {
-        for (let i = 1; i < 5; i++) {
-          const saida = placas.nth(i).locator('.saida');
-          await saida.scrollIntoViewIfNeeded();
-          await expect(saida).toBeVisible();
-          await expect(saida).toHaveText(linhasDasEtapas[i - 1]);
-          await expect(placas.nth(i).locator('.execucao')).toBeHidden();
-        }
-      }
-    });
   });
 }
+
+test('na janela da etapa ativa aparece a execução até ela', async ({ page }) => {
+  await page.goto('/projetos/technews/');
+  const rota = page.locator('main [data-rota]');
+  await rota.scrollIntoViewIfNeeded();
+  // Clica na Extração (etapa 3): o painel dela mostra o comando, o comentário das Fontes, a Coleta e a Extração em destaque.
+  await rota.locator('[data-placa-botao]').nth(2).click();
+  const painel = rota.locator('[data-painel]').nth(2);
+  await expect(painel).toBeVisible();
+  const janela = painel.locator('.execucao');
+  await expect(janela).toBeVisible();
+  await expect(janela.locator('.execucao-linha')).toHaveText([
+    '$ python scr/main.py',
+    '# Portais e APIs dos temas que eu acompanho.',
+    linhasDasEtapas[0],
+    linhasDasEtapas[1],
+  ]);
+  await expect(janela.locator('.execucao-linha--atual')).toHaveText(linhasDasEtapas[1]);
+  await expect(janela).not.toContainText('RESUMO_INGESTAO');
+  // A IA (etapa 5) não tem evento: a linha dela é o comentário com o texto curto.
+  await rota.locator('[data-placa-botao]').nth(4).click();
+  await expect(rota.locator('[data-painel]').nth(4).locator('.execucao-linha--atual')).toHaveText('# Filtra, classifica e resume.');
+});
 
 test('na home só o cartão do TechNews tem a moldura do terminal, com o cursor e "Etapa n" na rota compacta', async ({ page }) => {
   await page.goto('/');
@@ -490,15 +463,28 @@ test('no TechNews as decisões são blocos de terminal e os próximos passos, ca
   await expect(page.locator('details.decisao--terminal')).toHaveCount(0);
 });
 
-test('o TechNews mostra em que pé está sob o título; o Life RPG continua sem essa linha', async ({ page }) => {
-  await page.goto('/projetos/technews/');
-  await expect(page.locator('.caso-status')).toHaveText(
-    'Hoje ele coleta do Hacker News e grava no PostgreSQL. Estou escolhendo as próximas fontes e criando os coletores e os fallbacks.',
-  );
-  await page.goto('/en/projects/technews/');
-  await expect(page.locator('.caso-status')).toHaveText(
-    "Today it collects from Hacker News and writes to PostgreSQL. I'm choosing the next sources and building the collectors and their fallbacks.",
-  );
-  await page.goto('/projetos/life-rpg/');
-  await expect(page.locator('.caso-status')).toHaveCount(0);
+test('a "Situação atual" fica só no TechNews, entre os detalhes técnicos e os próximos passos, com os números', async ({ page }) => {
+  for (const [caminho, titulo] of [
+    ['/projetos/technews/', 'Situação atual'],
+    ['/en/projects/technews/', 'Where it stands today'],
+  ] as const) {
+    await page.goto(caminho);
+    const secao = page.locator('section[aria-labelledby="situacao"]');
+    await expect(secao.locator('h2')).toHaveText(titulo);
+    await expect(secao.locator('.numeros dt')).toHaveText(['81', '70', '21', '11']);
+    await expect(page.locator('.em-resumo .numeros')).toHaveCount(0);
+    const ordem = await page.evaluate(() =>
+      ['detalhes', 'situacao', 'proximos'].map((id) => document.getElementById(id)!.getBoundingClientRect().top + window.scrollY),
+    );
+    expect(ordem[0]).toBeLessThan(ordem[1]);
+    expect(ordem[1]).toBeLessThan(ordem[2]);
+    // O cabeçalho não tem mais a linha de situação.
+    await expect(page.locator('.caso-topo')).not.toContainText(/Hoje ele coleta|Today it collects/);
+  }
+  for (const caminho of ['/projetos/rodoviariaos/', '/projetos/life-rpg/']) {
+    await page.goto(caminho);
+    await expect(page.locator('#situacao')).toHaveCount(0);
+  }
+  await page.goto('/projetos/rodoviariaos/');
+  await expect(page.locator('.em-resumo .numeros dt').first()).toBeVisible();
 });
