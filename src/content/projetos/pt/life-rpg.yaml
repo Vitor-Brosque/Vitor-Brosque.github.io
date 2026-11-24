@@ -10,6 +10,7 @@ stack: [TypeScript, React 19, Vite, Dexie (IndexedDB), Zustand, Fastify 5, "SQLi
 links:
   codigo: https://github.com/Vitor-Brosque/life-rpg
 cartao: capa
+tema: rpg
 capa:
   imagem: ../../../assets/projetos/life-rpg/mapa.png
   moldura: celular

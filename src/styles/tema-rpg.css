@@ -1,0 +1,106 @@
+/* Tema "rpg": a cara do Life RPG ("noite na taverna"), só dentro do <main data-tema="rpg"> do estudo de caso.
+   Cores do jogo (tokens.css do app), raio zero, moldura em pixels e a fonte pixel em títulos, rótulos e botões.
+   Texto corrido e números ficam na fonte do sistema, como no jogo (na Pixelify o 5 parece S).
+   Todo seletor começa por main[data-tema='rpg'] para vencer as regras dos componentes (escopadas, uma classe a mais). */
+
+main[data-tema='rpg'] {
+  /* Tokens do site, redefinidos com a paleta do jogo. */
+  --bg: #12141f;
+  --bg-2: #1b1e2e;
+  --surface: #2a2e45;
+  --line: #0b0c14;
+  --line-2: #3b4063;
+  --ink: #ece6d6;
+  --ink-2: #d6d0c2;
+  --mute: #a9a3b8;
+  --dim: #a9a3b8;
+  --signal: #f2c14e;
+  --signal-hover: #f8dc84;
+  --signal-fundo: #2a2e45;
+  --ok: #7bc96f;
+  --asfalto: #0b0c14;
+  --estrada: #1b1e2e;
+  --raio: 0px;
+
+  /* Tokens do jogo. */
+  --px: 3px;
+  --pedra: #2a2e45;
+  --pedra-clara: #3b4063;
+  --pergaminho: #f1e3c4;
+  --pergaminho-escuro: #d9c39a;
+  --tinta: #2b1d12;
+  --tinta-suave: #5a4632;
+  --dourado-escuro: #a8741f;
+  --contorno: #0b0c14;
+  --madeira: #3a2614;
+  --fonte-pixel: 'Pixelify Sans', system-ui, sans-serif;
+  --fonte-corpo: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* Moldura em pixels: contorno de 1 pixel (3 px) com os cantos recortados e um chanfro por dentro. */
+  --moldura-pedra:
+    0 calc(-1 * var(--px)) 0 var(--contorno), 0 var(--px) 0 var(--contorno),
+    calc(-1 * var(--px)) 0 0 var(--contorno), var(--px) 0 0 var(--contorno),
+    inset var(--px) var(--px) 0 var(--pedra-clara), inset calc(-1 * var(--px)) calc(-1 * var(--px)) 0 #1b1e2e;
+  /* Pergaminho: moldura de madeira, contorno escuro por fora e a borda de baixo mais escura. */
+  --moldura-pergaminho:
+    0 calc(-1 * var(--px)) 0 var(--madeira), 0 var(--px) 0 var(--madeira),
+    calc(-1 * var(--px)) 0 0 var(--madeira), var(--px) 0 0 var(--madeira),
+    0 calc(-2 * var(--px)) 0 var(--contorno), 0 calc(2 * var(--px)) 0 var(--contorno),
+    calc(-2 * var(--px)) 0 0 var(--contorno), calc(2 * var(--px)) 0 0 var(--contorno),
+    calc(-1 * var(--px)) calc(-1 * var(--px)) 0 var(--contorno), var(--px) calc(-1 * var(--px)) 0 var(--contorno),
+    calc(-1 * var(--px)) var(--px) 0 var(--contorno), var(--px) var(--px) 0 var(--contorno),
+    inset 0 calc(-1 * var(--px)) 0 var(--pergaminho-escuro);
+
+  display: block;
+  font-family: var(--fonte-corpo);
+  /* Na Pixelify a ligadura "fi" vira um desenho só, que lê como "A": desligada na página toda. */
+  font-variant-ligatures: none;
+  color: var(--ink);
+  /* A parede de tijolos do jogo, bem discreta: argamassa um tom abaixo do azul-noite, fiadas desencontradas. */
+  background-color: var(--bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='54' height='36' shape-rendering='crispEdges'%3E%3Cg fill='%230e1019'%3E%3Crect width='54' height='3'/%3E%3Crect y='18' width='54' height='3'/%3E%3Crect width='3' height='18'/%3E%3Crect x='27' y='18' width='3' height='18'/%3E%3C/g%3E%3Cg fill='%23141624'%3E%3Crect x='3' y='3' width='51' height='3'/%3E%3Crect y='21' width='27' height='3'/%3E%3Crect x='30' y='21' width='24' height='3'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 54px 36px;
+}
+
+/* Fora do <main> só o necessário para a página não ter duas cores de fundo: o corpo e a navegação ficam azul-noite e chapados. */
+body:has(main[data-tema='rpg']) { background: #12141f; }
+body:has(main[data-tema='rpg']) .nav { background: #1b1e2e; backdrop-filter: none; border-bottom-color: #0b0c14; }
+/* A linha de progresso da navegação dá lugar à barra de XP (abaixo). */
+body:has(main[data-tema='rpg']) .nav::after { display: none; }
+
+/* Fonte pixel: títulos, rótulos e botões. */
+main[data-tema='rpg'] :is(h1, h2, h3, .rotulo, .botao, .resumo-titulo) {
+  font-family: var(--fonte-pixel);
+  font-stretch: normal;
+  letter-spacing: 0;
+}
+main[data-tema='rpg'] :is(h1, h2, h3) { font-weight: 700; line-height: 1.1; }
+main[data-tema='rpg'] h1 { color: var(--signal); text-shadow: var(--px) var(--px) 0 var(--contorno); }
+main[data-tema='rpg'] h2 { color: var(--signal); text-shadow: var(--px) var(--px) 0 var(--contorno); }
+main[data-tema='rpg'] .rotulo { font-size: 0.85rem; font-weight: 400; letter-spacing: 0.04em; }
+main[data-tema='rpg'] code { border-radius: 0; background: var(--bg-2); border-color: var(--line-2); }
+
+/* Fichas da stack: cantos retos, fonte do sistema (há números nos nomes). */
+main[data-tema='rpg'] .chips li { border-radius: 0; font-family: var(--fonte-corpo); font-size: 0.8rem; background: var(--pedra); border-color: var(--pedra-clara); color: var(--ink); }
+
+/* Botões do jogo: o principal é dourado, com a base mais escura e texto em tinta. */
+main[data-tema='rpg'] .botao { font-weight: 700; border-radius: 0; border: 0; padding: 12px 20px 15px; background: var(--pedra); color: var(--ink); box-shadow: var(--moldura-pedra); margin: var(--px); }
+main[data-tema='rpg'] .botao:hover { background: var(--pedra-clara); }
+main[data-tema='rpg'] .botao--sinal { background: var(--signal); color: var(--tinta); box-shadow: 0 calc(-1 * var(--px)) 0 var(--contorno), 0 var(--px) 0 var(--contorno), calc(-1 * var(--px)) 0 0 var(--contorno), var(--px) 0 0 var(--contorno), inset 0 calc(-1 * var(--px)) 0 var(--dourado-escuro), inset var(--px) var(--px) 0 #f8dc84; }
+main[data-tema='rpg'] .botao--sinal:hover { background: #f8dc84; }
+main[data-tema='rpg'] :focus-visible { outline-color: var(--signal); border-radius: 0; }
+
+/* Molduras das telas: cantos retos e a moldura de pedra no lugar da sombra difusa. */
+main[data-tema='rpg'] .moldura-tela { border-radius: 0; box-shadow: var(--moldura-pedra); border-color: var(--pedra); }
+main[data-tema='rpg'] .moldura.moldura--celular .moldura-tela { border: 6px solid var(--pedra); border-radius: 0; }
+main[data-tema='rpg'] .moldura.moldura--nenhuma .moldura-tela { box-shadow: none; }
+main[data-tema='rpg'] .moldura-barra { background: var(--pedra); border-bottom-color: var(--contorno); }
+main[data-tema='rpg'] .moldura-barra i { border-radius: 0; background: var(--pedra-clara); }
+main[data-tema='rpg'] .moldura-play { border-radius: 0; background: var(--bg-2); box-shadow: var(--moldura-pedra); }
+main[data-tema='rpg'] figcaption { color: var(--mute); }
+
+/* Mapa de arquitetura: só as cores do tema. */
+main[data-tema='rpg'] .mapa-tracejado { stroke: var(--pedra-clara); }
+main[data-tema='rpg'] .mapa-no.is-destaque rect { stroke: var(--dourado-escuro); }
+main[data-tema='rpg'] .mapa-rotulo { font-family: var(--fonte-corpo); font-weight: 700; }
+main[data-tema='rpg'] .mapa-explicacao { background: var(--pedra); border-left-color: var(--signal); }

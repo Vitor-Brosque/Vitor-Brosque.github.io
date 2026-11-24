@@ -9,6 +9,10 @@ import type { Projeto } from '../lib/projetos';
 import { slugDe } from '../lib/projetos-puro';
 import { paragrafos, textoRico } from '../lib/texto';
 import { t, urlDaHome, urlDoProjeto, type Idioma } from '../i18n/ui';
+import '@fontsource/pixelify-sans/latin-400.css';
+import '@fontsource/pixelify-sans/latin-700.css';
+import '../styles/tema-rpg.css';
+import pixelify700 from '@fontsource/pixelify-sans/files/pixelify-sans-latin-700-normal.woff2?url';
 
 interface Props { projeto: Projeto; proximo: Projeto; idioma: Idioma }
 const { projeto, proximo, idioma } = Astro.props;
@@ -17,6 +21,8 @@ const slug = slugDe(projeto.id);
 // Capa com moldura de navegador: recorte 16/10 para não ficar altíssima com prints em retrato.
 const capa = d.capa && d.capa.moldura === 'navegador' ? { ...d.capa, proporcao: '16/10' as const } : d.capa;
 const site = Astro.site ?? new URL('https://vitor-brosque.github.io');
+const tema = d.tema;
+const rpg = tema === 'rpg';
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'CreativeWork',
@@ -27,8 +33,10 @@ const jsonLd = {
   author: { '@type': 'Person', name: 'Vitor Brosque', url: site.href },
 };
 ---
-<Base titulo={`${d.titulo} · Vitor Brosque`} descricao={d.seo.descricao} idioma={idioma} imagemOg={d.capa?.imagem} altOg={d.capa?.alt} jsonLd={jsonLd}>
-  <main id="conteudo">
+<Base titulo={`${d.titulo} · Vitor Brosque`} descricao={d.seo.descricao} idioma={idioma} imagemOg={d.capa?.imagem} altOg={d.capa?.alt} jsonLd={jsonLd} fontes={rpg ? [pixelify700] : []}>
+  <main id="conteudo" data-tema={tema}>
+    {/* No tema rpg a leitura enche a barra de XP do jogo, presa ao pé da navegação (xp.ts; sem JS não aparece). */}
+    {rpg && <div class="xp" data-xp aria-hidden="true"><span class="xp-cheio"></span></div>}
     <header class="wrap caso-topo">
       <a class="voltar" data-entrada style="--ordem: 0" href={urlDaHome(idioma, 'projetos')}>← {t(idioma, 'caso.voltar')}</a>
       <p class="rotulo rotulo--sinal" data-entrada style="--ordem: 0">{d.statusTexto}</p>
@@ -172,4 +180,27 @@ const jsonLd = {
   .proximo strong { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 850; font-stretch: 125%; }
   .proximo-frase { color: var(--ink-2); }
   @media (max-width: 639px) { .ficha { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Tema rpg (as cores, a fonte e a parede ficam em tema-rpg.css). */
+  .xp { position: fixed; z-index: 51; left: 0; right: 0; top: calc(var(--altura-nav) - 6px); height: 6px; background: var(--contorno); pointer-events: none; }
+  .xp-cheio { display: block; height: 100%; width: var(--xp, 0px); background: repeating-linear-gradient(90deg, var(--signal) 0 15px, transparent 15px 18px); }
+  :global(html:not(.js)) .xp { display: none; }
+  @media print { .xp { display: none; } }
+  main[data-tema='rpg'] .voltar { font-family: var(--fonte-pixel); }
+  main[data-tema='rpg'] .caso-frase { color: var(--ink); }
+  /* "Em resumo" vira a ficha do personagem: pergaminho com moldura de madeira, texto em tinta. */
+  main[data-tema='rpg'] .em-resumo { margin: calc(2 * var(--px)); background: var(--pergaminho); border: 0; border-radius: 0; box-shadow: var(--moldura-pergaminho); color: var(--tinta); }
+  main[data-tema='rpg'] .em-resumo-titulo { font-family: var(--fonte-pixel); font-weight: 700; letter-spacing: 0; color: var(--tinta); text-shadow: none; }
+  main[data-tema='rpg'] .em-resumo-titulo::before { width: 12px; height: 12px; margin-right: 12px; background: var(--dourado-escuro); box-shadow: 0 0 0 3px var(--tinta); vertical-align: 0.1em; }
+  main[data-tema='rpg'] .em-resumo-texto { color: var(--tinta); }
+  main[data-tema='rpg'] .numeros dt { font-family: var(--fonte-corpo); color: var(--dourado-escuro); }
+  main[data-tema='rpg'] .numeros dd, main[data-tema='rpg'] .numeros-fonte { color: var(--tinta-suave); }
+  /* Painéis de pedra com a moldura em pixels. */
+  main[data-tema='rpg'] .arquitetura,
+  main[data-tema='rpg'] .proximo { margin-inline: var(--px); border: 0; border-radius: 0; background: var(--pedra); box-shadow: var(--moldura-pedra); }
+  main[data-tema='rpg'] .proximo:hover { background: var(--pedra-clara); }
+  main[data-tema='rpg'] .proximo strong { font-family: var(--fonte-pixel); font-weight: 700; font-stretch: normal; color: var(--signal); }
+  main[data-tema='rpg'] .funcs h3 { color: var(--ink); }
+  main[data-tema='rpg'] .proximos li::before { height: 6px; width: 6px; margin-top: 0.6em; }
 </style>
+<script>import '../scripts/xp';</script>

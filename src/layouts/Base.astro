@@ -21,8 +21,10 @@ interface Props {
   jsonLd?: Record<string, unknown>;
   indexar?: boolean;
   altOg?: string;
+  /** Fontes a mais para pré-carregar (a fonte pixel da página do Life RPG): o título não troca de fonte depois de aparecer. */
+  fontes?: string[];
 }
-const { titulo, descricao, idioma, imagemOg, jsonLd, indexar = true, altOg = titulo } = Astro.props;
+const { titulo, descricao, idioma, imagemOg, jsonLd, indexar = true, altOg = titulo, fontes = [] } = Astro.props;
 const site = Astro.site ?? new URL('https://vitor-brosque.github.io');
 const canonica = new URL(Astro.url.pathname, site).href;
 const urlPt = new URL(urlEquivalente(Astro.url.pathname, 'pt'), site).href;
@@ -44,6 +46,7 @@ const ogUrl = og ? new URL(og.src, site).href : undefined;
     {indexar && <link rel="alternate" hreflang="en" href={urlEn} />}
     {indexar && <link rel="alternate" hreflang="x-default" href={urlPt} />}
     <link rel="preload" href={archivoLatin} as="font" type="font/woff2" crossorigin />
+    {fontes.map((f) => <link rel="preload" href={f} as="font" type="font/woff2" crossorigin />)}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <meta name="theme-color" content="#111513" />
