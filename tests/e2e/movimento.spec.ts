@@ -107,26 +107,32 @@ test.describe('com movimento reduzido', () => {
   test('o carro da rota grande anda de placa em placa', async ({ page }) => {
     await page.goto('/');
     const rota = page.locator('#projetos [data-rota][data-modo="loop"]');
+    test.setTimeout(90_000);
     await rota.scrollIntoViewIfNeeded();
-    // Observa a cada quadro, dentro da página, até ver o carro andando e em três posições diferentes.
+    // Observa a cada quadro, dentro da página, até ver a sequência inteira: o carro parado sob uma placa,
+    // depois andando, depois parado sob OUTRA placa. Só a entrada do carro na pista não basta.
     const visto = await rota.evaluate(
       (el) =>
-        new Promise<{ andou: boolean; posicoes: number }>((resolve) => {
+        new Promise<{ paradas: number[]; andouEntreElas: boolean }>((resolve) => {
           const r = el as HTMLElement;
-          const posicoes = new Set<string>();
-          let andou = false;
-          const limite = performance.now() + 12_000;
+          const ativa = () => [...r.querySelectorAll('.placa')].findIndex((p) => p.hasAttribute('data-ativa'));
+          const paradas: number[] = [];
+          let andouDepoisDaPrimeira = false;
+          const limite = performance.now() + 60_000;
           const olhar = () => {
-            posicoes.add(r.style.getPropertyValue('--pos'));
-            andou ||= r.hasAttribute('data-andando');
-            if (!(andou && posicoes.size >= 3) && performance.now() < limite) requestAnimationFrame(olhar);
-            else resolve({ andou, posicoes: posicoes.size });
+            const andando = r.hasAttribute('data-andando');
+            const i = ativa();
+            if (!andando && i >= 0 && paradas[paradas.length - 1] !== i) paradas.push(i);
+            if (andando && paradas.length >= 1) andouDepoisDaPrimeira = true;
+            if (paradas.length >= 2 || performance.now() > limite) resolve({ paradas, andouEntreElas: andouDepoisDaPrimeira });
+            else requestAnimationFrame(olhar);
           };
           requestAnimationFrame(olhar);
         }),
     );
-    expect(visto.andou).toBe(true);
-    expect(visto.posicoes).toBeGreaterThanOrEqual(3);
+    expect(visto.paradas.length).toBeGreaterThanOrEqual(2);
+    expect(visto.paradas[1]).not.toBe(visto.paradas[0]);
+    expect(visto.andouEntreElas).toBe(true);
   });
 
   test('o conteúdo entra com fade ao rolar e nada fica escondido', async ({ page }) => {
@@ -221,7 +227,8 @@ test.describe('com movimento reduzido', () => {
       }, { timeout: 8000 })
       .toBe(true);
     expect(new Set(await textosDaContagem(page)).size).toBeGreaterThan(3);
-    expect(await page.locator('[data-contar]').nth(1).textContent()).toBe('~11.000');
+    // O segundo número termina a contagem um pouco depois do primeiro: espera, em vez de ler uma vez só.
+    await expect(page.locator('[data-contar]').nth(1)).toHaveText('~11.000', { timeout: 8000 });
   });
 
   test('os números do hero não contam se já estão à vista quando o script começa', async ({ page }) => {
@@ -505,8 +512,18 @@ for (const modo of ['reduce', 'no-preference'] as const) {
       await estrada.scrollIntoViewIfNeeded();
       await expect(botaoEstrada).toHaveAttribute('aria-label', 'Pausar animações');
       await expect.poll(() => desloc(page)).not.toBe('');
-      await botaoEstrada.click();
+      // A rota precisa estar rodando de verdade antes da pausa: sem isso, "o carro parou" não provaria nada.
+      await rota.scrollIntoViewIfNeeded();
+      await expect(rota).toHaveAttribute('data-andando', '', { timeout: 25_000 });
+      // O botão da estrada ficou fora da tela: o clique vai por script.
+      await botaoEstrada.evaluate((b) => (b as HTMLButtonElement).click());
       await expect(botaoEstrada).toHaveAttribute('aria-label', 'Continuar animações');
+      await expect(rota).not.toHaveAttribute('data-andando');
+      const carroNaPausa = await pos(page);
+      await page.waitForTimeout(1500);
+      expect(await pos(page)).toBe(carroNaPausa);
+      // De volta ao topo, com a estrada à vista: a rua continua parada.
+      await estrada.scrollIntoViewIfNeeded();
       const rua = await desloc(page);
       await page.waitForTimeout(1500);
       expect(await desloc(page)).toBe(rua);
