@@ -8,6 +8,15 @@ for (const largura of [1280, 390]) {
     const traj = page.locator('[data-trajetoria]');
     await traj.scrollIntoViewIfNeeded();
     const medidas = await traj.evaluate((el) => {
+      // Centro vertical da primeira linha do título, medido de verdade: caixa do primeiro caractere (um Range) no texto renderizado.
+      const centroDaPrimeiraLinha = (h3: Element) => {
+        const texto = document.createTreeWalker(h3, NodeFilter.SHOW_TEXT).nextNode()!;
+        const r = document.createRange();
+        r.setStart(texto, 0);
+        r.setEnd(texto, 1);
+        const linha = r.getClientRects()[0];
+        return linha.top + linha.height / 2;
+      };
       const pista = el.querySelector('.traj-estrada')!.getBoundingClientRect();
       const centro = pista.left + pista.width / 2;
       return [...el.querySelectorAll('.traj-marco h3')].map((h3) => {
@@ -17,7 +26,7 @@ for (const largura of [1280, 390]) {
         const altura = parseFloat(bola.height);
         return {
           dx: Math.abs(caixa.left + parseFloat(bola.left) - centro),
-          dy: Math.abs(caixa.top + parseFloat(bola.top) - (caixa.top + parseFloat(getComputedStyle(h3).lineHeight) / 2)),
+          dy: Math.abs(caixa.top + parseFloat(bola.top) - centroDaPrimeiraLinha(h3)),
           redonda: largura === altura,
           // A bolinha é posicionada pelo centro: left/top dela são o centro.
           translate: bola.translate,

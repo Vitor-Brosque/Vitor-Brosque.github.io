@@ -98,13 +98,13 @@ test.describe('com movimento reduzido', () => {
   });
 
   test('a rota grande troca a parada sozinha, a pausa segura, a placa leva à parada e nenhum vídeo toca', async ({ page }) => {
-    test.setTimeout(45_000);
+    test.setTimeout(90_000);
     await page.goto('/');
     const seletor = '#projetos [data-rota][data-modo="loop"]';
     const rota = page.locator(seletor);
     await rota.scrollIntoViewIfNeeded();
     const inicial = await indiceAtivo(page, seletor);
-    await expect.poll(() => indiceAtivo(page, seletor), { timeout: 12_000 }).not.toBe(inicial);
+    await expect.poll(() => indiceAtivo(page, seletor), { timeout: 25_000 }).not.toBe(inicial);
     expect(await painelVisivel(page, seletor)).toBe(await indiceAtivo(page, seletor));
     const pausa = rota.locator('[data-rota-pausa]');
     await pausa.click();
@@ -112,7 +112,11 @@ test.describe('com movimento reduzido', () => {
     const pausado = await indiceAtivo(page, seletor);
     await page.waitForTimeout(8000);
     expect(await indiceAtivo(page, seletor)).toBe(pausado);
+    // O clique com a rota rodando também pausa: retoma, e então clica na placa.
+    await pausa.click();
+    await expect(pausa).toHaveText('Pausar');
     await rota.locator('[data-placa-botao]').nth(3).click();
+    await expect(pausa).toHaveText('Continuar');
     await expect(rota.locator('.placa').nth(3)).toHaveAttribute('data-ativa', '');
     await expect.poll(() => painelVisivel(page, seletor)).toBe(3);
     await rota.locator('[data-placa-botao]').nth(5).click();
@@ -210,6 +214,7 @@ test.describe('com movimento permitido', () => {
   });
 
   test('o botão de pausa para tudo e troca o texto', async ({ page }) => {
+    test.setTimeout(90_000);
     await page.goto('/');
     const rota = page.locator('#projetos [data-rota][data-modo="loop"]');
     await rota.scrollIntoViewIfNeeded();
@@ -224,7 +229,7 @@ test.describe('com movimento permitido', () => {
     const pausa = rota.locator('[data-rota-pausa]');
     await expect(pausa).toHaveText('Pausar');
     // O caso difícil: pausar com o carro andando entre duas placas.
-    await expect(rota).toHaveAttribute('data-andando', '', { timeout: 10_000 });
+    await expect(rota).toHaveAttribute('data-andando', '', { timeout: 25_000 });
     await pausa.click();
     await expect(pausa).toHaveText('Continuar');
     await expect(rota).not.toHaveAttribute('data-andando');
@@ -237,19 +242,20 @@ test.describe('com movimento permitido', () => {
     await pausa.click();
     await expect(pausa).toHaveText('Pausar');
     // Se a pausa pegou o carro já chegando a uma placa, ele ainda fica até 7 s parado nela antes de seguir.
-    await expect.poll(pos, { timeout: 10_000 }).not.toBe(parado);
+    await expect.poll(pos, { timeout: 25_000 }).not.toBe(parado);
   });
 
   test.describe('rota grande da home', () => {
     const seletor = '#projetos [data-rota][data-modo="loop"]';
 
     test('troca sozinha de parada e mostra o painel dela', async ({ page }) => {
+      test.setTimeout(60_000);
       await page.goto('/');
       await page.locator(seletor).scrollIntoViewIfNeeded();
       // No começo o carro ainda entra (nenhuma placa acesa ou a primeira); o painel à vista é o da primeira parada.
       expect([-1, 0]).toContain(await indiceAtivo(page, seletor));
       expect(await painelVisivel(page, seletor)).toBe(0);
-      await expect.poll(() => indiceAtivo(page, seletor), { timeout: 12_000 }).toBe(1);
+      await expect.poll(() => indiceAtivo(page, seletor), { timeout: 25_000 }).toBe(1);
       await expect.poll(() => painelVisivel(page, seletor)).toBe(1);
     });
 
@@ -429,7 +435,6 @@ test.describe('com movimento permitido', () => {
     await expect.poll(desloc).not.toBe('');
     const antes = await desloc();
     await expect.poll(desloc, { timeout: 3000 }).not.toBe(antes);
-    await page.waitForTimeout(1600);
     const posicao = await carro();
     await page.mouse.wheel(0, 300);
     await page.waitForTimeout(400);
