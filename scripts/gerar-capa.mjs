@@ -31,6 +31,8 @@ try {
     if (!faixa) return r.fulfill({ contentType: 'video/mp4', body: bytes, headers: { 'accept-ranges': 'bytes' } });
     const ini = faixa[1] ? parseInt(faixa[1], 10) : 0;
     const fim = faixa[2] ? Math.min(parseInt(faixa[2], 10), bytes.length - 1) : bytes.length - 1;
+    // Trecho fora do arquivo: responde como um servidor de verdade, em vez de mandar um corpo vazio.
+    if (ini > fim) return r.fulfill({ status: 416, headers: { 'content-range': `bytes */${bytes.length}` } });
     return r.fulfill({
       status: 206,
       contentType: 'video/mp4',
