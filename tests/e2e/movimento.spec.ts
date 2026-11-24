@@ -121,6 +121,22 @@ test.describe('com movimento reduzido', () => {
     expect(await page.$$eval('video', (vs) => vs.filter((v) => !(v as HTMLVideoElement).paused).length)).toBe(0);
   });
 
+  test('o vídeo que a pessoa iniciou continua tocando ao a rota sair e voltar à tela', async ({ page }) => {
+    await page.goto('/');
+    const rota = page.locator('#projetos [data-rota][data-modo="loop"]');
+    await rota.scrollIntoViewIfNeeded();
+    const video = rota.locator('[data-painel]').first().locator('video');
+    await page.waitForTimeout(500);
+    expect(await video.evaluate((v) => (v as HTMLVideoElement).paused)).toBe(true);
+    await video.evaluate((v) => (v as HTMLVideoElement).play()); // a pessoa dá play
+    await expect.poll(() => video.evaluate((v) => (v as HTMLVideoElement).paused)).toBe(false);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(500);
+    await rota.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(1000);
+    expect(await video.evaluate((v) => (v as HTMLVideoElement).paused)).toBe(false);
+  });
+
   test('no estudo de caso o KM em destaque acompanha a rolagem', async ({ page }) => {
     await page.goto('/projetos/rodoviariaos/');
     const rota = page.locator('[data-rota][data-modo="rolagem"]');
@@ -266,6 +282,93 @@ test.describe('com movimento permitido', () => {
       await expect.poll(() => video.evaluate((v) => !(v as HTMLVideoElement).paused), { timeout: 5000 }).toBe(true);
       // Os vídeos das outras paradas ficam parados.
       expect(await rota.locator('[data-painel]:not([data-ativa]) video').evaluateAll((vs) => vs.filter((v) => !(v as HTMLVideoElement).paused).length)).toBe(0);
+    });
+
+    test('com o carro fora da rota, a placa do painel à mostra continua com aria-current', async ({ page }) => {
+      await page.goto('/');
+      const rota = page.locator(seletor);
+      // Antes de a rota aparecer o carro está fora (antes da entrada); depois, observa cada quadro durante a entrada.
+      const ativas = () => rota.locator('[data-placa-botao][aria-current="step"]').count();
+      expect(await ativas()).toBe(1);
+      await rota.scrollIntoViewIfNeeded();
+      const falhas = await rota.evaluate(
+        (el) =>
+          new Promise<string[]>((resolve) => {
+            const ruins: string[] = [];
+            const fim = performance.now() + 1500;
+            const olhar = () => {
+              const botoes = [...el.querySelectorAll('[data-placa-botao]')];
+              const atual = botoes.flatMap((b, i) => (b.getAttribute('aria-current') === 'step' ? [i] : []));
+              const lit = [...el.querySelectorAll('.placa')].flatMap((p, i) => (p.hasAttribute('data-ativa') ? [i] : []));
+              const painel = [...el.querySelectorAll('[data-painel]')].findIndex((p) => p.hasAttribute('data-ativa'));
+              if (atual.length !== 1 || atual[0] !== painel || lit.length !== 1 || lit[0] !== painel) ruins.push(`u=${el.style.getPropertyValue('--pos')} atual=${atual} acesa=${lit} painel=${painel}`);
+              if (performance.now() < fim) requestAnimationFrame(olhar);
+              else resolve(ruins);
+            };
+            requestAnimationFrame(olhar);
+          }),
+      );
+      expect(falhas).toEqual([]);
+    });
+
+    test('o vídeo que a pessoa pausou continua pausado ao a rota sair e voltar à tela', async ({ page }) => {
+      await page.goto('/');
+      const rota = page.locator(seletor);
+      await rota.scrollIntoViewIfNeeded();
+      const video = rota.locator('[data-painel]').first().locator('video');
+      await expect.poll(() => video.evaluate((v) => !(v as HTMLVideoElement).paused), { timeout: 5000 }).toBe(true);
+      await video.evaluate((v) => (v as HTMLVideoElement).pause()); // a pessoa pausa
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.waitForTimeout(500);
+      await rota.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(1000);
+      expect(await video.evaluate((v) => (v as HTMLVideoElement).paused)).toBe(true);
+    });
+
+    test('o ponteiro na vitrine com o carro a caminho: ele chega à placa e não sai dela', async ({ page }) => {
+      test.setTimeout(90_000);
+      await page.goto('/');
+      const rota = page.locator(seletor);
+      await rota.scrollIntoViewIfNeeded();
+      const andando = () => rota.evaluate((el) => el.hasAttribute('data-andando'));
+      // Espera a entrada acabar, o carro parar na primeira placa e sair para o próximo trecho.
+      await expect.poll(andando, { timeout: 25_000 }).toBe(false);
+      await expect.poll(andando, { timeout: 25_000 }).toBe(true);
+      const caixa = (await rota.locator('.vitrine').boundingBox())!;
+      await page.mouse.move(caixa.x + caixa.width / 2, caixa.y + caixa.height / 2);
+      await expect.poll(andando, { timeout: 5000 }).toBe(false);
+      const parada = await indiceAtivo(page, seletor);
+      expect(parada).toBeGreaterThanOrEqual(0);
+      await page.waitForTimeout(9000);
+      expect(await indiceAtivo(page, seletor)).toBe(parada);
+      expect(await painelVisivel(page, seletor)).toBe(parada);
+      expect(await andando()).toBe(false);
+    });
+
+    test('Continuar pelo teclado: o foco fica no botão e a rota volta a avançar', async ({ page }) => {
+      test.setTimeout(60_000);
+      await page.goto('/');
+      const rota = page.locator(seletor);
+      await rota.scrollIntoViewIfNeeded();
+      const pausa = rota.locator('[data-rota-pausa]');
+      // Clicar numa placa pausa a rota numa parada firme (sem o carro entrando).
+      await rota.locator('[data-placa-botao]').nth(2).click();
+      await expect(pausa).toHaveText('Continuar');
+      await expect.poll(() => indiceAtivo(page, seletor)).toBe(2);
+      // Uma tecla antes, para o foco por script contar como foco de teclado (:focus-visible), como no Tab.
+      await page.keyboard.press('Shift');
+      await pausa.focus();
+      expect(await pausa.evaluate((el) => el.matches(':focus-visible'))).toBe(true);
+      await page.keyboard.press('Enter');
+      await expect(pausa).toHaveText('Pausar');
+      await expect(pausa).toBeFocused();
+      await expect.poll(() => indiceAtivo(page, seletor), { timeout: 25_000 }).not.toBe(2);
+      await expect(pausa).toBeFocused();
+    });
+
+    test('a dica de que dá para escolher a parada aparece ao lado do título', async ({ page }) => {
+      await page.goto('/');
+      await expect(page.locator(`${seletor} .rota-dica`)).toHaveText('Escolha uma parada');
     });
   });
 
