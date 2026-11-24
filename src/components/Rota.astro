@@ -215,6 +215,7 @@ const vitrine = modo === 'loop' && !compacta;
   .vitrine .rota-detalhe :global(.moldura) { margin: 0; height: var(--area); container-type: size; display: grid; place-items: center; }
   /* Na vitrine o vídeo usa os controles nativos (e a tela inteira deles); o botão próprio ficaria por cima da barra. */
   .vitrine :global(.moldura-play) { display: none; }
+  .vitrine :global(.moldura-tela-cheia) { top: 10px; right: 10px; bottom: auto; }
 
   @media (prefers-reduced-motion: no-preference) {
     .placa[data-ativa] .placa-corpo { translate: 0 -4px; }

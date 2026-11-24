@@ -40,6 +40,10 @@ const poster = midia.video && midia.imagem ? await getImage({ src: midia.imagem,
             data-rotulo-pausar={t(idioma, 'midia.pausar')}
             aria-label={t(idioma, 'midia.tocar')}
           ><span aria-hidden="true"></span></button>
+          {/* Tela cheia: só aparece com JavaScript e onde o navegador tem a API (video.ts tira o hidden). */}
+          <button type="button" class="moldura-tela-cheia" data-video-tela-cheia aria-label={t(idioma, 'midia.telaCheia')} hidden>
+            <svg viewBox="0 0 12 12" width="14" height="14" aria-hidden="true" shape-rendering="crispEdges"><path d="M0 0h4v1.5H1.5V4H0zM8 0h4v4h-1.5V1.5H8zM0 8h1.5v2.5H4V12H0zM10.5 8H12v4H8v-1.5h2.5z" /></svg>
+          </button>
         </>
       ) : midia.imagem && grande ? (
         <button type="button" class="moldura-ampliar" data-ampliar={grande.src} aria-label={`${t(idioma, 'midia.ampliar')}: ${midia.alt}`}>
@@ -74,6 +78,17 @@ const poster = midia.video && midia.imagem ? await getImage({ src: midia.imagem,
   .moldura-ampliar:focus-visible { outline: 3px solid var(--signal); outline-offset: -3px; }
   .moldura-play { position: absolute; right: 10px; bottom: 10px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgb(17 21 19 / 0.85); cursor: pointer; display: grid; place-items: center; }
   .moldura-play span { width: 0; height: 0; border-block: 7px solid transparent; border-left: 12px solid var(--signal); margin-left: 3px; }
+  /* Botão de tela cheia: o mesmo estilo do botão de tocar, ao lado dele. Na vitrine da home (que usa os controles nativos)
+     ele sobe para o canto de cima, fora da barra dos controles (ver Rota.astro). */
+  .moldura-tela-cheia { position: absolute; right: 58px; bottom: 10px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgb(17 21 19 / 0.85); color: var(--signal); cursor: pointer; display: grid; place-items: center; }
+  .moldura-tela-cheia[hidden] { display: none; }
+  .moldura-tela-cheia svg { fill: currentColor; }
+  .moldura-tela-cheia:focus-visible, .moldura-play:focus-visible { outline: 3px solid var(--signal); outline-offset: 2px; }
+  :global(html:not(.js)) .moldura-tela-cheia { display: none; }
+  /* Em tela cheia o vídeo aparece inteiro, centralizado, sobre fundo preto. A folha do navegador põe "contain" sem
+     !important, então a regra "cover" acima continuaria valendo e cortaria o vídeo (até 76% no do celular). */
+  .moldura-midia video:fullscreen { object-fit: contain; object-position: center; background: #000; }
+  .moldura-midia video:-webkit-full-screen { object-fit: contain; object-position: center; background: #000; }
   .moldura-play[data-tocando='true'] span { width: 12px; height: 14px; border: 0; margin: 0; border-inline: 4px solid var(--signal); }
   :global(html:not(.js)) .moldura-play { display: none; }
   figcaption { margin-top: 10px; font-size: 0.9rem; color: var(--mute); }

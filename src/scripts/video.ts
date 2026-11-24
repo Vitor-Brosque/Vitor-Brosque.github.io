@@ -2,6 +2,31 @@ import { aoCarregarPagina } from './ciclo';
 import { movimentoReduzido } from './movimento';
 import { deveTocar, type EstadoVideo } from './video-estado';
 
+type VideoComPrefixo = HTMLVideoElement & { webkitEnterFullscreen?: () => void };
+
+/** Botão de tela cheia de todos os vídeos (inclusive os da vitrine): aparece só onde o navegador tem a API. */
+aoCarregarPagina(() => {
+  const botoes = [...document.querySelectorAll<HTMLButtonElement>('[data-video-tela-cheia]')];
+  const limpezas: Array<() => void> = [];
+  for (const b of botoes) {
+    const v = b.parentElement?.querySelector<VideoComPrefixo>('video');
+    if (!v) continue;
+    const pode = (document.fullscreenEnabled && typeof v.requestFullscreen === 'function') || typeof v.webkitEnterFullscreen === 'function';
+    if (!pode) continue;
+    b.hidden = false;
+    const abrir = () => {
+      if (document.fullscreenEnabled && v.requestFullscreen) void v.requestFullscreen().catch(() => undefined);
+      else v.webkitEnterFullscreen?.();
+    };
+    b.addEventListener('click', abrir);
+    limpezas.push(() => {
+      b.removeEventListener('click', abrir);
+      b.hidden = true;
+    });
+  }
+  return () => limpezas.forEach((f) => f());
+});
+
 aoCarregarPagina(() => {
   // Os vídeos da vitrine da rota ficam com os controles nativos e quem decide quando tocam é rota.ts (só o da parada ativa).
   const videos = [...document.querySelectorAll<HTMLVideoElement>('video[data-video]')].filter((v) => !v.closest('[data-vitrine]'));
