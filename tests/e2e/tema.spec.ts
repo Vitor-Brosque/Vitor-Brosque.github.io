@@ -99,8 +99,8 @@ for (const modo of ['reduce', 'no-preference'] as const) {
       // Na pausa a chama volta ao primeiro quadro.
       expect(await segundoQuadroAVista()).toBe(false);
       const visiveis = await page.locator('.lanterna .quadro').evaluateAll((qs) => qs.map((q) => getComputedStyle(q).visibility));
-      expect(visiveis.filter((v, i) => i % 2 === 0).every((v) => v === 'visible')).toBe(true);
-      expect(visiveis.filter((v, i) => i % 2 === 1).every((v) => v === 'hidden')).toBe(true);
+      expect(visiveis.filter((_, i) => i % 2 === 0).every((v) => v === 'visible')).toBe(true);
+      expect(visiveis.filter((_, i) => i % 2 === 1).every((v) => v === 'hidden')).toBe(true);
 
       await botao.click();
       await expect.poll(desloc, { timeout: 3000 }).not.toBe(parada);

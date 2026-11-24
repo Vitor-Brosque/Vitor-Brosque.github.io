@@ -6,6 +6,7 @@
       "url": [
         "http://localhost:4321/",
         "http://localhost:4321/projetos/rodoviariaos/",
+        "http://localhost:4321/projetos/life-rpg/",
         "http://localhost:4321/en/"
       ],
       "numberOfRuns": 3,
