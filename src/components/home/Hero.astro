@@ -75,7 +75,7 @@ const formato = new Intl.NumberFormat(locale);
   .numero { display: grid; justify-items: start; }
   .numero > * { grid-area: 1 / 1; }
   .numero-reserva { visibility: hidden; }
-  .rotulo-numero { display: block; margin-top: 6px; max-width: 24ch; color: var(--ink-2); font-size: 0.9rem; line-height: 1.28; }
+  .rotulo-numero { display: block; margin-top: 6px; max-width: 32ch; color: var(--ink-2); font-size: 0.9rem; line-height: 1.28; }
 
   .hero-visual { position: relative; isolation: isolate; }
   /* Halo amarelo difuso atrás do print: parado com movimento reduzido, respirando com movimento. */
@@ -124,8 +124,8 @@ const formato = new Intl.NumberFormat(locale);
     .hero-acoes { margin-top: clamp(16px, 2.8svh, 30px); }
     .hero-print { rotate: 2.5deg; }
     .hero-print :global(img) { height: clamp(220px, min(32vw, 46svh), 400px); }
-    /* Colunas proporcionais ao conteúdo: o primeiro rótulo é o mais longo e o terceiro número tem um dígito só. */
-    .numeros { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1.15fr) minmax(0, 1fr); }
+    /* Colunas proporcionais ao conteúdo: o segundo número e o rótulo dele são os mais longos e o terceiro número tem um dígito só. */
+    .numeros { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr) minmax(0, 0.9fr); }
     .numeros li { display: flex; align-items: center; gap: clamp(12px, 1.4vw, 18px); padding-block: clamp(10px, 1.8svh, 18px); }
     .numero { font-size: clamp(2rem, min(2.9vw, 5svh), 2.6rem); font-stretch: 112%; }
     .rotulo-numero { margin-top: 0; }

@@ -38,7 +38,7 @@ export const textosHome: Record<Idioma, TextosHome> = {
         'Sou o Vitor, estudante de Sistemas de Informação na UNESP, em Bauru. Comecei atendendo clientes na loja de carros da minha família e hoje construo o software que organiza a loja.',
       numeros: [
         { numero: 1000, prefixo: '~', rotulo: 'leads recebidos pelo sistema que eu construí, desde jul/2026' },
-        { numero: 1400, sufixo: '+', rotulo: 'testes de API contra PostgreSQL real' },
+        { numero: 11000, prefixo: '~', rotulo: 'mensagens de WhatsApp registradas por ele, de ago a nov/2026' },
         { numero: 3, rotulo: 'projetos: 1 em produção e 2 de código aberto' },
       ],
       ctaPrincipal: 'Ver o RodoviariaOS',
@@ -50,18 +50,18 @@ export const textosHome: Record<Idioma, TextosHome> = {
       titulo: 'Trajetória',
       intro: 'Cheguei à tecnologia pelo lado do negócio, e isso muda como eu olho para um sistema.',
       marcos: [
-        {
-          quando: 'jan. a ago. 2025',
-          titulo: 'Formação de oficiais no Exército Brasileiro',
-          texto: 'Planejamento e execução com prazo e recursos curtos, trabalho em equipe e decisão sob pressão.',
-        },
+        { quando: '2026 a 2029', titulo: 'Sistemas de Informação na UNESP', texto: 'Graduação em andamento, em Bauru.' },
         {
           quando: 'ago. 2025 até hoje',
           titulo: 'CRM, operações digitais e automação na Rodoviária Veículos',
           texto:
             'Na revenda da minha família, cuido de leads, anúncios, estoque, atendimento e indicadores. Foi vendo os gargalos do dia a dia que comecei a programar.',
         },
-        { quando: '2026 a 2029', titulo: 'Sistemas de Informação na UNESP', texto: 'Graduação em andamento, em Bauru.' },
+        {
+          quando: 'jan. a ago. 2025',
+          titulo: 'Formação de oficiais no Exército Brasileiro',
+          texto: 'Planejamento e execução com prazo e recursos curtos, trabalho em equipe e decisão sob pressão.',
+        },
       ],
     },
     ferramentas: {
@@ -99,7 +99,7 @@ export const textosHome: Record<Idioma, TextosHome> = {
         "I'm Vitor, an Information Systems student at UNESP, in Brazil. I started out serving customers at my family's car dealership, and now I build the software that keeps the dealership organized.",
       numeros: [
         { numero: 1000, prefixo: '~', rotulo: 'leads received by the system I built, since Jul 2026' },
-        { numero: 1400, sufixo: '+', rotulo: 'API tests against a real PostgreSQL' },
+        { numero: 11000, prefixo: '~', rotulo: 'WhatsApp messages logged by it, Aug to Nov 2026' },
         { numero: 3, rotulo: 'projects: 1 in production and 2 open source' },
       ],
       ctaPrincipal: 'See RodoviariaOS',
@@ -111,18 +111,18 @@ export const textosHome: Record<Idioma, TextosHome> = {
       titulo: 'Journey',
       intro: 'I came to tech from the business side, and that shapes how I look at a system.',
       marcos: [
-        {
-          quando: 'Jan to Aug 2025',
-          titulo: 'Officer training in the Brazilian Army',
-          texto: 'Planning and execution with tight deadlines and resources, teamwork and decisions under pressure.',
-        },
+        { quando: '2026 to 2029', titulo: 'Information Systems at UNESP', texto: 'Undergraduate degree in progress, in Bauru, Brazil.' },
         {
           quando: 'Aug 2025 to now',
           titulo: 'CRM, digital operations and automation at Rodoviária Veículos',
           texto:
             "At my family's dealership I handle leads, ads, inventory, customer service and metrics. Seeing the daily bottlenecks is what got me programming.",
         },
-        { quando: '2026 to 2029', titulo: 'Information Systems at UNESP', texto: 'Undergraduate degree in progress, in Bauru, Brazil.' },
+        {
+          quando: 'Jan to Aug 2025',
+          titulo: 'Officer training in the Brazilian Army',
+          texto: 'Planning and execution with tight deadlines and resources, teamwork and decisions under pressure.',
+        },
       ],
     },
     ferramentas: {

@@ -14,8 +14,8 @@ test('o estudo de caso é legível sem JavaScript', async ({ page }) => {
   await page.goto('/projetos/rodoviariaos/');
   await expect(page.locator('h1')).toBeVisible();
   const textos = page.locator('.rota-detalhe-texto');
-  expect(await textos.count()).toBe(5);
-  for (let i = 0; i < 5; i++) await expect(textos.nth(i)).toBeVisible();
+  expect(await textos.count()).toBe(6);
+  for (let i = 0; i < 6; i++) await expect(textos.nth(i)).toBeVisible();
   await expect(page.locator('#problema')).toBeVisible();
   await expect(page.locator('#problema + .texto p').first()).toBeVisible();
 });

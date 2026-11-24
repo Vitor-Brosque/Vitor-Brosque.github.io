@@ -131,7 +131,7 @@ test.describe('com movimento reduzido', () => {
     // Dá tempo de sobra para uma contagem (atraso + 1,6 s) acontecer, se fosse acontecer.
     await page.waitForTimeout(2500);
     expect(await textosDaContagem(page)).toEqual(['~1.000']);
-    expect(await page.locator('[data-contar]').nth(1).textContent()).toBe('1.400+');
+    expect(await page.locator('[data-contar]').nth(1).textContent()).toBe('~11.000');
   });
 });
 
