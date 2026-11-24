@@ -3,13 +3,14 @@ import CarrinhoPixel from './CarrinhoPixel.astro';
 import { t, type Idioma } from '../i18n/ui';
 interface Props { carro?: boolean; idioma?: Idioma }
 const { carro = false, idioma = 'pt' } = Astro.props;
-const pausar = t(idioma, 'rota.pausar');
+// Nome próprio para este botão: o da rota já se chama "Pausar", e dois botões com o mesmo nome confundem no leitor de tela.
+const pausar = t(idioma, 'animacoes.pausar');
 ---
 {/* A pista é decorativa (aria-hidden); na estrada com carro o botão de pausa fica fora da parte escondida do leitor de tela. */}
 <div class:list={['estrada', { 'estrada--carro': carro }]} data-estrada aria-hidden={carro ? undefined : 'true'}>
   {carro && <div class="estrada-carro" aria-hidden="true"><CarrinhoPixel /></div>}
   {carro && (
-    <button type="button" class="estrada-pausa" data-estrada-pausa data-pausar={pausar} data-continuar={t(idioma, 'rota.continuar')} aria-label={pausar}>
+    <button type="button" class="estrada-pausa" data-estrada-pausa data-pausar={pausar} data-continuar={t(idioma, 'animacoes.continuar')} aria-label={pausar}>
       <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" shape-rendering="crispEdges">
         <g class="icone-pausar"><rect x="2" y="1" width="3" height="10" /><rect x="7" y="1" width="3" height="10" /></g>
         <path class="icone-continuar" d="M3 1h2v1h2v1h2v1h2v4h-2v1h-2v1h-2v1h-2z" />

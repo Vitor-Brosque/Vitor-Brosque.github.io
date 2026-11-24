@@ -503,13 +503,19 @@ for (const modo of ['reduce', 'no-preference'] as const) {
       const rota = page.locator(seletorRota);
       const botaoRota = rota.locator('[data-rota-pausa]');
       await estrada.scrollIntoViewIfNeeded();
-      await expect(botaoEstrada).toHaveAttribute('aria-label', 'Pausar');
+      await expect(botaoEstrada).toHaveAttribute('aria-label', 'Pausar animações');
       await expect.poll(() => desloc(page)).not.toBe('');
       await botaoEstrada.click();
-      await expect(botaoEstrada).toHaveAttribute('aria-label', 'Continuar');
+      await expect(botaoEstrada).toHaveAttribute('aria-label', 'Continuar animações');
       const rua = await desloc(page);
       await page.waitForTimeout(1500);
       expect(await desloc(page)).toBe(rua);
+      // A pausa vale para a página: os loops feitos em CSS (selo piscando, print flutuando, halo) também param.
+      const loopsRodando = () =>
+        page.evaluate(
+          () => document.getAnimations().filter((a) => a.playState === 'running' && a.effect?.getComputedTiming().iterations === Infinity).length,
+        );
+      expect(await loopsRodando()).toBe(0);
 
       await rota.scrollIntoViewIfNeeded();
       await expect(botaoRota).toHaveText('Continuar');
@@ -522,7 +528,7 @@ for (const modo of ['reduce', 'no-preference'] as const) {
       await expect(botaoRota).toHaveText('Pausar');
       await expect.poll(() => pos(page), { timeout: 25_000 }).not.toBe(carro);
       await estrada.scrollIntoViewIfNeeded();
-      await expect(botaoEstrada).toHaveAttribute('aria-label', 'Pausar');
+      await expect(botaoEstrada).toHaveAttribute('aria-label', 'Pausar animações');
       const rua2 = await desloc(page);
       await expect.poll(() => desloc(page), { timeout: 3000 }).not.toBe(rua2);
     });
@@ -532,7 +538,7 @@ for (const modo of ['reduce', 'no-preference'] as const) {
       await page.goto('/');
       const botaoEstrada = page.locator('[data-estrada-pausa]');
       await botaoEstrada.click();
-      await expect(botaoEstrada).toHaveAttribute('aria-label', 'Continuar');
+      await expect(botaoEstrada).toHaveAttribute('aria-label', 'Continuar animações');
       await page.evaluate(() => {
         (window as unknown as { __marca: number }).__marca = 1;
       });
@@ -547,7 +553,7 @@ for (const modo of ['reduce', 'no-preference'] as const) {
       await page.locator('.nav-logo').click();
       await expect(page).toHaveURL(/\/$/);
       expect(await page.evaluate(() => (window as unknown as { __marca?: number }).__marca)).toBe(1);
-      await expect(botaoEstrada).toHaveAttribute('aria-label', 'Pausar');
+      await expect(botaoEstrada).toHaveAttribute('aria-label', 'Pausar animações');
       await expect(page.locator(`${seletorRota} [data-rota-pausa]`)).toHaveText('Pausar');
       await expect(page.locator(seletorRota)).not.toHaveAttribute('data-pausada');
       await page.locator('[data-estrada]').first().scrollIntoViewIfNeeded();
