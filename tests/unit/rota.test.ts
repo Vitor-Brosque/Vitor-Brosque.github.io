@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { LOOP, estadoDaRolagem, estadoDoLoop, fracaoDoCarro, inicioDaParada, unidadesDoLoop } from '../../src/scripts/rota-estado';
+import { LOOP, TEMPOS_GRANDE, UNIDADE_MS, estadoDaRolagem, estadoDoLoop, fracaoDoCarro, inicioDaParada, unidadesDoLoop } from '../../src/scripts/rota-estado';
 
 describe('estadoDaRolagem', () => {
   it('começa parado na primeira placa', () => {
@@ -140,5 +140,20 @@ describe('inicioDaParada', () => {
       expect(v).toBeLessThan(1);
       if (i) expect(v).toBeGreaterThan(inicios[i - 1]);
     });
+  });
+});
+
+describe('tempos da rota grande (home)', () => {
+  // Em ms desde que a rota aparece: quando o carro chega à placa i e quando sai dela.
+  const chegada = (i: number) => inicioDaParada(i, 6, TEMPOS_GRANDE) * unidadesDoLoop(6, TEMPOS_GRANDE) * UNIDADE_MS;
+  it('o carro chega à primeira placa em cerca de 1 s', () => {
+    expect(chegada(0)).toBeGreaterThan(800);
+    expect(chegada(0)).toBeLessThan(1200);
+  });
+  it('fica 4 s em cada parada e parte para a segunda em cerca de 5 s', () => {
+    expect(TEMPOS_GRANDE.parada * UNIDADE_MS).toBe(4000);
+    const saida = chegada(0) + TEMPOS_GRANDE.parada * UNIDADE_MS;
+    expect(saida).toBeGreaterThan(4800);
+    expect(saida).toBeLessThan(5200);
   });
 });

@@ -5,6 +5,8 @@ import { movimentoReduzido } from './movimento';
 import { aoMudarPausa, definirPausa, estaPausado } from './pausa';
 import {
   LOOP,
+  TEMPOS_GRANDE,
+  UNIDADE_MS,
   estadoDaRolagem,
   estadoDoLoop,
   fracaoDoCarro,
@@ -16,11 +18,6 @@ import {
 
 gsap.registerPlugin(ScrollTrigger);
 
-/** Duração de uma unidade do loop (parada numa placa da rota compacta), em ms. */
-const UNIDADE_MS = 1500;
-/** Na rota grande (com a vitrine), cada parada fica bem mais tempo: é o tempo de olhar a tela. */
-const PARADA_GRANDE_MS = 7000;
-const TEMPOS_GRANDE: TemposDoLoop = { ...LOOP, parada: PARADA_GRANDE_MS / UNIDADE_MS };
 /** Ao clicar numa placa, o carro anda até ela nesse tempo. */
 const IDA_MS = 600;
 

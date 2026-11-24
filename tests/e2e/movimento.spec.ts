@@ -155,13 +155,15 @@ test.describe('com movimento reduzido', () => {
     const rota = page.locator(seletor);
     await rota.scrollIntoViewIfNeeded();
     const inicial = await indiceAtivo(page, seletor);
-    await expect.poll(() => indiceAtivo(page, seletor), { timeout: 25_000 }).not.toBe(inicial);
+    // 4 s por parada: a troca chega em menos de 8 s.
+    await expect.poll(() => indiceAtivo(page, seletor), { timeout: 8_000 }).not.toBe(inicial);
     expect(await painelVisivel(page, seletor)).toBe(await indiceAtivo(page, seletor));
     const pausa = rota.locator('[data-rota-pausa]');
     await pausa.click();
     await expect(pausa).toHaveText('Continuar');
     const pausado = await indiceAtivo(page, seletor);
-    await page.waitForTimeout(8000);
+    // Mais que uma parada inteira (4 s): sem a pausa, teria trocado.
+    await page.waitForTimeout(6000);
     expect(await indiceAtivo(page, seletor)).toBe(pausado);
     // O clique com a rota rodando também pausa: retoma, e então clica na placa.
     await pausa.click();
@@ -306,7 +308,7 @@ test.describe('com movimento permitido', () => {
     await expect(rota).not.toHaveAttribute('data-andando');
     await pausa.click();
     await expect(pausa).toHaveText('Pausar');
-    // Se a pausa pegou o carro já chegando a uma placa, ele ainda fica até 7 s parado nela antes de seguir.
+    // Se a pausa pegou o carro já chegando a uma placa, ele ainda fica até 4 s parado nela antes de seguir.
     await expect.poll(pos, { timeout: 25_000 }).not.toBe(parado);
   });
 
@@ -320,7 +322,7 @@ test.describe('com movimento permitido', () => {
       // No começo o carro ainda entra (nenhuma placa acesa ou a primeira); o painel à vista é o da primeira parada.
       expect([-1, 0]).toContain(await indiceAtivo(page, seletor));
       expect(await painelVisivel(page, seletor)).toBe(0);
-      await expect.poll(() => indiceAtivo(page, seletor), { timeout: 25_000 }).toBe(1);
+      await expect.poll(() => indiceAtivo(page, seletor), { timeout: 8_000 }).toBe(1);
       await expect.poll(() => painelVisivel(page, seletor)).toBe(1);
     });
 
@@ -403,14 +405,15 @@ test.describe('com movimento permitido', () => {
       await rota.scrollIntoViewIfNeeded();
       const andando = () => rota.evaluate((el) => el.hasAttribute('data-andando'));
       // Espera a entrada acabar, o carro parar na primeira placa e sair para o próximo trecho.
-      await expect.poll(andando, { timeout: 25_000 }).toBe(false);
-      await expect.poll(andando, { timeout: 25_000 }).toBe(true);
+      await expect.poll(andando, { timeout: 8_000 }).toBe(false);
+      await expect.poll(andando, { timeout: 8_000 }).toBe(true);
       const caixa = (await rota.locator('.vitrine').boundingBox())!;
       await page.mouse.move(caixa.x + caixa.width / 2, caixa.y + caixa.height / 2);
       await expect.poll(andando, { timeout: 5000 }).toBe(false);
       const parada = await indiceAtivo(page, seletor);
       expect(parada).toBeGreaterThanOrEqual(0);
-      await page.waitForTimeout(9000);
+      // Mais que uma parada inteira (4 s): sem o ponteiro, teria saído.
+      await page.waitForTimeout(6000);
       expect(await indiceAtivo(page, seletor)).toBe(parada);
       expect(await painelVisivel(page, seletor)).toBe(parada);
       expect(await andando()).toBe(false);
@@ -578,5 +581,36 @@ for (const modo of ['reduce', 'no-preference'] as const) {
       const rua = await desloc(page);
       await expect.poll(() => desloc(page), { timeout: 3000 }).not.toBe(rua);
     });
+  });
+}
+
+// A rota grande da home mostra logo que anda: com a seção à vista, o carro chega à primeira placa em cerca de 1 s e parte
+// para a segunda em cerca de 5 s (4 s por parada), nos dois modos de movimento.
+for (const modo of ['reduce', 'no-preference'] as const) {
+  test(`rota grande da home: primeira placa em ~1 s e saída para a segunda em ~5 s (${modo})`, async ({ page }) => {
+    test.setTimeout(30_000);
+    await page.emulateMedia({ reducedMotion: modo });
+    await page.goto('/');
+    const rota = page.locator('#projetos [data-rota][data-modo="loop"]');
+    await rota.evaluate((el) => {
+      const w = window as unknown as { __marcas: Array<[number, boolean]> };
+      w.__marcas = [];
+      el.scrollIntoView({ block: 'center' });
+      const t0 = performance.now();
+      new MutationObserver(() => w.__marcas.push([performance.now() - t0, el.hasAttribute('data-andando')])).observe(el, { attributes: true, attributeFilter: ['data-andando'] });
+    });
+    // Espera a saída da primeira placa (segunda vez que fica "andando").
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { __marcas: Array<[number, boolean]> }).__marcas.filter(([, a]) => !a).length), { timeout: 10_000 })
+      .toBeGreaterThan(0);
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { __marcas: Array<[number, boolean]> }).__marcas.filter(([, a]) => a).length), { timeout: 10_000 })
+      .toBeGreaterThan(1);
+    const marcas = await page.evaluate(() => (window as unknown as { __marcas: Array<[number, boolean]> }).__marcas);
+    const chegou = marcas.find(([, a]) => !a)![0];
+    const saiu = marcas.filter(([, a]) => a).find(([t]) => t > chegou)![0];
+    expect(chegou).toBeLessThan(2000);
+    expect(saiu).toBeGreaterThan(4300);
+    expect(saiu).toBeLessThan(6500);
   });
 }

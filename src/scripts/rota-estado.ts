@@ -31,6 +31,15 @@ export interface TemposDoLoop {
 }
 export const LOOP: Readonly<TemposDoLoop> = { entrada: 0.7, parada: 1, trecho: 0.6, saida: 0.7 };
 
+/** Duração de uma unidade do loop (parada numa placa da rota compacta), em ms. */
+export const UNIDADE_MS = 1500;
+/**
+ * Na rota grande (com a vitrine), cada parada dura 4 s: o tempo de olhar a tela sem demorar para mostrar que a rota anda.
+ * Com a entrada (0,7 unidade), o carro chega à primeira placa em cerca de 1 s e parte para a segunda em cerca de 5 s.
+ */
+export const PARADA_GRANDE_MS = 4000;
+export const TEMPOS_GRANDE: Readonly<TemposDoLoop> = { ...LOOP, parada: PARADA_GRANDE_MS / UNIDADE_MS };
+
 export function unidadesDoLoop(total: number, tempos: TemposDoLoop = LOOP): number {
   const n = Math.max(total, 1);
   return tempos.entrada + n * tempos.parada + (n - 1) * tempos.trecho + tempos.saida;
