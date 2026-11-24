@@ -1,5 +1,6 @@
 import { aoCarregarPagina } from './ciclo';
 import { movimentoReduzido } from './movimento';
+import { aoMudarPausa, estaPausado } from './pausa';
 import { proximoDeslocamento } from './estrada-calculo';
 
 aoCarregarPagina(() => {
@@ -22,7 +23,20 @@ aoCarregarPagina(() => {
     desloc = proximoDeslocamento(desloc, dt, dy, reduzido);
     // Só a rua corre (tracejado e tachões); o carro fica no lugar.
     for (const e of visiveis) e.style.setProperty('--desloc', `${desloc.toFixed(2)}px`);
-    raf = visiveis.size ? requestAnimationFrame(passo) : 0;
+    raf = visiveis.size && !estaPausado() ? requestAnimationFrame(passo) : 0;
+  };
+
+  /** O quadro a quadro só corre com alguma estrada visível e a página sem pausa. */
+  const sincronizar = () => {
+    const rodar = visiveis.size > 0 && !estaPausado();
+    if (rodar && !raf) {
+      ultimoTempo = performance.now();
+      ultimoScroll = window.scrollY;
+      raf = requestAnimationFrame(passo);
+    } else if (!rodar && raf) {
+      cancelAnimationFrame(raf);
+      raf = 0;
+    }
   };
 
   const obs = new IntersectionObserver((entradas) => {
@@ -31,15 +45,13 @@ aoCarregarPagina(() => {
       if (en.isIntersecting) visiveis.add(e);
       else visiveis.delete(e);
     }
-    if (visiveis.size && !raf) {
-      ultimoTempo = performance.now();
-      ultimoScroll = window.scrollY;
-      raf = requestAnimationFrame(passo);
-    }
+    sincronizar();
   });
   estradas.forEach((e) => obs.observe(e));
+  const pararPausa = aoMudarPausa(sincronizar);
 
   return () => {
+    pararPausa();
     obs.disconnect();
     cancelAnimationFrame(raf);
   };

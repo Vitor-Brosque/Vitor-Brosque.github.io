@@ -485,3 +485,75 @@ test.describe('com movimento permitido', () => {
     expect(await carro()).toBe(posicao);
   });
 });
+
+// Uma pausa só para a página: o botão da estrada do topo e o da rota grande mostram e mudam o mesmo estado.
+for (const modo of ['reduce', 'no-preference'] as const) {
+  test.describe(`pausa da página (${modo === 'reduce' ? 'movimento reduzido' : 'movimento permitido'})`, () => {
+    test.use({ reducedMotion: modo });
+
+    const desloc = (page: Page) => page.locator('[data-estrada]').first().evaluate((el) => (el as HTMLElement).style.getPropertyValue('--desloc'));
+    const seletorRota = '#projetos [data-rota][data-modo="loop"]';
+    const pos = (page: Page) => page.locator(seletorRota).evaluate((el) => (el as HTMLElement).style.getPropertyValue('--pos'));
+
+    test('o botão da estrada para a rua e o carro da rota; Continuar na rota retoma os dois', async ({ page }) => {
+      test.setTimeout(90_000);
+      await page.goto('/');
+      const estrada = page.locator('[data-estrada]').first();
+      const botaoEstrada = page.locator('[data-estrada-pausa]');
+      const rota = page.locator(seletorRota);
+      const botaoRota = rota.locator('[data-rota-pausa]');
+      await estrada.scrollIntoViewIfNeeded();
+      await expect(botaoEstrada).toHaveAttribute('aria-label', 'Pausar');
+      await expect.poll(() => desloc(page)).not.toBe('');
+      await botaoEstrada.click();
+      await expect(botaoEstrada).toHaveAttribute('aria-label', 'Continuar');
+      const rua = await desloc(page);
+      await page.waitForTimeout(1500);
+      expect(await desloc(page)).toBe(rua);
+
+      await rota.scrollIntoViewIfNeeded();
+      await expect(botaoRota).toHaveText('Continuar');
+      const carro = await pos(page);
+      await page.waitForTimeout(1500);
+      expect(await pos(page)).toBe(carro);
+      await expect(rota).not.toHaveAttribute('data-andando');
+
+      await botaoRota.click();
+      await expect(botaoRota).toHaveText('Pausar');
+      await expect.poll(() => pos(page), { timeout: 25_000 }).not.toBe(carro);
+      await estrada.scrollIntoViewIfNeeded();
+      await expect(botaoEstrada).toHaveAttribute('aria-label', 'Pausar');
+      const rua2 = await desloc(page);
+      await expect.poll(() => desloc(page), { timeout: 3000 }).not.toBe(rua2);
+    });
+
+    test('depois de ir a um estudo de caso e voltar pelo site, a página começa rodando', async ({ page }) => {
+      test.setTimeout(60_000);
+      await page.goto('/');
+      const botaoEstrada = page.locator('[data-estrada-pausa]');
+      await botaoEstrada.click();
+      await expect(botaoEstrada).toHaveAttribute('aria-label', 'Continuar');
+      await page.evaluate(() => {
+        (window as unknown as { __marca: number }).__marca = 1;
+      });
+      await page.locator('#projetos').getByRole('link', { name: /ver estudo de caso/i }).click();
+      await expect(page).toHaveURL(/\/projetos\/rodoviariaos\/$/);
+      // A estrada do estudo de caso não tem botão e corre: a pausa da home não veio junto.
+      await page.locator('[data-estrada]').first().scrollIntoViewIfNeeded();
+      await expect.poll(() => desloc(page)).not.toBe('');
+      const ruaCaso = await desloc(page);
+      await expect.poll(() => desloc(page), { timeout: 3000 }).not.toBe(ruaCaso);
+
+      await page.locator('.nav-logo').click();
+      await expect(page).toHaveURL(/\/$/);
+      expect(await page.evaluate(() => (window as unknown as { __marca?: number }).__marca)).toBe(1);
+      await expect(botaoEstrada).toHaveAttribute('aria-label', 'Pausar');
+      await expect(page.locator(`${seletorRota} [data-rota-pausa]`)).toHaveText('Pausar');
+      await expect(page.locator(seletorRota)).not.toHaveAttribute('data-pausada');
+      await page.locator('[data-estrada]').first().scrollIntoViewIfNeeded();
+      await expect.poll(() => desloc(page)).not.toBe('');
+      const rua = await desloc(page);
+      await expect.poll(() => desloc(page), { timeout: 3000 }).not.toBe(rua);
+    });
+  });
+}

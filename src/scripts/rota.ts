@@ -2,6 +2,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { aoCarregarPagina } from './ciclo';
 import { movimentoReduzido } from './movimento';
+import { aoMudarPausa, definirPausa, estaPausado } from './pausa';
 import {
   LOOP,
   estadoDaRolagem,
@@ -131,12 +132,6 @@ function aoAparecer(raiz: HTMLElement, mudou: (visivel: boolean) => void): () =>
   return () => obs.disconnect();
 }
 
-/** Estado de pausa compartilhado pelas rotas em loop da página; avisa quem precisa reagir à troca. */
-interface Pausa {
-  pausado: boolean;
-  ouvintes: Set<() => void>;
-}
-
 /** Um loop em andamento: `irPara` leva o carro a uma placa (a pausa fica com quem chama). */
 interface Loop {
   irPara(i: number): void;
@@ -146,7 +141,7 @@ interface Loop {
 const suavizar = (t: number) => 1 - (1 - t) ** 3;
 
 /** Loop (nos dois modos): o carro entra, para em cada placa e sai. O tempo e o quadro só correm visível e sem pausa. */
-function loopAndando(rota: Rota, pausa: Pausa, tempos: TemposDoLoop): Loop {
+function loopAndando(rota: Rota, tempos: TemposDoLoop): Loop {
   const n = rota.placas.length;
   const duracao = unidadesDoLoop(n, tempos) * UNIDADE_MS;
   let decorrido = 0;
@@ -166,7 +161,7 @@ function loopAndando(rota: Rota, pausa: Pausa, tempos: TemposDoLoop): Loop {
   };
   /** Liga o quadro a quadro só quando a rota está visível e sem pausa; parada, ela não fica "andando". */
   const sincronizar = () => {
-    const rodar = visivel && !pausa.pausado;
+    const rodar = visivel && !estaPausado();
     if (rodar && fimDaIda) fimDaIda();
     if (rodar && !raf) {
       anterior = performance.now();
@@ -177,7 +172,7 @@ function loopAndando(rota: Rota, pausa: Pausa, tempos: TemposDoLoop): Loop {
       if (!fimDaIda) rota.raiz.removeAttribute('data-andando');
     }
   };
-  pausa.ouvintes.add(sincronizar);
+  const pararPausa = aoMudarPausa(sincronizar);
   const pararObs = aoAparecer(rota.raiz, (v) => {
     visivel = v;
     sincronizar();
@@ -210,7 +205,7 @@ function loopAndando(rota: Rota, pausa: Pausa, tempos: TemposDoLoop): Loop {
   return {
     irPara,
     limpar: () => {
-      pausa.ouvintes.delete(sincronizar);
+      pararPausa();
       pararObs();
       cancelAnimationFrame(raf);
       cancelAnimationFrame(ida);
@@ -386,21 +381,12 @@ aoCarregarPagina(() => {
   const raizes = [...document.querySelectorAll<HTMLElement>('[data-rota]')];
   if (raizes.length === 0) return;
   const reduzido = movimentoReduzido();
-  const pausa: Pausa = { pausado: false, ouvintes: new Set() };
   const limpezas: Array<() => void> = [];
 
-  const botoes = [...document.querySelectorAll<HTMLButtonElement>('[data-rota-pausa]')];
-  const definirPausa = (pausado: boolean) => {
-    if (pausa.pausado === pausado) return;
-    pausa.pausado = pausado;
-    // Só o texto troca (Pausar/Continuar): com aria-pressed junto, o leitor de tela diria "Continuar, pressionado".
-    for (const b of botoes) b.textContent = (pausado ? b.dataset.continuar : b.dataset.pausar) ?? b.textContent;
-    raizes.forEach((r) => r.dataset.modo === 'loop' && r.toggleAttribute('data-pausada', pausado));
-    pausa.ouvintes.forEach((f) => f());
-  };
-  const alternar = () => definirPausa(!pausa.pausado);
-  botoes.forEach((b) => b.addEventListener('click', alternar));
-  limpezas.push(() => botoes.forEach((b) => b.removeEventListener('click', alternar)));
+  // A pausa é da página (pausa.ts): os botões dela trocam o texto lá; aqui as rotas em loop só mostram o estado.
+  const marcarPausa = (pausado: boolean) => raizes.forEach((r) => r.dataset.modo === 'loop' && r.toggleAttribute('data-pausada', pausado));
+  marcarPausa(estaPausado());
+  limpezas.push(aoMudarPausa(marcarPausa));
 
   for (const raiz of raizes) {
     const rota = new Rota(raiz);
@@ -408,7 +394,7 @@ aoCarregarPagina(() => {
     if (raiz.dataset.modo === 'loop') {
       const grande = rota.paineis.length > 0;
       // O carro anda nos dois modos (exceção escolhida à regra dos dois modos); quique, tracejado correndo e placa subindo ficam no CSS só com movimento.
-      const loop = loopAndando(rota, pausa, grande ? TEMPOS_GRANDE : LOOP);
+      const loop = loopAndando(rota, grande ? TEMPOS_GRANDE : LOOP);
       limpezas.push(() => loop.limpar());
       if (grande) limpezas.push(vitrineViva(rota, loop, () => definirPausa(true), reduzido));
     } else limpezas.push(reduzido ? rolagemEstatica(rota) : rolagemAndando(rota));
