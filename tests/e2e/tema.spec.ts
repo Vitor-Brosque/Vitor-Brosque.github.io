@@ -126,3 +126,13 @@ test('o RodoviariaOS continua com a lista de próximos passos, sem estágios', a
   await page.goto('/projetos/rodoviariaos/');
   await expect(page.locator('.estagios')).toHaveCount(0);
 });
+
+test('na home só o cartão do Life RPG tem a moldura do jogo e a lanterna', async ({ page }) => {
+  await page.goto('/');
+  const cartao = page.locator('.card--rpg');
+  await expect(cartao).toHaveCount(1);
+  await expect(cartao.locator('h3')).toHaveText('Life RPG');
+  expect(await cartao.locator('h3').evaluate((h) => getComputedStyle(h).fontFamily)).toMatch(/Pixelify Sans/);
+  await expect(cartao.locator('.card-midia .lanterna')).toHaveCount(1);
+  await expect(page.locator('.card:not(.card--rpg) .lanterna')).toHaveCount(0);
+});

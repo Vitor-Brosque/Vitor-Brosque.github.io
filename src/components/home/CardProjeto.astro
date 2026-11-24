@@ -1,6 +1,8 @@
 ---
 import { Picture } from 'astro:assets';
 import Rota from '../Rota.astro';
+import Lanterna from '../rpg/Lanterna.astro';
+import '@fontsource/pixelify-sans/latin-400.css';
 import type { Projeto } from '../../lib/projetos';
 import { slugDe } from '../../lib/projetos-puro';
 import { t, urlDoProjeto, type Idioma } from '../../i18n/ui';
@@ -10,14 +12,17 @@ const { idioma, projeto, numero } = Astro.props;
 const d = projeto.data;
 const slug = slugDe(projeto.id);
 const usaCapa = d.cartao === 'capa' && d.capa?.imagem;
+/** Cartão do projeto com tema rpg (Life RPG): moldura em pixels do jogo, título na fonte pixel e a lanterna num canto da imagem. */
+const rpg = d.tema === 'rpg';
 ---
-<article class="card revelar">
+<article class:list={['card', 'revelar', { 'card--rpg': rpg }]}>
   <div class:list={['card-midia', { 'card-midia--rota': !usaCapa }]}>
     {usaCapa && d.capa?.imagem ? (
       <Picture src={d.capa.imagem} alt="" formats={['avif', 'webp']} widths={[480, 780]} sizes="(min-width: 900px) 34vw, 92vw" />
     ) : (
       <Rota titulo={d.rota.titulo} paradas={d.rota.paradas} modo="loop" idioma={idioma} compacta />
     )}
+    {rpg && <div class="card-lanterna" aria-hidden="true"><Lanterna /></div>}
   </div>
   <div class="card-corpo">
     <p class="rotulo"><span class:list={['ponto', `ponto--${d.status}`]} aria-hidden="true"></span>{String(numero).padStart(2, '0')} · {d.statusTexto}</p>
@@ -52,4 +57,25 @@ const usaCapa = d.cartao === 'capa' && d.capa?.imagem;
   .card-link::after { content: ''; position: absolute; inset: 0; }
   .card-frase { margin-top: 6px; color: var(--ink-2); font-size: 0.95rem; }
   .card-mais { display: inline-block; margin-top: 12px; color: var(--signal); font-weight: 700; font-size: 0.9rem; }
+
+  /* Tema rpg (Life RPG): moldura em pixels do jogo (contorno com os cantos recortados e o chanfro de pedra),
+     cantos retos e o título na Pixelify Sans. As cores são as do jogo ("noite na taverna"). */
+  .card--rpg {
+    --px: 3px; overflow: visible; border-color: transparent; border-radius: 0; background: #1b1e2e;
+    box-shadow: 0 calc(-1 * var(--px)) 0 #0b0c14, 0 var(--px) 0 #0b0c14, calc(-1 * var(--px)) 0 0 #0b0c14, var(--px) 0 0 #0b0c14,
+      inset var(--px) var(--px) 0 #3b4063, inset calc(-1 * var(--px)) calc(-1 * var(--px)) 0 #12141f;
+  }
+  .card--rpg:hover, .card--rpg:focus-within {
+    box-shadow: 0 calc(-1 * var(--px)) 0 #f2c14e, 0 var(--px) 0 #f2c14e, calc(-1 * var(--px)) 0 0 #f2c14e, var(--px) 0 0 #f2c14e,
+      inset var(--px) var(--px) 0 #3b4063, inset calc(-1 * var(--px)) calc(-1 * var(--px)) 0 #12141f;
+  }
+  /* A moldura fica por fora (sombras): o cartão mede o mesmo que antes e o resto da home não se mexe. */
+  .card--rpg .card-midia { position: relative; border-bottom: var(--px) solid #0b0c14; background: #12141f; }
+  .card--rpg h3 { font-family: 'Pixelify Sans', system-ui, sans-serif; font-weight: 400; font-stretch: normal; letter-spacing: 0; font-variant-ligatures: none; font-size: 1.75rem; line-height: calc(1.45rem * 1.15); /* a mesma altura de linha do título dos outros cartões */ }
+  .card--rpg .card-link:hover { color: #f2c14e; text-decoration: none; }
+  /* A lanterna (16 × 16, em escala 3) no canto de baixo da imagem; a chama alterna os quadros só com movimento permitido. */
+  .card-lanterna {
+    position: absolute; right: 12px; bottom: 12px; z-index: 1; box-sizing: content-box; width: 48px; height: 48px; padding: 6px;
+    background: #2a2e45; box-shadow: 0 -3px 0 #0b0c14, 0 3px 0 #0b0c14, -3px 0 0 #0b0c14, 3px 0 0 #0b0c14, inset 3px 3px 0 #3b4063, inset -3px -3px 0 #1b1e2e;
+  }
 </style>
