@@ -99,7 +99,7 @@ O site respeita a preferência de movimento reduzido do sistema. Nesse modo fica
 Há três exceções escolhidas, que continuam nesse modo:
 
 - a rua da estrada corre, mais devagar e sem acelerar com a rolagem (o carro dela fica parado no lugar);
-- o carro da rota anda de placa em placa, igual ao modo com movimento (sem o quique, sem a placa subir e com o painel trocando só com fade);
+- o carro da rota anda de placa em placa, igual ao modo com movimento (sem o quique, sem a placa subir e com o painel trocando só com fade). Na página do Life RPG vale o mesmo para a lanterna: ela percorre a trilha da rota acompanhando a rolagem, com a chama parada no primeiro quadro e sem o pulinho;
 - os números do topo contam até o valor final, igual ao modo com movimento.
 
 Para parar tudo, há um botão de pausa na estrada do topo e outro na rota. Os dois mostram o mesmo estado, e a página volta a rodar a cada carregamento.

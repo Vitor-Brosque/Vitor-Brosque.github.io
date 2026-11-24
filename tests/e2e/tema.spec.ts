@@ -157,3 +157,41 @@ test('na home só o cartão do Life RPG tem a moldura do jogo e a lanterna', asy
   await expect(cartao.locator('.card-midia .lanterna')).toHaveCount(1);
   await expect(page.locator('.card:not(.card--rpg) .lanterna')).toHaveCount(0);
 });
+
+// Exceção escolhida à regra dos dois modos: no Life RPG a lanterna percorre a trilha também com movimento reduzido.
+test.describe('rota com movimento reduzido', () => {
+  test.use({ reducedMotion: 'reduce' });
+
+  test('no Life RPG a lanterna anda com a rolagem e a placa ativa troca', async ({ page }) => {
+    await page.goto('/projetos/life-rpg/');
+    const rota = page.locator('[data-rota][data-modo="rolagem"]');
+    const lanterna = rota.locator('.carro .lanterna');
+    await expect(rota).not.toHaveAttribute('data-estatico');
+    await expect(page.locator('[data-rota] [data-estatico], [data-rota][data-estatico]')).toHaveCount(0);
+    const topo = await rota.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+    await page.evaluate((y) => window.scrollTo(0, y - 40), topo);
+    await expect(lanterna).toBeVisible();
+    const pos = () => rota.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--pos'));
+    const ativa = () => rota.locator('.placa').evaluateAll((ps) => ps.findIndex((p) => p.hasAttribute('data-ativa')));
+    await expect.poll(pos).not.toBe('');
+    // Parado numa parada: a posição não muda sozinha (sem suavização que continue andando).
+    const antes = await pos();
+    const placaAntes = await ativa();
+    await page.waitForTimeout(400);
+    expect(await pos()).toBe(antes);
+    await page.evaluate(() => window.scrollBy(0, 900));
+    await expect.poll(pos).not.toBe(antes);
+    await expect.poll(ativa).not.toBe(placaAntes);
+    await expect(lanterna).toBeVisible();
+    // A chama fica no primeiro quadro e nada fica em loop.
+    expect(await page.locator('.lanterna .quadro-2').evaluateAll((qs) => qs.every((q) => getComputedStyle(q).visibility === 'hidden'))).toBe(true);
+  });
+
+  test('no RodoviariaOS a rota continua a lista estática, sem veículo', async ({ page }) => {
+    await page.goto('/projetos/rodoviariaos/');
+    const rota = page.locator('[data-rota][data-modo="rolagem"]');
+    await expect(rota).toHaveAttribute('data-estatico', '');
+    await rota.scrollIntoViewIfNeeded();
+    await expect(rota.locator('.carro')).toBeHidden();
+  });
+});

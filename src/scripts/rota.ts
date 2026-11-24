@@ -97,8 +97,6 @@ class Rota {
     // Na rota grande, com o carro fora da rota (entrando ou saindo) o painel da última parada continua à mostra: a placa dele fica acesa.
     const ativa = estadoAtiva < 0 && this.paineis.length > 0 ? this.painel : estadoAtiva;
     this.placas.forEach((p, i) => p.toggleAttribute('data-ativa', i === ativa));
-    // Na lista (movimento reduzido) a lanterna não anda: acendem os marcos até a parada ativa.
-    if (this.raiz.hasAttribute('data-estatico')) this.marcos.forEach((m, i) => m.toggleAttribute('data-aceso', i <= ativa));
     this.botoes.forEach((b, i) => (i === ativa ? b.setAttribute('aria-current', 'step') : b.removeAttribute('aria-current')));
     if (ativa >= 0) this.mostrarPainel(ativa);
   }
@@ -333,8 +331,11 @@ function vitrineViva(rota: Rota, loop: Loop, pausar: () => void, reduzido: boole
   return () => limpezas.forEach((f) => f());
 }
 
-/** Estudo de caso com movimento: presa no desktop, guiada pela rolagem no celular. */
-function rolagemAndando(rota: Rota): () => void {
+/**
+ * Estudo de caso: presa no desktop, guiada pela rolagem no celular. Com movimento reduzido (só no tema rpg, ver abaixo)
+ * a posição segue a rolagem direto (`scrub: true`), sem suavização que continue andando depois de a rolagem parar.
+ */
+function rolagemAndando(rota: Rota, reduzido = false): () => void {
   const n = rota.placas.length;
   const atualizar = (st: ScrollTrigger) => rota.aplicar(estadoDaRolagem(st.progress, n));
   const mm = gsap.matchMedia();
@@ -346,7 +347,7 @@ function rolagemAndando(rota: Rota): () => void {
       pin: true,
       start: 'top top+=80',
       end: () => `+=${Math.round(n * window.innerHeight * 0.6)}`,
-      scrub: 0.4,
+      scrub: reduzido ? true : 0.4,
       onUpdate: atualizar,
     });
     rota.aplicar(estadoDaRolagem(0, n));
@@ -357,7 +358,7 @@ function rolagemAndando(rota: Rota): () => void {
       trigger: rota.raiz,
       start: 'top 60%',
       end: 'bottom 60%',
-      scrub: 0.3,
+      scrub: reduzido ? true : 0.3,
       onUpdate: atualizar,
       onRefresh: atualizar,
     });
@@ -408,7 +409,12 @@ aoCarregarPagina(() => {
       const loop = loopAndando(rota, grande ? TEMPOS_GRANDE : LOOP);
       limpezas.push(() => loop.limpar());
       if (grande) limpezas.push(vitrineViva(rota, loop, () => definirPausa(true), reduzido));
-    } else limpezas.push(reduzido ? rolagemEstatica(rota) : rolagemAndando(rota));
+    } else {
+      // Exceção escolhida à regra dos dois modos: no tema rpg (Life RPG) a lanterna percorre a trilha também com movimento
+      // reduzido, como o carro da rota da home. Loops, pulinho e deslocamentos de painel continuam só no CSS com movimento.
+      const andaSempre = raiz.classList.contains('rota--rpg');
+      limpezas.push(reduzido && !andaSempre ? rolagemEstatica(rota) : rolagemAndando(rota, reduzido));
+    }
   }
   return () => limpezas.forEach((f) => f());
 });

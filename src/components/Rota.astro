@@ -313,7 +313,7 @@ const vitrine = modo === 'loop' && !compacta;
   .rota--rpg .rota-detalhe-marco { font-family: var(--fonte-corpo); font-weight: 900; font-stretch: normal; -webkit-text-stroke: 3px var(--pedra-clara); }
   .fala { display: none; }
   /* Parada ativa em pergaminho, num lugar só. O quadro é a placa na rota presa do desktop ([data-presa], posto por rota.ts)
-     e o item inteiro nos outros modos (celular, lista com movimento reduzido, sem JS). Dentro dele as cores viram tinta. */
+     e o item inteiro nos outros modos (celular e sem JS). Dentro dele as cores viram tinta. */
   .rota--rpg[data-modo='rolagem']:not([data-presa]) .placa[data-ativa],
   .rota--rpg[data-modo='rolagem'][data-presa] .placa[data-ativa] .placa-corpo {
     --ink: var(--tinta); --ink-2: var(--tinta); --mute: var(--tinta-suave); --signal: var(--tinta-suave);
@@ -338,7 +338,6 @@ const vitrine = modo === 'loop' && !compacta;
   }
 
   @media (min-width: 900px) {
-    .rota--rpg[data-modo='rolagem'][data-estatico] .placa,
     :global(html:not(.js)) .rota--rpg[data-modo='rolagem'] .placa { border: 0; border-radius: 0; background: var(--pedra); box-shadow: var(--moldura-pedra); }
 
     /* Rota presa: espaço no alto do painel para o balão, que sai da lanterna e acompanha onde ela está (--pos). */
