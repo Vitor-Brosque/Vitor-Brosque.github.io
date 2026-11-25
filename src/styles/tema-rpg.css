@@ -109,7 +109,9 @@ main[data-tema='rpg'] .moldura.moldura--celular .moldura-tela { border: 6px soli
 main[data-tema='rpg'] .moldura.moldura--nenhuma .moldura-tela { box-shadow: none; }
 main[data-tema='rpg'] .moldura-barra { background: var(--pedra); border-bottom-color: var(--contorno); }
 main[data-tema='rpg'] .moldura-barra i { border-radius: 0; background: var(--pedra-clara); }
-main[data-tema='rpg'] .moldura-play { border-radius: 0; background: var(--bg-2); box-shadow: var(--moldura-pedra); }
+main[data-tema='rpg'] :is(.moldura-play, .moldura-tela-cheia) { border-radius: 0; background: var(--bg-2); box-shadow: var(--moldura-pedra); }
+/* A moldura de pedra ocupa 3 px de cada lado: o botão de tela cheia se afasta um pouco do de tocar. */
+main[data-tema='rpg'] .moldura-tela-cheia { right: 62px; color: var(--signal); }
 main[data-tema='rpg'] figcaption { color: var(--mute); }
 
 /* Mapa de arquitetura: só as cores do tema. */

@@ -64,6 +64,13 @@ rota:
     - titulo: Notifying devices
       curto: Server-Sent Events.
       texto: When a new revision comes in, the server notifies the connected devices through Server-Sent Events, and each one fetches the changes.
+      midia:
+        video: /media/life-rpg/sincronizacao-celular-pc.mp4
+        imagem: ../../../assets/projetos/life-rpg/sincronizacao-celular-pc.png
+        proporcao: "16/9"
+        moldura: nenhuma
+        alt: A task created on the phone screen shows up on the PC screen about a second later, and a quest completed on the PC changes the phone screen
+        legenda: "Demo with made-up data: two browsers on the same machine, one phone-sized and one PC-sized, connected to the same server."
     - titulo: Dashboard on the PC
       curto: Updates in near real time.
       texto: The Dashboard open on the second monitor updates in near real time.
@@ -75,23 +82,29 @@ funcionalidades:
     texto: >-
       One quest at a time, the day's blocks, an optional timer and quick capture: type, then adjust with buttons.
     midia:
-      imagem: ../../../assets/projetos/life-rpg/agora.png
+      video: /media/life-rpg/completar-uma-missao.mp4
+      imagem: ../../../assets/projetos/life-rpg/completar-uma-missao.png
+      proporcao: "159/287"
       moldura: celular
-      alt: Now screen, with one study quest in focus and Start and Finish buttons
+      alt: On the Now screen, the person sees why the quest was suggested, starts it, finishes it and earns XP, and the next quest shows up, with made-up data
   - titulo: Spaced repetition
     texto: Code, cloze, image and audio cards, scheduled with FSRS-6 and a daily time budget.
     midia:
-      imagem: ../../../assets/projetos/life-rpg/revisao.png
+      video: /media/life-rpg/revisao-espacada.mp4
+      imagem: ../../../assets/projetos/life-rpg/revisao-espacada.png
+      proporcao: "159/287"
       moldura: celular
-      alt: 'Reviewing a card with the question "What is a foreign key?", the answer and four rating buttons: Missed, Hard, Good and Easy'
+      alt: "A review session with database cards: first the question, then the answer with the why and the four buttons that set the next interval"
   - titulo: Character
     texto: >-
       XP for the estimated effort of each task, with a cap on focus time and no XP for just logging
       data, and attributes tied to real areas of life.
     midia:
-      imagem: ../../../assets/projetos/life-rpg/personagem.png
+      video: /media/life-rpg/personagem-evoluindo.mp4
+      imagem: ../../../assets/projetos/life-rpg/personagem-evoluindo.png
+      proporcao: "159/287"
       moldura: celular
-      alt: Character sheet for the fictional character Lia, with level, XP, a shortcut to the world map and attributes by area of life
+      alt: A finished quest takes the made-up character Lia to level 8, the Intellect territory becomes a town on the map, and a new outfit color is unlocked and chosen
   - titulo: Journeys
     texto: A project becomes a journey of quests in order. Only the next one shows up on the Now screen, so the project never turns into a to-do list.
     midia:

@@ -64,6 +64,13 @@ rota:
     - titulo: Aviso aos aparelhos
       curto: Server-Sent Events.
       texto: Quando entra uma revisão nova, o servidor avisa os aparelhos conectados por Server-Sent Events, e cada um busca as mudanças.
+      midia:
+        video: /media/life-rpg/sincronizacao-celular-pc.mp4
+        imagem: ../../../assets/projetos/life-rpg/sincronizacao-celular-pc.png
+        proporcao: "16/9"
+        moldura: nenhuma
+        alt: Uma tarefa criada na tela de celular aparece na tela de PC cerca de um segundo depois, e uma missão concluída no PC muda a tela do celular
+        legenda: "Demonstração com dados fictícios: dois navegadores na mesma máquina, um em tamanho de celular e outro de PC, ligados ao mesmo servidor."
     - titulo: Painel no PC
       curto: Atualiza quase em tempo real.
       texto: O Painel aberto no monitor secundário se atualiza quase em tempo real.
@@ -75,25 +82,31 @@ funcionalidades:
     texto: >-
       Uma missão por vez, os blocos do dia, cronômetro opcional e captura rápida: escrever e ajustar por botões.
     midia:
-      imagem: ../../../assets/projetos/life-rpg/agora.png
+      video: /media/life-rpg/completar-uma-missao.mp4
+      imagem: ../../../assets/projetos/life-rpg/completar-uma-missao.png
+      proporcao: "159/287"
       moldura: celular
-      alt: Tela Agora, com uma missão de estudo em destaque e os botões Começar e Concluir
+      alt: Na tela Agora, a pessoa vê por que a missão foi sugerida, começa, conclui e ganha XP, e a próxima missão aparece, com dados fictícios
   - titulo: Revisão espaçada
     texto: >-
       Cards de código, de lacuna, com imagem e com áudio, agendados com FSRS-6 e um orçamento de
       tempo diário.
     midia:
-      imagem: ../../../assets/projetos/life-rpg/revisao.png
+      video: /media/life-rpg/revisao-espacada.mp4
+      imagem: ../../../assets/projetos/life-rpg/revisao-espacada.png
+      proporcao: "159/287"
       moldura: celular
-      alt: 'Revisão de um card com a pergunta "O que é uma chave estrangeira?", a resposta e quatro botões de avaliação: Errei, Difícil, Bom e Fácil'
+      alt: "Sessão de revisão com cards de banco de dados: primeiro a pergunta, depois a resposta com o porquê e os quatro botões que decidem o próximo intervalo"
   - titulo: Personagem
     texto: >-
       XP pelo esforço estimado de cada tarefa, com teto para o tempo de foco e sem XP por só registrar
       dados, e atributos ligados a áreas reais da vida.
     midia:
-      imagem: ../../../assets/projetos/life-rpg/personagem.png
+      video: /media/life-rpg/personagem-evoluindo.mp4
+      imagem: ../../../assets/projetos/life-rpg/personagem-evoluindo.png
+      proporcao: "159/287"
       moldura: celular
-      alt: Ficha da personagem fictícia Lia, com nível, XP, o atalho para o mapa do mundo e atributos por área da vida
+      alt: Uma missão concluída leva a personagem fictícia Lia ao nível 8, o território de Intelecto vira vila no mapa e uma cor de roupa nova é liberada e escolhida
   - titulo: Jornadas
     texto: Um projeto vira uma jornada de missões em ordem. Só a próxima aparece no Agora, para o projeto não virar uma lista de tarefas.
     midia:
