@@ -38,7 +38,7 @@ export const textosHome: Record<Idioma, TextosHome> = {
         'Sou o Vitor, estudante de Sistemas de Informação na UNESP, em Bauru. Comecei atendendo clientes na loja de carros da minha família e hoje construo o software que organiza a loja.',
       numeros: [
         { numero: 1000, prefixo: '~', rotulo: 'leads recebidos pelo sistema que eu construí, desde jul/2026' },
-        { numero: 11000, prefixo: '~', rotulo: 'mensagens de WhatsApp registradas por ele, de ago a nov/2026' },
+        { numero: 13000, prefixo: '~', rotulo: 'mensagens de WhatsApp registradas por ele desde julho de 2026' },
         { numero: 3, rotulo: 'projetos: 1 em produção e 2 de código aberto' },
       ],
       ctaPrincipal: 'Ver o RodoviariaOS',
@@ -55,7 +55,7 @@ export const textosHome: Record<Idioma, TextosHome> = {
           quando: 'ago. 2025 até hoje',
           titulo: 'CRM, operações digitais e automação na Rodoviária Veículos',
           texto:
-            'Na revenda da minha família, cuido de leads, anúncios, estoque, atendimento e indicadores. Foi vendo os gargalos do dia a dia que comecei a programar.',
+            'Na revenda da minha família, cuido de leads, anúncios, estoque, atendimento e indicadores. Foi vendo os gargalos do dia a dia que comecei a construir o sistema que hoje organiza a loja.',
         },
         {
           quando: 'jan. a ago. 2025',
@@ -99,7 +99,7 @@ export const textosHome: Record<Idioma, TextosHome> = {
         "I'm Vitor, an Information Systems student at UNESP, in Brazil. I started out serving customers at my family's car dealership, and now I build the software that keeps the dealership organized.",
       numeros: [
         { numero: 1000, prefixo: '~', rotulo: 'leads received by the system I built, since Jul 2026' },
-        { numero: 11000, prefixo: '~', rotulo: 'WhatsApp messages logged by it, Aug to Nov 2026' },
+        { numero: 13000, prefixo: '~', rotulo: 'WhatsApp messages logged by it since July 2026' },
         { numero: 3, rotulo: 'projects: 1 in production and 2 open source' },
       ],
       ctaPrincipal: 'See RodoviariaOS',
@@ -116,7 +116,7 @@ export const textosHome: Record<Idioma, TextosHome> = {
           quando: 'Aug 2025 to now',
           titulo: 'CRM, digital operations and automation at Rodoviária Veículos',
           texto:
-            "At my family's dealership I handle leads, ads, inventory, customer service and metrics. Seeing the daily bottlenecks is what got me programming.",
+            "At my family's dealership I handle leads, ads, inventory, customer service and metrics. Seeing the daily bottlenecks is what got me building the system that now runs the dealership.",
         },
         {
           quando: 'Jan to Aug 2025',

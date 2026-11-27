@@ -7,7 +7,7 @@ statusTexto: In production · closed source
 statusDetalhe: >-
   CRM, WhatsApp and inventory are in daily use. Finance, the assistant and the market radar are
   built and tested, and are being rolled out.
-papel: Everything, from the database to the UI, on my own
+papel: My own project, from the problem to running it at the store, with the code written with AI
 periodo: Since July 2026
 stack: [TypeScript, Next.js 15, React 19, Tailwind CSS 4, Fastify 5, PostgreSQL 18, Drizzle ORM, Zod 4, Vitest]
 links:
@@ -17,7 +17,7 @@ capa:
   imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
   alt: RodoviariaOS daily dashboard with summary, pending items, inventory and the month's finances, in the demo store, with made-up data
 emResumo: >-
-  The system my family's car dealership uses every day so it doesn't lose customers. Since July 2026 it has received about 1,000 leads and logged close to 11,000 WhatsApp messages. For each lead, it keeps where they came from, which car they want and when to call again. For each car, it adds up purchase, preparation, taxes and commission and shows the profit. I built all of it on my own. The CRM, WhatsApp and inventory are in use; finance, the AI assistant and the market radar are built and being rolled out.
+  The system my family's car dealership uses every day so it doesn't lose customers. Since July 2026 it has received about 1,000 leads and logged about 13,000 WhatsApp messages. For each lead, it keeps where they came from, which car they want and when to call again. For each car, it adds up purchase, preparation, taxes and commission and shows the profit. The code was written with AI: I defined the problem, the rules and how each part works, and guided the technical decisions. The CRM, WhatsApp and inventory are in use; finance, the AI assistant and the market radar are built and being rolled out.
 resumo:
   problema: >-
     The salesperson got the lead and lost the thread: no way to tell where it came from, which car they wanted, how interested they were or when to call again. And nobody could say how much each car had made.
@@ -26,7 +26,7 @@ resumo:
   orgulho: >-
     A lead from an ad arrives already linked to the right car, with nobody typing. Each partner sees only the numbers for their own cars. And no message goes out to a customer before the salesperson reviews it.
 problema: |-
-  Before I wrote code, I worked the counter at Rodoviária Veículos, my family's car dealership. I took care of the ads, the inventory and customer service on WhatsApp.
+  Before building the system, I worked the counter at Rodoviária Veículos, my family's car dealership. I took care of the ads, the inventory and customer service on WhatsApp.
 
   The salesperson got the lead and couldn't keep up with it. There was no way to tell where it had come from, which car the person wanted, how interested they were or when it was time to call again. Anyone who didn't answer right away disappeared, and when a car that suited them arrived, nobody remembered them.
 
@@ -252,11 +252,11 @@ decisoes:
     deixeiDeLado: Automated CI/CD. Because the code is closed, I chose human control, with a written runbook for every release.
 numeros:
   - { valor: "~1,000", rotulo: "leads received since July 2026" }
-  - { valor: "~11,000", rotulo: "WhatsApp messages logged, August to November 2026" }
+  - { valor: "~13,000", rotulo: "WhatsApp messages logged since late July 2026" }
   - { valor: "36", rotulo: "cars in inventory, tracked by the system" }
   - { valor: "1,400+", rotulo: "automated API tests, running on a real database" }
 numerosFonte: >-
-  Read from the production database on Nov 23, 2026. Leads, messages and inventory come from the modules in use. Finance and the assistant have no real volume yet.
+  Read from the production database on Nov 23, 2026; the messages, on Nov 27, 2026. Leads, messages and inventory come from the modules in use. Finance and the assistant have no real volume yet.
 proximos:
   - Put finance and the assistant into daily use at the dealership.
   - Publish the market radar extension and check it against the real listing sites.

@@ -7,7 +7,7 @@ statusTexto: Em produção · código fechado
 statusDetalhe: >-
   CRM, WhatsApp e estoque em uso todos os dias. Financeiro, assistente e radar de mercado
   prontos e testados, entrando em uso.
-papel: Tudo, do banco de dados à interface, sozinho
+papel: Projeto meu, do problema à operação na loja, com o código escrito com IA
 periodo: Desde julho de 2026
 stack: [TypeScript, Next.js 15, React 19, Tailwind CSS 4, Fastify 5, PostgreSQL 18, Drizzle ORM, Zod 4, Vitest]
 links:
@@ -17,7 +17,7 @@ capa:
   imagem: ../../../assets/projetos/rodoviariaos/painel-do-dia.png
   alt: Painel do dia do RodoviariaOS com resumo, pendências, estoque e financeiro do mês, na loja de demonstração, com dados inventados
 emResumo: >-
-  Sistema que a revenda da minha família usa todos os dias para não perder cliente. Desde julho de 2026 ele recebeu cerca de 1.000 leads e registrou perto de 11 mil mensagens de WhatsApp. Para cada lead, guarda de onde ele veio, qual carro quer e quando chamar de novo. Para cada carro, soma compra, preparação, impostos e comissão e mostra o lucro. Fiz tudo sozinho. O CRM, o WhatsApp e o estoque estão em uso; o financeiro, o assistente com IA e o radar de mercado estão prontos e entrando em uso.
+  Sistema que a revenda da minha família usa todos os dias para não perder cliente. Desde julho de 2026 ele recebeu cerca de 1.000 leads e registrou cerca de 13 mil mensagens de WhatsApp. Para cada lead, guarda de onde ele veio, qual carro quer e quando chamar de novo. Para cada carro, soma compra, preparação, impostos e comissão e mostra o lucro. O código foi escrito com IA: eu defini o problema, as regras e como cada parte funciona, e orientei as decisões técnicas. O CRM, o WhatsApp e o estoque estão em uso; o financeiro, o assistente com IA e o radar de mercado estão prontos e entrando em uso.
 resumo:
   problema: >-
     O vendedor recebia o lead e perdia o fio: não sabia de onde ele veio, qual carro queria, quão interessado estava nem quando chamar de novo. E ninguém sabia dizer quanto cada carro tinha dado de lucro.
@@ -26,7 +26,7 @@ resumo:
   orgulho: >-
     O lead de anúncio chega já ligado ao carro certo, sem ninguém digitar. Cada sócio vê só os números dos próprios carros. E nenhuma mensagem sai para o cliente sem o vendedor revisar.
 problema: |-
-  Antes de programar, eu trabalhava no balcão da Rodoviária Veículos, a revenda da minha família. Cuidava dos anúncios, do estoque e do atendimento pelo WhatsApp.
+  Antes de construir o sistema, eu trabalhava no balcão da Rodoviária Veículos, a revenda da minha família. Cuidava dos anúncios, do estoque e do atendimento pelo WhatsApp.
 
   O vendedor recebia o lead e não conseguia acompanhar. Não dava para saber de onde ele tinha vindo, qual carro queria, quão interessado estava nem quando era hora de chamar de novo. Quem não respondia na hora sumia, e quando chegava um carro que servia para a pessoa ninguém lembrava dela.
 
@@ -303,11 +303,11 @@ decisoes:
     deixeiDeLado: O CI/CD automático. Como o código é fechado, preferi controle humano, com um roteiro escrito para cada rodada.
 numeros:
   - { valor: "~1.000", rotulo: "leads recebidos desde julho de 2026" }
-  - { valor: "~11 mil", rotulo: "mensagens de WhatsApp registradas, de agosto a novembro de 2026" }
+  - { valor: "~13 mil", rotulo: "mensagens de WhatsApp registradas desde o fim de julho de 2026" }
   - { valor: "36", rotulo: "carros no estoque, acompanhados pelo sistema" }
   - { valor: "1.400+", rotulo: "testes automáticos da API, rodando num banco de dados de verdade" }
 numerosFonte: >-
-  Lidos no banco de produção em 23/11/2026. Leads, mensagens e estoque vêm dos módulos em uso. O financeiro e o assistente ainda não têm volume real.
+  Lidos no banco de produção em 23/11/2026; as mensagens, em 27/11/2026. Leads, mensagens e estoque vêm dos módulos em uso. O financeiro e o assistente ainda não têm volume real.
 proximos:
   - Colocar o financeiro e o assistente em uso diário na loja.
   - Publicar a extensão do radar de mercado e conferir com os portais reais.

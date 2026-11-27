@@ -122,8 +122,8 @@ for (const modo of ['reduce', 'no-preference'] as const) {
 
 // Estágios do projeto (tema rpg): os cinco estágios de território, Hoje sob a Vila e o que falta sob o Castelo.
 const estagios = [
-  { caminho: '/projetos/life-rpg/', nomes: ['Ruínas', 'Acampamento', 'Aldeia', 'Vila', 'Castelo'], hoje: 'Hoje', frase: 'Funciona sem internet, tem mais de 2.300 testes automáticos e está em uso no PC.', falta: 'Falta para o castelo', proximo: /testar no iPhone real/ },
-  { caminho: '/en/projects/life-rpg/', nomes: ['Ruins', 'Camp', 'Village', 'Town', 'Castle'], hoje: 'Today', frase: 'It works offline, has more than 2,300 automated tests and is in use on the PC.', falta: 'Left before the castle', proximo: /test on a real iPhone/ },
+  { caminho: '/projetos/life-rpg/', nomes: ['Ruínas', 'Acampamento', 'Aldeia', 'Vila', 'Castelo'], hoje: 'Hoje', frase: 'Funciona sem internet, tem cerca de 2.700 testes automáticos rodando no CI do GitHub e está em uso no PC.', falta: 'Falta para o castelo', proximo: /testar no iPhone real/ },
+  { caminho: '/en/projects/life-rpg/', nomes: ['Ruins', 'Camp', 'Village', 'Town', 'Castle'], hoje: 'Today', frase: 'It works offline, has about 2,700 automated tests running in GitHub\'s CI and is in use on the PC.', falta: 'Left before the castle', proximo: /test on a real iPhone/ },
 ] as const;
 for (const js of [true, false]) {
   test.describe(js ? 'com JavaScript' : 'sem JavaScript', () => {

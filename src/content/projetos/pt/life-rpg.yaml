@@ -3,8 +3,8 @@ ordem: 2
 frase: App em pixel art que transforma rotina e estudo num jogo, feito para ajudar nos dias difíceis.
 status: aberto
 statusTexto: Código aberto (MIT) · em uso no PC
-statusDetalhe: Em uso no PC desde novembro de 2026. Faltam o acesso pelo iPhone, a IA com chave real e o CI.
-papel: Projeto pessoal, do design à infraestrutura
+statusDetalhe: Em uso no PC desde novembro de 2026. Faltam o acesso pelo iPhone, a IA com chave real e a primeira conexão real com o ChatGPT e o Claude.
+papel: Projeto pessoal, do design à infraestrutura, com o código escrito com IA
 periodo: "2026"
 stack: [TypeScript, React 19, Vite, Dexie (IndexedDB), Zustand, Fastify 5, "SQLite (node:sqlite)", Zod 4, ts-fsrs, Vitest]
 links:
@@ -19,7 +19,8 @@ emResumo: >-
   Comecei o Life RPG para me organizar e ele cresceu: hoje, na terceira versão, junta rotina, estudo e
   hábitos num jogo em pixel art, pensado para os dias difíceis, quando falta energia e não dá para
   sentir progresso. Uso no PC desde novembro de 2026. Foi feito para funcionar sem internet no celular
-  e sincronizar com o PC quase em tempo real. O código é aberto, com testes, e as regras do app foram
+  e sincronizar com o PC quase em tempo real, e para conversar com o ChatGPT e o Claude, que propõem
+  mudanças que eu reviso antes de aplicar. O código é aberto, com testes, e as regras do app foram
   comparadas com uma base de pesquisa de 63 fontes sobre hábitos e aprendizagem.
 resumo:
   problema: >-
@@ -183,6 +184,29 @@ decisoes:
       servidor.
     porque: É um servidor com meus dados pessoais. Nada fica exposto direto na internet.
     deixeiDeLado: Abrir uma porta no roteador, que seria mais simples e muito mais arriscado.
+  - titulo: Assistentes que propõem, eu reviso
+    resumo: >-
+      O ChatGPT ou o Claude se conectam ao app e mandam propostas de rotina, objetivos, treino e estudo. Nada é gravado sem eu revisar item por item.
+    escolha: >-
+      Um servidor MCP próprio, sem SDK, com OAuth 2.1 (PKCE, registro dinâmico de clientes, página de
+      consentimento e chaves revogáveis guardadas só como hash). A proposta é validada por JSON Schema e
+      pelas regras do domínio e só vale depois da minha revisão, item por item. Também funciona sem
+      conector, copiando e colando num chat qualquer.
+    porque: >-
+      Um erro da IA vira um item desmarcado, não um dado estragado. E só uma porta vai para a internet:
+      a do conector, com chaves que eu revogo quando quiser.
+    deixeiDeLado: Deixar a IA gravar direto no app, mais rápido de fazer e capaz de transformar qualquer erro dela em dado errado.
+  - titulo: A IA vê só o que precisa
+    resumo: >-
+      O que vai para o assistente é escolhido campo a campo. Diário, sono e nutrição nunca saem do aparelho.
+    escolha: >-
+      Uma função pura monta o contexto: entram a estrutura do app e o estudo das disciplinas (caderno,
+      apostilas, cards e o texto dos PDFs da aula, entregue por página e com limite de tamanho). Diário,
+      sono, nutrição e PDFs fora das disciplinas nunca entram, e testes conferem o que fica de fora.
+    porque: >-
+      Privacidade começa no desenho. E o caderno de cada disciplina guarda o que já foi estudado, então
+      um chat novo de uma matéria continua de onde o outro parou.
+    deixeiDeLado: Mandar o banco inteiro para a IA, que daria mais contexto e exporia o que ela não precisa ver.
   - titulo: Evidência antes de gamificação
     resumo: >-
       Antes de decidir o que dá pontos, revisei os fluxos principais do app à luz de pesquisas sobre hábitos e aprendizagem.
@@ -194,11 +218,11 @@ decisoes:
     deixeiDeLado: >-
       Dar XP para tudo, que parece motivador e cria incentivo errado. XP, níveis e mapa são assumidos
       como gosto pessoal, não como técnica comprovada.
-hoje: Funciona sem internet, tem mais de 2.300 testes automáticos e está em uso no PC.
+hoje: Funciona sem internet, tem cerca de 2.700 testes automáticos rodando no CI do GitHub e está em uso no PC.
 proximos:
   - "Ligar o acesso HTTPS pela rede privada e testar no iPhone real: instalação como PWA, notificações, microfone, uso offline e sincronização com o PC."
   - Testar as ajudas de IA com uma chave real.
-  - Configurar integração contínua (CI).
+  - Fazer a primeira conexão real do ChatGPT e do Claude com o app.
 seo:
   descricao: >-
     Estudo de caso do Life RPG: PWA offline-first em pixel art, com sincronização por cursor, SSE e

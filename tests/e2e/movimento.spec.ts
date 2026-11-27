@@ -251,7 +251,7 @@ test.describe('com movimento reduzido', () => {
       .toBe(true);
     expect(new Set(await textosDaContagem(page)).size).toBeGreaterThan(3);
     // O segundo número termina a contagem um pouco depois do primeiro: espera, em vez de ler uma vez só.
-    await expect(page.locator('[data-contar]').nth(1)).toHaveText('~11.000', { timeout: 8000 });
+    await expect(page.locator('[data-contar]').nth(1)).toHaveText('~13.000', { timeout: 8000 });
   });
 
   test('os números do hero não contam se já estão à vista quando o script começa', async ({ page }) => {

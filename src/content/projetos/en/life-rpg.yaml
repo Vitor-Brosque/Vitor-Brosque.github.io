@@ -3,8 +3,8 @@ ordem: 2
 frase: A pixel-art app that turns routine and study into a game, built to help on the hard days.
 status: aberto
 statusTexto: Open source (MIT) · in use on the PC
-statusDetalhe: In use on the PC since November 2026. Still to come are iPhone access, the AI with a real key, and CI.
-papel: Personal project, from design to infrastructure
+statusDetalhe: In use on the PC since November 2026. Still to come are iPhone access, the AI with a real key, and the first real connection with ChatGPT and Claude.
+papel: Personal project, from design to infrastructure, with the code written with AI
 periodo: "2026"
 stack: [TypeScript, React 19, Vite, Dexie (IndexedDB), Zustand, Fastify 5, "SQLite (node:sqlite)", Zod 4, ts-fsrs, Vitest]
 links:
@@ -19,7 +19,8 @@ emResumo: >-
   I started Life RPG to get organized, and it grew: today, in its third version, it brings routine,
   study and habits together in a pixel-art game, designed for the hard days, when energy is low and
   progress is hard to feel. I have used it on my PC since November 2026. It was built to work offline
-  on the phone and sync with the PC in near real time. The code is open, with tests, and the app's
+  on the phone, sync with the PC in near real time, and talk to ChatGPT and Claude, which propose
+  changes I review before applying them. The code is open, with tests, and the app's
   rules were compared with a research base of 63 sources on habits and learning.
 resumo:
   problema: >-
@@ -174,6 +175,29 @@ decisoes:
       lives only on the server.
     porque: It's a server with my personal data. Nothing is exposed directly to the internet.
     deixeiDeLado: Opening a port on the router, which would be simpler and much riskier.
+  - titulo: Assistants propose, I review
+    resumo: >-
+      ChatGPT or Claude connect to the app and send proposals for routine, goals, training and study. Nothing is saved until I review it item by item.
+    escolha: >-
+      My own MCP server, without an SDK, with OAuth 2.1 (PKCE, dynamic client registration, a consent
+      page and revocable keys stored only as hashes). A proposal is validated against a JSON Schema and
+      the domain rules, and it only takes effect after I review it, item by item. It also works without
+      the connector, by copying and pasting into any chat.
+    porque: >-
+      An AI mistake becomes an unchecked item, not corrupted data. And only one door faces the
+      internet: the connector's, with keys I can revoke whenever I want.
+    deixeiDeLado: Letting the AI write straight to the app, faster to build and able to turn any of its mistakes into bad data.
+  - titulo: The AI only sees what it needs
+    resumo: >-
+      What goes to the assistant is chosen field by field. Journal, sleep and nutrition never leave the device.
+    escolha: >-
+      A pure function builds the context: the app's structure and the study material for each course go
+      in (notebook, handouts, cards and the text of class PDFs, delivered page by page with a size limit).
+      Journal, sleep, nutrition and PDFs outside the courses never go in, and tests check what stays out.
+    porque: >-
+      Privacy starts with the design. And each course's notebook keeps what has already been studied, so
+      a new chat for a course picks up where the last one left off.
+    deixeiDeLado: Sending the whole database to the AI, which would give it more context and expose what it doesn't need to see.
   - titulo: Evidence before gamification
     resumo: >-
       Before deciding what earns points, I reviewed the app's main flows in light of research on habits and learning.
@@ -185,11 +209,11 @@ decisoes:
     deixeiDeLado: >-
       XP for everything, which feels motivating and creates the wrong incentive. XP, levels and the map
       are treated as personal taste, not as a proven technique.
-hoje: It works offline, has more than 2,300 automated tests and is in use on the PC.
+hoje: It works offline, has about 2,700 automated tests running in GitHub's CI and is in use on the PC.
 proximos:
   - "Turn on HTTPS access over the private network and test on a real iPhone: installing as a PWA, notifications, microphone, offline use and syncing with the PC."
   - Test the AI helpers with a real key.
-  - Set up continuous integration (CI).
+  - Make the first real connection between ChatGPT, Claude and the app.
 seo:
   descricao: >-
     Life RPG case study: an offline-first pixel-art PWA with cursor-based sync, SSE and pure domain
